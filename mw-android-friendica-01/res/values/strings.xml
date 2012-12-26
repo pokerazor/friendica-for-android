@@ -2,6 +2,8 @@
 <resources>
 
     <string name="hello">Hello World!</string>
+    <string name="nul"></string>
+    
     <string name="timeline">Timeline</string>
     <string name="notifications">Notifications</string>
     <string name="app_name">Friendica</string>
@@ -35,6 +37,7 @@
 	<string name="mm_friends">Friends</string>
 	<string name="mm_directmessages">Messages</string>
 	<string name="mm_updatemystatus">Update My Status</string>
+	<string name="menuitem_map">Map</string>
 	<string name="mm_takephoto">Take Photo And Upload</string>
 	<string name="mm_selectphoto">Select Photo And Upload</string>
 	<string name="mm_preferences">Preferences</string>

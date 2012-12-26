@@ -26,6 +26,8 @@ import android.widget.TextView;
 
 import com.google.android.gcm.GCMRegistrar;
 
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.MapFragment;
+
 public class HomeActivity extends FragmentActivity implements FragmentParentListener, LoginListener {
 	private static final String TAG="Friendica/HomeActivity";
 
@@ -231,55 +233,59 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 		}
 	}
 	
-	void navigate(String arg1) {
-		currentMMItem = arg1;
+	void navigate(String navTarget) {
+		currentMMItem = navTarget;
 
-		if (arg1.equals("Timeline")) {
+		if (navTarget.equals(getString(R.string.mm_timeline))) {
 			navigatePostList("timeline");
 		}
 
-		if (arg1.equals("Notifications")) {
+		if (navTarget.equals(getString(R.string.mm_notifications))) {
 			navigatePostList("notifications");
 		}
 
-		if (arg1.equals("My Wall")) {
+		if (navTarget.equals(getString(R.string.mm_mywall))) {
 			navigatePostList("mywall");
 		}
 
-		if (arg1.equals("Update My Status")) {
+		if (navTarget.equals(getString(R.string.mm_updatemystatus))) {
 			navigateStatusUpdate();
 		}
-
-		if (arg1.equals("Friends")) {
+		
+		if (navTarget.equals(getString(R.string.menuitem_map))) {
+			navigateMap();
+		}
+		
+		if (navTarget.equals(getString(R.string.mm_friends))) {
 			navigateFriendList();
 		}
 
-		if (arg1.equals("My Photo Albums")) {
+		if (navTarget.equals(getString(R.string.mm_myphotoalbums))) {
 			navigatePhotoGallery("myalbums");
 		}
 
-		if (arg1.equals("Take Photo And Upload")) {
+		if (navTarget.equals(getString(R.string.mm_takephoto))) {
 			Intent in = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			takePhotoTarget = Max.getTempFile();
 			in.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(takePhotoTarget));
 			startActivityForResult(in, RQ_TAKE_PHOTO);
 		}
-		if (arg1.equals("Select Photo And Upload")) {
+		if (navTarget.equals(getString(R.string.mm_takephoto))) {
 			Intent in = new Intent(Intent.ACTION_PICK);
 			in.setType("image/*");
 			startActivityForResult(in, RQ_SELECT_PHOTO);
 		}
-		if (arg1.equals("Messages")) {
+		if (navTarget.equals(getString(R.string.mm_directmessages))) {
 			//Intent in = new Intent(HomeActivity.this, MessagesActivity.class);
 			//startActivity(in);
 			navigateMessages("msg:all");
 		}
 
-		if (arg1.equals("Preferences")) {
+		if (navTarget.equals(getString(R.string.mm_preferences))) {
 			navigatePreferences();
 		}
 
-		if (arg1.equals("Log Out")) {
+		if (navTarget.equals(getString(R.string.mm_logout))) {
 			SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).edit();
 			//prefs.putString("login_server", null); //keep server and user ...
 			prefs.putString("login_user", null);
@@ -401,6 +407,21 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 		} else {
 			return super.onKeyUp(keyCode, event);
 		}
+	}
+	
+	
+	
+	private void navigateMap() {
+		navigateMainFragment(getMapFragment(), "map");
+	}
+
+	MapFragment mapFragment;
+	
+	private MapFragment getMapFragment(){
+		if(mapFragment==null){
+			mapFragment=new MapFragment();
+		}
+		return mapFragment;
 	}
 	
 }

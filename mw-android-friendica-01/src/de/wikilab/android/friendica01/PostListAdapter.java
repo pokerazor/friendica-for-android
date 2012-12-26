@@ -42,10 +42,16 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 	public OnUsernameClickListener onUsernameClick;
 	
 	public static class ViewHolder {
+		public static final Integer POST_TYPE_IMAGE=1;
+		public static final Integer POST_TYPE_COMMENT=2;
+		public static final Integer POST_TYPE_LIKE = 3;
+		public static final Integer POST_TYPE_UNKNOWN = 0;
+
 		int Type, position;
 		ImageView profileImage;
 		TextView userName, htmlContent, dateTime;
 		ImageView[] picture = new ImageView[3];
+		TextView coordinates;
 	}
 	
 	
@@ -74,13 +80,13 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 			JSONObject post = (JSONObject) getItem(position);
 			
 			if (post.getString("verb").equals("http://activitystrea.ms/schema/1.0/like")) {
-				post.put("MW_TYPE", 3);
+				post.put("MW_TYPE", ViewHolder.POST_TYPE_LIKE);
 			} else if (post.has("in_reply_to_status_id") && post.getString("in_reply_to_status_id").equals("0") == false) {
-				post.put("MW_TYPE", 2);
+				post.put("MW_TYPE", ViewHolder.POST_TYPE_LIKE);
 			} else if (post.getString("statusnet_html").contains("<img")) {
-				post.put("MW_TYPE", 1);
+				post.put("MW_TYPE", ViewHolder.POST_TYPE_IMAGE);
 			} else {
-				post.put("MW_TYPE", 0);
+				post.put("MW_TYPE", ViewHolder.POST_TYPE_UNKNOWN);
 			}
 			
 			return post.getInt("MW_TYPE");
@@ -122,7 +128,7 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 			H = new ViewHolder();
 			H.Type = getItemViewType(position);
 			
-			if (H.Type == 1) {
+			if (H.Type == ViewHolder.POST_TYPE_IMAGE) {
 				convertView = inf.inflate(R.layout.pl_listitem_picture, null);
 				H.userName = (TextView) convertView.findViewById(R.id.userName);
 				H.htmlContent = (TextView) convertView.findViewById(R.id.htmlContent);
@@ -132,13 +138,15 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 				H.picture[1] = (ImageView) convertView.findViewById(R.id.picture2); H.picture[1].setOnClickListener(postPictureOnClickListener);
 				H.picture[2] = (ImageView) convertView.findViewById(R.id.picture3); H.picture[2].setOnClickListener(postPictureOnClickListener);
 				
-			} else if (H.Type == 2) {
+			} else if (H.Type == ViewHolder.POST_TYPE_COMMENT) {
 				convertView = inf.inflate(R.layout.pl_listitem_comment, null);
 				H.userName = (TextView) convertView.findViewById(R.id.userName);
 				H.htmlContent = (TextView) convertView.findViewById(R.id.htmlContent);
 				H.profileImage = (ImageView) convertView.findViewById(R.id.profileImage);
+				
+				
 
-			} else if (H.Type == 3) {
+			} else if (H.Type == ViewHolder.POST_TYPE_LIKE) {
 				convertView = inf.inflate(R.layout.pl_listitem_like, null);
 				H.htmlContent = (TextView) convertView.findViewById(R.id.htmlContent);
 				
@@ -148,9 +156,9 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 				H.htmlContent = (TextView) convertView.findViewById(R.id.htmlContent);
 				H.profileImage = (ImageView) convertView.findViewById(R.id.profileImage);
 			}
-			
-			if (isPostDetails && H.Type != 3) {
-				if (H.Type <= 1) {
+
+			if (isPostDetails && H.Type != ViewHolder.POST_TYPE_LIKE) {
+				if (H.Type <= ViewHolder.POST_TYPE_IMAGE) {
 					H.userName.setTextSize(18); H.htmlContent.setTextSize(18);
 				}
 				
@@ -161,6 +169,8 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 				H.htmlContent.setMovementMethod(LinkMovementMethod.getInstance());
 
 				H.dateTime = (TextView) convertView.findViewById(R.id.date);
+				H.coordinates = (TextView) convertView.findViewById(R.id.coordinates);
+
 			}
 			
 			convertView.setTag(H);
@@ -212,7 +222,7 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 		if (H.userName != null) {
 			try {
 				String appendix = "";
-				if (H.Type ==  2 && !isPostDetails)  appendix = " replied to " + post.getString("in_reply_to_screen_name") + ":";
+				if (H.Type ==  ViewHolder.POST_TYPE_COMMENT && !isPostDetails)  appendix = " replied to " + post.getString("in_reply_to_screen_name") + ":";
 				H.userName.setText(post.getJSONObject("user").getString("name") + appendix);
 			} catch (Exception e) {
 				H.userName.setText("Invalid Dataset!");
@@ -233,6 +243,17 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 			}
 		}
 		
+		if (H.coordinates != null) {
+			try {
+
+				
+				H.coordinates.setText(post.getString("coordinates"));
+				
+			} catch (Exception e) {
+				H.coordinates.setText("Invalid Dataset!");
+			}
+		}
+		
 		try {
 
 			//Max.setHtmlWithImages(H.htmlContent, post.getString("statusnet_html"));
@@ -246,7 +267,7 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 			} else {
 				htmlSpannable = new SpannableStringBuilder(spanned);
 			}
-			if (H.Type == 1 ) {
+			if (H.Type == ViewHolder.POST_TYPE_IMAGE ) {
 				downloadPics(H, htmlSpannable);
 			}
 			

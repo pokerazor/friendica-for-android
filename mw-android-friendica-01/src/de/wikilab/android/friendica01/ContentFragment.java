@@ -9,7 +9,7 @@ import android.view.View;
 public abstract class ContentFragment extends Fragment {
 	private static final String TAG="Friendica/ContentFragment";
 	
-	View myView;
+	protected View myView;
 	
 	String navigateOrder = null;
 	
