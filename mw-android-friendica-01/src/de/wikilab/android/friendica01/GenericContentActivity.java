@@ -2,6 +2,7 @@ package de.wikilab.android.friendica01;
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.MapFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -82,6 +83,11 @@ public class GenericContentActivity extends FragmentActivity implements Fragment
 			if (target.equals("friendlist")) {
 				FragmentTransaction t = getSupportFragmentManager().beginTransaction();
 				t.add(R.id.content_fragment, new FriendListFragment());
+				t.commit();
+			}
+			if (target.equals("map")) {
+				FragmentTransaction t = getSupportFragmentManager().beginTransaction();
+				t.add(R.id.content_fragment, new MapFragment());
 				t.commit();
 			}
 			if (target.startsWith("conversation:")) {

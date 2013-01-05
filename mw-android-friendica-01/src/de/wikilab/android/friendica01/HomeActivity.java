@@ -256,6 +256,10 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 			navigateMap();
 		}
 		
+		if (navTarget.equals(getString(R.string.menuitem_mapactivity))) {
+			navigateMapActivity();
+		}
+		
 		if (navTarget.equals(getString(R.string.mm_friends))) {
 			navigateFriendList();
 		}
@@ -412,9 +416,14 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 	
 	
 	private void navigateMap() {
-		navigateMainFragment(getMapFragment(), "map");
+		navigateMainFragment(new MapFragment(), "map");
+	//	navigateMainFragment(getMapFragment(), "map");
 	}
 
+	private void navigateMapActivity() {
+		startActivity(new Intent("de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.MapActivity"));
+	}
+	
 	MapFragment mapFragment;
 	
 	private MapFragment getMapFragment(){

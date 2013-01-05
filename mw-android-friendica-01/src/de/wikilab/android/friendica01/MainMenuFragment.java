@@ -109,6 +109,8 @@ public class MainMenuFragment extends Fragment implements LoginListener {
 		MainList.add(getString(R.string.mm_directmessages));
 		MainList.add(getString(R.string.mm_updatemystatus));
 		MainList.add(getString(R.string.menuitem_map));
+		MainList.add(getString(R.string.menuitem_mapactivity));
+
 		MainList.add(getString(R.string.mm_takephoto));
 		MainList.add(getString(R.string.mm_selectphoto));
 		MainList.add(getString(R.string.mm_preferences));
