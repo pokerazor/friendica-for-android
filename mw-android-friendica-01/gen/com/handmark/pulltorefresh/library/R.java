@@ -45,11 +45,11 @@ public final class R {
 		public static final int PullToRefresh_ptrHeaderBackground = 1;
 	}
 	public static final class drawable {
-		public static final int arrow_up = 0x7f020001;
-		public static final int default_ptr_drawable = 0x7f020004;
-		public static final int indicator_bg_top = 0x7f02000d;
-		public static final int indicator_bg_bottom = 0x7f02000c;
-		public static final int arrow_down = 0x7f020000;
+		public static final int arrow_up = 0x7f020002;
+		public static final int default_ptr_drawable = 0x7f020005;
+		public static final int indicator_bg_top = 0x7f02000e;
+		public static final int indicator_bg_bottom = 0x7f02000d;
+		public static final int arrow_down = 0x7f020001;
 	}
 	public static final class attr {
 		public static final int ptrHeaderBackground = 0x7f010001;

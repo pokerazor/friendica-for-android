@@ -105,22 +105,25 @@ public class MapActivity extends Activity {
 		 * Toast.LENGTH_LONG).show(); return false; }
 		 * 
 		 * };
-		 */
+
 		ArrayList<OverlayItem> overlayItemList = new ArrayList<OverlayItem>();
 		OverlayItem newItem = new OverlayItem("testpunkt", "testpunkt", new GeoPoint(51.4624925, 7.0169541));
 		overlayItemList.add(newItem);
-
-		this.locEvOv = new LocationEventsOverlay(marker, resourceProxy);
+		 */
+		this.locEvOv = new LocationEventsOverlay(marker, resourceProxy,this);
 		mOsmv.getOverlays().add(this.locEvOv);
 		/*
 		 * this.locEvOv.setFocusItemsOnTap(true);
 		 * this.locEvOv.setFocusedItem(0);
 		 */
-		// this.locEvOv.addItem();
 
 		this.mOsmv.setBuiltInZoomControls(true);
 		this.mOsmv.setMultiTouchControls(true);
 		this.mOsmv.getOverlays().add(this.mLocationOverlay);
+		
+		this.locEvOv.addTestItem();
+		this.locEvOv.addTimelinePositions();
+		
 		rl.addView(this.mOsmv, new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 
 		this.setContentView(rl);

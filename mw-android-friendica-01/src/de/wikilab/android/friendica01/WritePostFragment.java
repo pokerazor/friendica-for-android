@@ -60,6 +60,7 @@ public class WritePostFragment extends ContentFragment {
 						Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 						
 						lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+						
 						viewLatLon.setText(getString(R.string.viewLatLon)+"\n"+"Loading...");
 						locationListenerAttached = true;
 					}
