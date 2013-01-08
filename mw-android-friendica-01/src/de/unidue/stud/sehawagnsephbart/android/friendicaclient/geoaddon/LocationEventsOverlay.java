@@ -32,8 +32,7 @@ public class LocationEventsOverlay extends ItemizedOverlay<OverlayItem> {
 	protected ListView list = null;
 	protected ListAdapter ad = null;
 
-	public LocationEventsOverlay(Drawable pDefaultMarker,
-			ResourceProxy pResourceProxy, Activity owner) {
+	public LocationEventsOverlay(Drawable pDefaultMarker, ResourceProxy pResourceProxy, Activity owner) {
 		super(pDefaultMarker, pResourceProxy);
 		this.owner = owner;
 		// TODO Auto-generated constructor stub
@@ -58,29 +57,29 @@ public class LocationEventsOverlay extends ItemizedOverlay<OverlayItem> {
 	public void addTimelinePositions() {
 		final TwAjax t = new TwAjax(owner, true, true);
 
-		t.getUrlContent(Max.getServer(owner)
-				+ "/api/statuses/home_timeline.json", new Runnable() {
+		t.getUrlContent(Max.getServer(owner) + "/api/statuses/home_timeline.json", new Runnable() {
 			@Override
 			public void run() {
 				try {
 					JSONArray j = (JSONArray) t.getJsonResult();
 
-					ArrayList<JSONObject> jsonObjectArray = new ArrayList<JSONObject>(
-							j.length());
+					ArrayList<JSONObject> jsonObjectArray = new ArrayList<JSONObject>(j.length());
 
 					for (int i = 0; i < j.length(); i++) {
 						JSONObject jj = j.getJSONObject(i);
 						String coordinates = jj.getString("coordinates");
-						String[] splitcoordinates = coordinates.split(" ");
-						jsonObjectArray.add(jj);
+						if (!coordinates.equals("")) {
+							String[] splitcoordinates = coordinates.split(" ");
+							jsonObjectArray.add(jj);
 
-						addItem("testpunkt",
-								"testpunkt",
-								new GeoPoint(Double
-										.parseDouble(splitcoordinates[0]), Double
-										.parseDouble(splitcoordinates[1])));
-						System.out.println(Double
-										.parseDouble(splitcoordinates[0]));
+							addItem("testpunkt", "testpunkt", new GeoPoint(Double.parseDouble(splitcoordinates[0]), Double.parseDouble(splitcoordinates[1])));
+							System.out.println(Double.parseDouble(splitcoordinates[0]));
+						}
+						else{
+							System.out.println("Leer");
+
+						}
+
 					}
 
 					/*
