@@ -1,15 +1,20 @@
 package de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon;
 
+import java.util.ArrayList;
+
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.util.CloudmadeUtil;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MyLocationOverlay;
+import org.osmdroid.views.overlay.OverlayItem;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,12 +24,12 @@ import android.widget.RelativeLayout.LayoutParams;
 
 /**
  * Default map view activity.
- *
+ * 
  * @author Manuel Stahl
- *
+ * 
  */
 public class MapActivity extends Activity {
-	
+
 	public static final String DEBUGTAG = "OPENSTREETMAP";
 
 	public static final boolean DEBUGMODE = false;
@@ -38,7 +43,7 @@ public class MapActivity extends Activity {
 	public static final String PREFS_ZOOM_LEVEL = "zoomLevel";
 	public static final String PREFS_SHOW_LOCATION = "showLocation";
 	public static final String PREFS_SHOW_COMPASS = "showCompass";
-	
+
 	// ===========================================================
 	// Constants
 	// ===========================================================
@@ -46,7 +51,8 @@ public class MapActivity extends Activity {
 	private static final int MENU_SAMPLES = Menu.FIRST + 1;
 	private static final int MENU_ABOUT = MENU_SAMPLES + 1;
 
-	private static final int MENU_LAST_ID = MENU_ABOUT + 1; // Always set to last unused id
+	private static final int MENU_LAST_ID = MENU_ABOUT + 1; // Always set to
+															// last unused id
 	// ===========================================================
 	// Fields
 	// ===========================================================
@@ -54,6 +60,7 @@ public class MapActivity extends Activity {
 	private SharedPreferences mPrefs;
 	private MapView mOsmv;
 	private MyLocationOverlay mLocationOverlay;
+	private LocationEventsOverlay locEvOv;
 	private ResourceProxy mResourceProxy;
 
 	// ===========================================================
@@ -75,21 +82,52 @@ public class MapActivity extends Activity {
 
 		final RelativeLayout rl = new RelativeLayout(this);
 		this.mOsmv = new MapView(this, 256, mResourceProxy);
-		this.mLocationOverlay = new MyLocationOverlay(this.getBaseContext(), this.mOsmv,
-				mResourceProxy);
+		this.mLocationOverlay = new MyLocationOverlay(this.getBaseContext(), this.mOsmv, mResourceProxy);
+
+		Drawable marker = getResources().getDrawable(android.R.drawable.star_big_on);
+		Integer markerWidth = marker.getIntrinsicWidth();
+		Integer markerHeight = marker.getIntrinsicHeight();
+		marker.setBounds(0, markerHeight, markerWidth, 0);
+
+		ResourceProxy resourceProxy = new DefaultResourceProxyImpl(getApplicationContext());
+		/*
+		 * OnItemGestureListener<OverlayItem> listener = new
+		 * ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+		 * 
+		 * @Override public boolean onItemSingleTapUp(final int index, final
+		 * OverlayItem item) { Toast.makeText( MapActivity.this, "Item '" +
+		 * item.mTitle + "' (index=" + index + ") got single tapped up",
+		 * Toast.LENGTH_LONG).show(); return true; }
+		 * 
+		 * @Override public boolean onItemLongPress(final int index, final
+		 * OverlayItem item) { Toast.makeText( MapActivity.this, "Item '" +
+		 * item.mTitle + "' (index=" + index + ") got long pressed",
+		 * Toast.LENGTH_LONG).show(); return false; }
+		 * 
+		 * };
+		 */
+		ArrayList<OverlayItem> overlayItemList = new ArrayList<OverlayItem>();
+		OverlayItem newItem = new OverlayItem("testpunkt", "testpunkt", new GeoPoint(51.4624925, 7.0169541));
+		overlayItemList.add(newItem);
+
+		this.locEvOv = new LocationEventsOverlay(marker, resourceProxy);
+		mOsmv.getOverlays().add(this.locEvOv);
+		/*
+		 * this.locEvOv.setFocusItemsOnTap(true);
+		 * this.locEvOv.setFocusedItem(0);
+		 */
+		// this.locEvOv.addItem();
+
 		this.mOsmv.setBuiltInZoomControls(true);
 		this.mOsmv.setMultiTouchControls(true);
 		this.mOsmv.getOverlays().add(this.mLocationOverlay);
-		rl.addView(this.mOsmv, new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,
-				LayoutParams.FILL_PARENT));
+		rl.addView(this.mOsmv, new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 
 		this.setContentView(rl);
 
 		mOsmv.getController().setZoom(mPrefs.getInt(PREFS_ZOOM_LEVEL, 1));
 		mOsmv.scrollTo(mPrefs.getInt(PREFS_SCROLL_X, 0), mPrefs.getInt(PREFS_SCROLL_Y, 0));
 
-
-	
 	}
 
 	@Override
@@ -112,8 +150,7 @@ public class MapActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		final String tileSourceName = mPrefs.getString(PREFS_TILE_SOURCE,
-				TileSourceFactory.DEFAULT_TILE_SOURCE.name());
+		final String tileSourceName = mPrefs.getString(PREFS_TILE_SOURCE, TileSourceFactory.DEFAULT_TILE_SOURCE.name());
 		try {
 			final ITileSource tileSource = TileSourceFactory.getTileSource(tileSourceName);
 			mOsmv.setTileSource(tileSource);
@@ -132,7 +169,6 @@ public class MapActivity extends Activity {
 		// Put overlay items next
 		mOsmv.getOverlayManager().onCreateOptionsMenu(pMenu, MENU_LAST_ID, mOsmv);
 
-
 		return true;
 	}
 
@@ -146,7 +182,6 @@ public class MapActivity extends Activity {
 	public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
 		// Now process the menu item selection
 		switch (item.getItemId()) {
-
 
 		default:
 			return mOsmv.getOverlayManager().onOptionsItemSelected(item, MENU_LAST_ID, mOsmv);

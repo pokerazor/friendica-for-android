@@ -416,7 +416,7 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 	
 	
 	private void navigateMap() {
-		navigateMainFragment(new MapFragment(), "map");
+	//	navigateMainFragment(new MapFragment(), "map");
 	//	navigateMainFragment(getMapFragment(), "map");
 	}
 
