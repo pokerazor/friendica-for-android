@@ -1,43 +1,57 @@
 package de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.osmdroid.DefaultResourceProxyImpl;
-import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IMapView;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.ItemizedOverlay;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 
-import de.wikilab.android.friendica01.Max;
-import de.wikilab.android.friendica01.PostListAdapter;
-import de.wikilab.android.friendica01.PostListFragment;
-import de.wikilab.android.friendica01.R;
-import de.wikilab.android.friendica01.TwAjax;
-
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Point;
-import android.graphics.drawable.Drawable;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import de.wikilab.android.friendica01.Max;
+import de.wikilab.android.friendica01.TwAjax;
 
-public class LocationEventsOverlay extends ItemizedOverlay<OverlayItem> {
+public class LocationEventsOverlay extends ItemizedIconOverlay<OverlayItem> {
 
-	private ArrayList<OverlayItem> overlayItemList = new ArrayList<OverlayItem>();
+	private List<OverlayItem> overlayItemList = new ArrayList<OverlayItem>();
+	
+	
 	private Activity owner = null;
 	protected ListView list = null;
 	protected ListAdapter ad = null;
+	
+	protected Context mContext;
 
-	public LocationEventsOverlay(Drawable pDefaultMarker, ResourceProxy pResourceProxy, Activity owner) {
-		super(pDefaultMarker, pResourceProxy);
+	
+	public LocationEventsOverlay(final Context context, final List<OverlayItem> aList) {
+
+		 super(context, aList, new OnItemGestureListener<OverlayItem>() {
+           @Override public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
+                   return false;
+           }
+           @Override public boolean onItemLongPress(final int index, final OverlayItem item) {
+                   return false;
+           }
+   	  } );
+	  overlayItemList=aList;
+	  mContext = context;
+	}
+	/*
+	LocationEventsOverlay(Drawable pDefaultMarker,
+			ResourceProxy pResourceProxy, Activity owner) {
+		super (pDefaultMarker, pResourceProxy);
 		this.owner = owner;
+		
 		// TODO Auto-generated constructor stub
 	}
-
+*/
 	public void addItem(String title, String snippet, GeoPoint p) {
 		OverlayItem newItem = new OverlayItem(title, snippet, p);
 		overlayItemList.add(newItem);
@@ -45,41 +59,42 @@ public class LocationEventsOverlay extends ItemizedOverlay<OverlayItem> {
 	}
 
 	public void addTestItem() {
-		// addItem("testpunkt", "testpunkt", new GeoPoint(51.4624925,
-		// 7.0169541));
-		// addItem("testpunkt1", "testpunkt1", new GeoPoint(41.4624925,
-		// 7.0169541));
-		// addItem("testpunkt", "testpunkt", new GeoPoint(11.4624925,
-		// 7.0169541));
+//		 addItem("testpunkt", "testpunkt", new GeoPoint(51.4624925,
+//		 7.0169541));
+//		 addItem("testpunkt1", "testpunkt1", new GeoPoint(41.4624925,
+//		 7.0169541));
+//		 addItem("testpunkt", "testpunkt", new GeoPoint(11.4624925,
+//		 7.0169541));
 
 	}
 
 	public void addTimelinePositions() {
+
 		final TwAjax t = new TwAjax(owner, true, true);
 
-		t.getUrlContent(Max.getServer(owner) + "/api/statuses/home_timeline.json", new Runnable() {
+		t.getUrlContent(Max.getServer(owner)
+				+ "/api/statuses/home_timeline.json", new Runnable() {
 			@Override
 			public void run() {
 				try {
 					JSONArray j = (JSONArray) t.getJsonResult();
 
-					ArrayList<JSONObject> jsonObjectArray = new ArrayList<JSONObject>(j.length());
+					ArrayList<JSONObject> jsonObjectArray = new ArrayList<JSONObject>(
+							j.length());
 
 					for (int i = 0; i < j.length(); i++) {
 						JSONObject jj = j.getJSONObject(i);
 						String coordinates = jj.getString("coordinates");
-						if (!coordinates.equals("")) {
-							String[] splitcoordinates = coordinates.split(" ");
-							jsonObjectArray.add(jj);
+						String[] splitcoordinates = coordinates.split(" ");
+						jsonObjectArray.add(jj);
 
-							addItem("testpunkt", "testpunkt", new GeoPoint(Double.parseDouble(splitcoordinates[0]), Double.parseDouble(splitcoordinates[1])));
-							System.out.println(Double.parseDouble(splitcoordinates[0]));
-						}
-						else{
-							System.out.println("Leer");
-
-						}
-
+						addItem("testpunkt",
+								"testpunkt",
+								new GeoPoint(Double
+										.parseDouble(splitcoordinates[0]), Double
+										.parseDouble(splitcoordinates[1])));
+						System.out.println(Double
+										.parseDouble(splitcoordinates[0]));
 					}
 
 					/*
@@ -97,7 +112,7 @@ public class LocationEventsOverlay extends ItemizedOverlay<OverlayItem> {
 		});
 
 	}
-
+	
 	@Override
 	public boolean onSnapToItem(int arg0, int arg1, Point arg2, IMapView arg3) {
 		// TODO Auto-generated method stub
@@ -115,5 +130,4 @@ public class LocationEventsOverlay extends ItemizedOverlay<OverlayItem> {
 		// TODO Auto-generated method stub
 		return overlayItemList.size();
 	}
-
 }
