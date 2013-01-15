@@ -110,7 +110,11 @@ public class MapActivity extends Activity {
 		OverlayItem newItem = new OverlayItem("testpunkt", "testpunkt", new GeoPoint(51.4624925, 7.0169541));
 		overlayItemList.add(newItem);
 		 */
-		this.locEvOv = new LocationEventsOverlay(marker, resourceProxy,this);
+		
+		ArrayList<OverlayItem> list = new ArrayList<OverlayItem>();
+		this.locEvOv = new LocationEventsOverlay(this, list);
+
+//		this.locEvOv = new LocationEventsOverlay(marker, resourceProxy,this);
 		mOsmv.getOverlays().add(this.locEvOv);
 		/*
 		 * this.locEvOv.setFocusItemsOnTap(true);
