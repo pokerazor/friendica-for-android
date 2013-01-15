@@ -43,7 +43,10 @@ public class MapActivity extends Activity {
 			this.mMyLocationOverlay= new LocationEventsOverlay(items, this, mResourceProxy);
 			this.mMyLocationOverlay.addTimelinePositions();
 			this.mMyLocationOverlay.setFocusItemsOnTap(true);
-
+			
+			this.mOsmv.setBuiltInZoomControls(true);
+			this.mOsmv.setMultiTouchControls(true);
+			
 			this.mOsmv.getOverlays().add(this.mMyLocationOverlay);
 		}
 
