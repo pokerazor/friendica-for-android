@@ -1,17 +1,14 @@
 package de.wikilab.android.friendica01.legacy;
 
-import de.wikilab.android.friendica01.FragmentParentListener;
-import de.wikilab.android.friendica01.R;
-import de.wikilab.android.friendica01.WritePostFragment;
-import de.wikilab.android.friendica01.R.id;
-import de.wikilab.android.friendica01.R.layout;
-import de.wikilab.android.friendica01.R.string;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
+import de.wikilab.android.friendica01.FragmentParentListener;
+import de.wikilab.android.friendica01.R;
+import de.wikilab.android.friendica01.WritePostFragment;
 
 public class WritePostActivity extends FragmentActivity implements FragmentParentListener {
 	private static final String TAG="Friendica/WritePostActivity";
