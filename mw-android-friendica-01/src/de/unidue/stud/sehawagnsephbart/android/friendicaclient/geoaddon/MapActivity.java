@@ -22,7 +22,7 @@ import android.widget.RelativeLayout.LayoutParams;
 public class MapActivity extends Activity {
 
 	private MapView mOsmv;
-	private ItemizedOverlayWithFocus<OverlayItem> mMyLocationOverlay;
+	private LocationEventsOverlay mMyLocationOverlay;
 	public ResourceProxy mResourceProxy;
 
 	@Override
@@ -33,17 +33,16 @@ public class MapActivity extends Activity {
 
 		final RelativeLayout rl = new RelativeLayout(this);
 
-		this.mOsmv = new MapView(this, 256);
+		this.mOsmv = new MapView(this, 1024);
 		rl.addView(this.mOsmv, new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 		{
 
 			ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
-			items.add(new OverlayItem("Hannover", "Tiny SampleDescription", new GeoPoint(52370816, 9735936))); // Hannover
 
-			this.mMyLocationOverlay= new LocationEventsOverlay(items, this, mResourceProxy);
 			
+			this.mMyLocationOverlay= new LocationEventsOverlay(items, this, mResourceProxy);
+			this.mMyLocationOverlay.addTimelinePositions();
 			this.mMyLocationOverlay.setFocusItemsOnTap(true);
-			this.mMyLocationOverlay.setFocusedItem(0);
 
 			this.mOsmv.getOverlays().add(this.mMyLocationOverlay);
 		}

@@ -1,17 +1,25 @@
 package de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.osmdroid.ResourceProxy;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
+
+import de.wikilab.android.friendica01.Max;
+import de.wikilab.android.friendica01.TwAjax;
 
 import android.app.Activity;
 import android.widget.Toast;
 
 public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem> {	
 	protected List<OverlayItem> itemList=null;
+	private Activity owner = null;
 	
 	public LocationEventsOverlay(List<OverlayItem> aList, final Activity owner, ResourceProxy mResourceProxy) {
 		 super(aList, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
@@ -28,5 +36,64 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 				}
 			} , mResourceProxy);
 		 itemList=aList;
+		 this.owner = owner;
 	}
+
+
+public void addItem(String title, String snippet, GeoPoint p) {
+	OverlayItem newItem = new OverlayItem(title, snippet, p);
+	itemList.add(newItem);
+	populate();
+
 }
+
+public void addTestItem() {
+	 addItem("testpunkt", "testpunkt", new GeoPoint(51.4624925,
+	 7.0169541));
+//	 addItem("testpunkt1", "testpunkt1", new GeoPoint(41.4624925,
+//	 7.0169541));
+//	 addItem("testpunkt", "testpunkt", new GeoPoint(11.4624925,
+//	 7.0169541));
+
+}
+
+public void addTimelinePositions() {
+	final TwAjax t = new TwAjax(owner, true, true);
+
+	t.getUrlContent(Max.getServer(owner)
+			+ "/api/statuses/home_timeline.json", new Runnable() {
+
+		@Override
+		public void run() {
+			try {
+				JSONArray j = (JSONArray) t.getJsonResult();
+
+				ArrayList<JSONObject> jsonObjectArray = new ArrayList<JSONObject>(
+						j.length());
+
+				for (int i = 0; i < j.length(); i++) {
+					JSONObject jj = j.getJSONObject(i);
+					String coordinates = jj.getString("coordinates");
+					if(!coordinates.equals("")){
+					String[] splitcoordinates = coordinates.split(" ");
+					jsonObjectArray.add(jj);
+
+					addItem(jj.getString("id"),
+					jj.getString("text"),
+							new GeoPoint(Double
+									.parseDouble(splitcoordinates[0]), Double
+									.parseDouble(splitcoordinates[1])));
+					System.out.println(Double
+									.parseDouble(splitcoordinates[0]));}
+				}
+				
+
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			}
+		}
+
+	});
+
+}}
