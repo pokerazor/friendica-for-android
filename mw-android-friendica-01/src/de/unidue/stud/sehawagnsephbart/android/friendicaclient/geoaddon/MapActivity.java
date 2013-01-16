@@ -4,9 +4,10 @@ package de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon;
 import java.util.ArrayList;
 
 import org.osmdroid.ResourceProxy;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
 
 import android.app.Activity;
@@ -21,9 +22,10 @@ import android.widget.RelativeLayout.LayoutParams;
  */
 public class MapActivity extends Activity {
 
-	private MapView mOsmv;
-	private LocationEventsOverlay mMyLocationOverlay;
+	public MapView mOsmv;
+	private LocationEventsOverlay locationEventsOverlay;
 	public ResourceProxy mResourceProxy;
+	private MapController mMapController;
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
@@ -39,17 +41,24 @@ public class MapActivity extends Activity {
 
 			ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
 
-			
-			this.mMyLocationOverlay= new LocationEventsOverlay(items, this, mResourceProxy);
-			this.mMyLocationOverlay.addTimelinePositions();
-			this.mMyLocationOverlay.setFocusItemsOnTap(true);
-			
+			this.locationEventsOverlay = new LocationEventsOverlay(items, this, mResourceProxy);
+			this.locationEventsOverlay.addTimelinePositions();
+			this.locationEventsOverlay.setFocusItemsOnTap(true);
+
 			this.mOsmv.setBuiltInZoomControls(true);
 			this.mOsmv.setMultiTouchControls(true);
-			
-			this.mOsmv.getOverlays().add(this.mMyLocationOverlay);
+
+			this.mOsmv.setTileSource(TileSourceFactory.MAPNIK);
+			mMapController = this.mOsmv.getController();
+			mMapController.setZoom(16);
+
+			mMapController.setCenter(new GeoPoint(51.4624925, 7.0169541));
+
+			this.mOsmv.getOverlays().add(this.locationEventsOverlay);
+
 		}
 
 		this.setContentView(rl);
 	}
+
 }
