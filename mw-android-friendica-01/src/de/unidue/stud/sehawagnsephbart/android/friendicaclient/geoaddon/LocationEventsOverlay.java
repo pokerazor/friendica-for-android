@@ -6,23 +6,24 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.osmdroid.ResourceProxy;
+import org.osmdroid.bonuspack.overlays.ExtendedOverlayItem;
+import org.osmdroid.bonuspack.overlays.ItemizedOverlayWithBubble;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
-import org.osmdroid.views.overlay.PathOverlay;
 
+import android.app.Activity;
+import android.widget.Toast;
 import de.wikilab.android.friendica01.Max;
 import de.wikilab.android.friendica01.TwAjax;
 
-import android.app.Activity;
-import android.graphics.Color;
-import android.widget.Toast;
-
 public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem> {
+
 	protected List<OverlayItem> itemList = null;
 	private MapActivity owner = null;
-	private PathOverlay myPath;
+
+	protected ItemizedOverlayWithBubble<ExtendedOverlayItem> roadNodeMarkers;
 
 	public LocationEventsOverlay(List<OverlayItem> aList, final Activity owner, ResourceProxy mResourceProxy) {
 		super(aList, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
@@ -43,14 +44,15 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 	}
 
 	public void addItem(String title, String snippet, GeoPoint p) {
-		OverlayItem newItem = new OverlayItem(title, snippet, p);
+		ExtendedOverlayItem newItem = new ExtendedOverlayItem(title, snippet, p, owner);
 		itemList.add(newItem);
 		populate();
 
 	}
 
 	public void addTestItem() {
-		addItem("testpunkt", "testpunkt", new GeoPoint(51.4624925, 7.0169541));
+		// addItem("testpunkt", "testpunkt", new GeoPoint(51.4624925,
+		// 7.0169541));
 		// addItem("testpunkt1", "testpunkt1", new GeoPoint(41.4624925,
 		// 7.0169541));
 		// addItem("testpunkt", "testpunkt", new GeoPoint(11.4624925,
@@ -66,9 +68,15 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 			@Override
 			public void run() {
 				try {
-
 					JSONArray j = (JSONArray) t.getJsonResult();
 
+					ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
+					/*
+					 * waypoints.add(new GeoPoint(48.13, -1.63));
+					 * waypoints.add(new GeoPoint(48.4, -1.9));
+					 * owner.mOsmv.getController().setCenter( new GeoPoint(48.4,
+					 * -1.9));
+					 */
 					ArrayList<JSONObject> jsonObjectArray = new ArrayList<JSONObject>(j.length());
 					GeoPoint gp = null;
 					for (int i = 0; i < j.length(); i++) {
@@ -79,13 +87,15 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 							jsonObjectArray.add(jj);
 							gp = new GeoPoint(Double.parseDouble(splitcoordinates[0]), Double.parseDouble(splitcoordinates[1]));
 
-							addItem(jj.getString("id"), jj.getString("text"), (GeoPoint) gp.clone());
+							addItem(jj.getString("id"), jj.getString("text"), gp);
+							owner.coordinates.add(gp);
 							System.out.println(Double.parseDouble(splitcoordinates[0]));
-							LocationEventsOverlay.this.getPathOverlay().addPoint(gp);
+							owner.getPathOverlay().addPoint(gp);
+							waypoints.add(gp);
 
 						}
 					}
-					owner.mOsmv.getOverlays().add(getPathOverlay());
+					owner.goOn();
 
 				} catch (Exception e) {
 
@@ -97,10 +107,4 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 
 	}
 
-	public PathOverlay getPathOverlay() {
-		if (myPath == null) {
-			myPath = new PathOverlay(Color.RED, owner);
-		}
-		return myPath;
-	}
 }
