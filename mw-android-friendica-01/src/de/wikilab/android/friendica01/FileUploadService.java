@@ -9,21 +9,21 @@ import java.util.Date;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 
+@SuppressLint("SimpleDateFormat")
 public class FileUploadService extends IntentService {
-	private static final String TAG="Friendica/FileUploadService";
+	//private static final String TAG="Friendica/FileUploadService";
 	
 	/**
 	 * Clipboard ID to upload to.
@@ -50,7 +50,8 @@ public class FileUploadService extends IntentService {
 	boolean deleteAfterUpload;
 	Uri fileToUpload;
 	String targetFilename;
-
+	
+	
 	public FileUploadService() {
 		super("Andfrnd_FileUploadService");
 		Log.i("=== UPLOAD SERVICE ===", "on New()");
@@ -62,7 +63,7 @@ public class FileUploadService extends IntentService {
 		Log.i("=== UPLOAD SERVICE ===", "on New(String)");
 		// TODO Auto-generated constructor stub
 	}
-
+	
 	private void showFailMsg(Context ctx, String txt) {
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		
@@ -101,6 +102,13 @@ public class FileUploadService extends IntentService {
 
 		Notification notification = new Notification(icon, tickerText, when);
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
+		
+		
+		
+		System.out.println("Foto hochladen");
+		
+		
+		
 		
 		/*
 		//TODO!!!
