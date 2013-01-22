@@ -15,7 +15,7 @@
         android:id="@+id/profileImage"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:contentDescription="Profile Image"
+        android:contentDescription="@string/contentDescription_profile_image"
         android:layout_marginRight="10dp" />
         
         <LinearLayout

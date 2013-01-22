@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
+import de.wikilab.android.friendica01.R;
 
 /**
  * 

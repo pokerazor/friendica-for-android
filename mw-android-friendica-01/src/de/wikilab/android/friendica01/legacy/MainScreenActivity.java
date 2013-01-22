@@ -1,4 +1,6 @@
 package de.wikilab.android.friendica01.legacy;
+
+import de.wikilab.android.friendica01.R;
 /*package de.wikilab.android.friendica01;
 
 import java.util.ArrayList;

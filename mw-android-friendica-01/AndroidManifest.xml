@@ -170,7 +170,7 @@
         <activity
             android:name="de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.MapActivity"
             android:exported="false"
-            android:label="@string/menuitem_mapactivity" >
+            android:label="@string/menuitem_map" >
             <intent-filter>
                 <action android:name="de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.MapActivity" />
 

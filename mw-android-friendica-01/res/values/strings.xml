@@ -35,7 +35,6 @@
     <string name="mm_directmessages">Messages</string>
     <string name="mm_updatemystatus">Update My Status</string>
     <string name="menuitem_map">Map</string>
-    <string name="menuitem_mapactivity">Map Activity</string>
     <string name="mm_takephoto">Take Photo And Upload</string>
     <string name="mm_selectphoto">Select Photo And Upload</string>
     <string name="mm_preferences">Preferences</string>
@@ -56,5 +55,9 @@
         <item>43200000</item>
         <item>86400000</item>
     </string-array>
+        <string name="post_image_description_field">Description:</string>
+        <string name="contentDescription_profile_image">Profile Image</string>
+        <string name="contentDescriptionUploadImagePreview">Preview of image to upload</string>
+        <string name="input_label_post_title">Post Title (optional):</string>
 
 </resources>

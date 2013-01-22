@@ -26,8 +26,6 @@ import android.widget.TextView;
 
 import com.google.android.gcm.GCMRegistrar;
 
-import de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.MapFragment;
-
 public class HomeActivity extends FragmentActivity implements FragmentParentListener, LoginListener {
 	private static final String TAG="Friendica/HomeActivity";
 
@@ -179,9 +177,7 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
-
 	}
 
 	@Override
@@ -214,10 +210,8 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 			break;
 		case RQ_TAKE_PHOTO:
 			if (resultCode == RESULT_OK) {
-				//Log.e("INTENT=",data==null?"NULL":"not null");
 				Intent in = new Intent(HomeActivity.this, FriendicaImgUploadActivity.class);
 				in.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(takePhotoTarget));
-				//in.putExtra(Intent.EXTRA_STREAM, data.getData());
 				startActivity(in);
 			}
 			break;
@@ -253,10 +247,6 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 		}
 		
 		if (navTarget.equals(getString(R.string.menuitem_map))) {
-			navigateMap();
-		}
-		
-		if (navTarget.equals(getString(R.string.menuitem_mapactivity))) {
 			navigateMapActivity();
 		}
 		
@@ -274,7 +264,7 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 			in.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(takePhotoTarget));
 			startActivityForResult(in, RQ_TAKE_PHOTO);
 		}
-		if (navTarget.equals(getString(R.string.mm_takephoto))) {
+		if (navTarget.equals(getString(R.string.mm_selectphoto))) {
 			Intent in = new Intent(Intent.ACTION_PICK);
 			in.setType("image/*");
 			startActivityForResult(in, RQ_SELECT_PHOTO);
@@ -348,36 +338,11 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 
 
 	private void navigatePreferences() {
-		/*if (! isMultiCol()) {*/
 		Intent showContent = new Intent(getApplicationContext(), PreferencesActivity.class);
-		//showContent.putExtra("target", listTarget);
 		startActivity(showContent);
-		/*} else {
-	    	Fragment viewerFragment = (Fragment) getSupportFragmentManager().findFragmentById(R.id.view_fragment_container);
-	    	if (viewerFragment != frag_preferences) {
-	    		FragmentTransaction t = getSupportFragmentManager().beginTransaction();
-	    		t.replace(R.id.view_fragment_container, frag_preferences);
-	    		t.commit();
-	    	}
-    		frag_preferences.navigate("");
-	    }*/
+
 	}
 	
-	
-	//never used???
-	
-/*
-	public void navigatePostDetailId(String postId) {
-		onNavMainFragment();
-		Fragment viewerFragment = (Fragment) getSupportFragmentManager().findFragmentById(R.id.view_fragment_container);
-		if (viewerFragment != frag_postdetail) {
-			FragmentTransaction t = getSupportFragmentManager().beginTransaction();
-			t.replace(R.id.view_fragment_container, frag_postdetail);
-			t.commit();
-		}
-		frag_postdetail.navigate("post:" + postId);
-	}
-*/
 	@Override
 	public void onLogin() {
 		LoginListener target = (LoginListener) getSupportFragmentManager().findFragmentById(R.id.menu_fragment);
@@ -412,25 +377,8 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 			return super.onKeyUp(keyCode, event);
 		}
 	}
-	
-	
-	
-	private void navigateMap() {
-	//	navigateMainFragment(new MapFragment(), "map");
-	//	navigateMainFragment(getMapFragment(), "map");
-	}
 
 	private void navigateMapActivity() {
 		startActivity(new Intent("de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.MapActivity"));
-	}
-	
-	MapFragment mapFragment;
-	
-	private MapFragment getMapFragment(){
-		if(mapFragment==null){
-			mapFragment=new MapFragment();
-		}
-		return mapFragment;
-	}
-	
+	}	
 }

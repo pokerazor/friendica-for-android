@@ -16,6 +16,7 @@ import org.osmdroid.views.overlay.OverlayItem;
 import android.app.Activity;
 import android.widget.Toast;
 import de.wikilab.android.friendica01.Max;
+import de.wikilab.android.friendica01.R;
 import de.wikilab.android.friendica01.TwAjax;
 
 public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem> {

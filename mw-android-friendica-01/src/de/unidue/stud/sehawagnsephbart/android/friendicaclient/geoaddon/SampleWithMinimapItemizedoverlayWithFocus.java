@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Toast;
+import de.wikilab.android.friendica01.R;
 
 /**
  * 

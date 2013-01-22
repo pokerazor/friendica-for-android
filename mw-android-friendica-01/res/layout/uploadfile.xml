@@ -1,118 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_width="wrap_content" android:layout_height="wrap_content"
-android:orientation="vertical">
-	
-    
-    
-	<LinearLayout 
-	  xmlns:android="http://schemas.android.com/apk/res/android"
-	  android:layout_width="match_parent"
-	  android:layout_height="wrap_content"
-	  android:orientation="vertical"
-	  android:id="@+id/top_control_bar">
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:orientation="vertical" >
 
-			    <RelativeLayout android:background="@drawable/header_gradient" android:layout_width="fill_parent" android:orientation="horizontal"
-					android:layout_height="wrap_content">
-						<include layout="@layout/header_logo" />
-					  
-						<TextView android:text="@string/upload_file" android:layout_width="wrap_content" android:layout_height="wrap_content"
-			    			  android:textColor="#000" android:layout_toRightOf="@id/header_logo" android:layout_alignBaseline="@id/header_logo"></TextView>
-			    	
-						<!-- <ImageButton android:layout_height="wrap_content" android:id="@+id/btn_upload_paste" android:layout_toLeftOf="@+id/btn_upload_sdcard" android:layout_width="wrap_content" android:src="@drawable/clipboard_paste"></ImageButton>
+	<LinearLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/top_control_bar"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical" >
+
+		<RelativeLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:background="@drawable/header_gradient"
+			android:orientation="horizontal" >
+
+			<include layout="@layout/header_logo" />
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignBaseline="@id/header_logo"
+				android:layout_toRightOf="@id/header_logo"
+				android:text="@string/upload_file"
+				android:textColor="#000" >
+			</TextView>
+
+			<!--
+                        <ImageButton android:layout_height="wrap_content" android:id="@+id/btn_upload_paste" android:layout_toLeftOf="@+id/btn_upload_sdcard" android:layout_width="wrap_content" android:src="@drawable/clipboard_paste"></ImageButton>
 						<ImageButton android:layout_height="wrap_content" android:id="@+id/btn_upload_sdcard" android:layout_toLeftOf="@+id/btn_upload_photo" android:layout_width="wrap_content" android:src="@drawable/sdcard"></ImageButton>
 						<ImageButton android:layout_height="wrap_content" android:id="@+id/btn_upload_photo" android:layout_alignParentRight="true"  android:layout_width="wrap_content" android:src="@drawable/photo"></ImageButton>
-						-->
-					</RelativeLayout>
-			    
-			    <LinearLayout android:paddingLeft="10dip" android:paddingTop="5dip" android:paddingBottom="5dip" android:background="@drawable/subheader_gradient" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-			    	
-						<ImageView android:layout_height="35dp" android:id="@+id/profile_image" android:layout_width="35dp" android:src="@drawable/ic_menu_archive"></ImageView>
-						
-			    	<TextView android:id="@+id/selected_clipboard" android:text="@string/loading_data" android:layout_width="wrap_content" android:layout_height="wrap_content"
-			    			  android:textColor="#fff" android:paddingLeft="10dp"></TextView>
-			    	
-			    </LinearLayout>
-			    
-			    
-			    
+			-->
+		</RelativeLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@drawable/subheader_gradient"
+			android:orientation="horizontal"
+			android:paddingBottom="5dip"
+			android:paddingLeft="10dip"
+			android:paddingTop="5dip" >
+
+			<ImageView
+				android:id="@+id/profile_image"
+				android:layout_width="35dp"
+				android:layout_height="35dp"
+				android:contentDescription="@string/contentDescription_profile_image"
+				android:src="@drawable/ic_menu_archive" >
+			</ImageView>
+
+			<TextView
+				android:id="@+id/selected_clipboard"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:paddingLeft="10dp"
+				android:text="@string/loading_data"
+				android:textColor="#fff" >
+			</TextView>
+		</LinearLayout>
 	</LinearLayout>
-	
-	
-	<LinearLayout android:id="@+id/bottom_control_bar" android:orientation="vertical"
-	android:layout_width="match_parent" android:layout_height="wrap_content"
-	android:layout_alignParentBottom="true">
-		<LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-			<!-- 
+
+	<LinearLayout
+		android:id="@+id/bottom_control_bar"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:orientation="vertical" >
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal" >
+
+			<!--
 			<TextView android:text="Name: " android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
 			<EditText android:id="@+id/txt_filename" android:layout_width="match_parent" android:layout_height="wrap_content"></EditText>
-			 -->
-			<ImageView android:layout_height="200dp" android:maxHeight="200dp" android:padding="10dp" android:id="@+id/preview" android:layout_width="match_parent" android:src="@drawable/ic_menu_archive"></ImageView>
+			-->
+
+			<ImageView
+				android:id="@+id/preview"
+				android:layout_width="match_parent"
+				android:layout_height="200dp"
+				android:contentDescription="@string/contentDescriptionUploadImagePreview"
+				android:maxHeight="200dp"
+				android:padding="10dp"
+				android:src="@drawable/ic_menu_archive" >
+			</ImageView>
 		</LinearLayout>
 
 		<RelativeLayout
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:background="@drawable/footer_gradient"
-		    android:orientation="horizontal" >
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@drawable/footer_gradient"
+			android:orientation="horizontal" >
 
-		    <ToggleButton
-		        android:id="@+id/sendLatLon"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:textOff="Location off"
-		        android:textOn="Location on"
-		        android:onClick="onToggleClicked" />
-		     <TextView
-                android:id="@+id/viewLatLon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/viewLatLon" />
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_alignParentLeft="true"
+				android:orientation="horizontal" >
 
-		    <Button
-		        android:id="@+id/btn_upload"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_alignParentRight="true"
-		        android:layout_alignParentTop="true"
-		        android:paddingLeft="60dp"
-		        android:paddingRight="60dp"
-		        android:text="@string/upload_now" />
+				<ToggleButton
+					android:id="@+id/sendLatLonPhoto"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textOff="Location off"
+					android:textOn="Location on" />
 
+				<TextView
+					android:id="@+id/viewLatLonPhoto"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="@string/viewLatLon"
+					android:textColor="#fff" />
+			</LinearLayout>
+
+			<Button
+				android:id="@+id/btn_upload"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentRight="true"
+				android:layout_alignParentTop="true"
+				android:paddingLeft="60dp"
+				android:paddingRight="60dp"
+				android:text="@string/upload_now" />
 		</RelativeLayout>
-
 	</LinearLayout>
-	
-	
-	
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/top_control_bar" android:layout_above="@id/bottom_control_bar"
-            android:orientation="vertical"
-            android:padding="10dp" >
 
-            <TextView android:text="Post Title (optional):"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            
-            <EditText
-                android:id="@+id/subject"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="" />
-            
-            <TextView android:text="Description:"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            
-            <EditText
-                android:id="@+id/maintb"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="top"
-                android:text="" />
-        </LinearLayout>
-	
-	
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_above="@id/bottom_control_bar"
+		android:layout_below="@id/top_control_bar"
+		android:orientation="vertical"
+		android:padding="10dp" >
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/input_label_post_title" />
+
+		<EditText
+			android:id="@+id/subject"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:inputType="text"
+			android:text="" />
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/post_image_description_field" />
+
+		<EditText
+			android:id="@+id/maintb"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:gravity="top"
+			android:inputType="text"
+			android:text="" />
+	</LinearLayout>
+
 </RelativeLayout>

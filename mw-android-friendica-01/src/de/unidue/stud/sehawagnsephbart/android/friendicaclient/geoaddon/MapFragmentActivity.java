@@ -1,6 +1,7 @@
 package de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon;
 
 import de.wikilab.android.friendica01.ContentFragment;
+import de.wikilab.android.friendica01.R;
 import android.view.Window;
 
 import android.app.LocalActivityManager;

@@ -33,7 +33,7 @@ public class FriendicaImgUploadActivity extends Activity implements LoginListene
 
 	Boolean deleteAfterUpload = false;
 	Boolean uploadTextMode = false;
-	private Boolean locationListenerAttached=false;
+	private Boolean locationListenerAttached = false;
 
 	String uploadCbName = "";
 	String textToUpload = "";
@@ -52,8 +52,26 @@ public class FriendicaImgUploadActivity extends Activity implements LoginListene
 
 		setContentView(R.layout.uploadfile);
 
-		sendLatLon = (ToggleButton) findViewById(R.id.sendLatLon);
-		viewLatLon = (TextView) findViewById(R.id.viewLatLon);
+		sendLatLon = (ToggleButton) findViewById(R.id.sendLatLonPhoto);
+		sendLatLon.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				{
+
+					if (!locationListenerAttached) {
+						LocationManager lm = (LocationManager) FriendicaImgUploadActivity.this.getSystemService(Context.LOCATION_SERVICE);
+
+						lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+
+						viewLatLon.setText(getString(R.string.viewLatLon) + "\n" + "Loading...");
+						locationListenerAttached = true;
+					} else {
+						detachLocationListener();
+					}
+
+				}
+			}
+		});
+		viewLatLon = (TextView) findViewById(R.id.viewLatLonPhoto);
 		View btn_upload = (View) findViewById(R.id.btn_upload);
 		btn_upload.setEnabled(false);
 
@@ -70,7 +88,6 @@ public class FriendicaImgUploadActivity extends Activity implements LoginListene
 		t.setText("File Uploader\n\nERR: Intent did not contain file!\n\nPress menu button for debug info !!!\n\n");
 
 		Intent callingIntent = getIntent();
-		sendLatLon = (ToggleButton) findViewById(R.id.sendLatLon);
 
 		if (callingIntent != null) {
 			if (callingIntent.hasExtra(Intent.EXTRA_STREAM)) {
@@ -96,6 +113,7 @@ public class FriendicaImgUploadActivity extends Activity implements LoginListene
 
 				uploadTextMode = false;
 				btn_upload.setEnabled(true);
+
 				if (sendLatLon.isChecked()) {
 					LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 					Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -104,6 +122,7 @@ public class FriendicaImgUploadActivity extends Activity implements LoginListene
 						return;
 					}
 				}
+
 			}
 		}
 
@@ -131,24 +150,7 @@ public class FriendicaImgUploadActivity extends Activity implements LoginListene
 			}
 		});
 
-		sendLatLon.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				{
-					/*
-					if (!locationListenerAttached) {
-						LocationManager lm = (LocationManager) FriendicaImgUploadActivity.this.getSystemService(Context.LOCATION_SERVICE);
-
-						lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-
-						viewLatLon.setText(getString(R.string.viewLatLon) + "\n" + "Loading...");
-						locationListenerAttached = true;
-					} else {
-						detachLocationListener();
-					}
-					*/
-				}
-			}
-		});
+	
 
 	}
 

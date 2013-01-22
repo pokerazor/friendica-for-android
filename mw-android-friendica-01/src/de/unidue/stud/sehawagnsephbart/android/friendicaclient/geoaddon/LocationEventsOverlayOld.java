@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+import de.wikilab.android.friendica01.R;
 
 public class LocationEventsOverlayOld extends ItemizedOverlayWithFocus<OverlayItem> {
 
