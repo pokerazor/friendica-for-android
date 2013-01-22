@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.TextView;
 
 
 public class FileUploadService extends IntentService {
@@ -50,7 +51,9 @@ public class FileUploadService extends IntentService {
 	boolean deleteAfterUpload;
 	Uri fileToUpload;
 	String targetFilename;
-
+	
+	
+	
 	public FileUploadService() {
 		super("Andfrnd_FileUploadService");
 		Log.i("=== UPLOAD SERVICE ===", "on New()");

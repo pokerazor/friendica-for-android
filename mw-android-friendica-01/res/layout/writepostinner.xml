@@ -88,7 +88,9 @@
             <ToggleButton
                 android:id="@+id/sendLatLon"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:textOn="Location on"
+				android:textOff="Location off" />
 
             <TextView
                 android:id="@+id/viewLatLon"
