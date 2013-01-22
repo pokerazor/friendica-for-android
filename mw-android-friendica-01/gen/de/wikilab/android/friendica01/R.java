@@ -123,8 +123,8 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
     public static final class id {
         public static final int both=0x7f070002;
         public static final int bottom_control_bar=0x7f07004a;
-        public static final int btn_nav_1=0x7f07004e;
-        public static final int btn_nav_2=0x7f07004f;
+        public static final int btn_nav_1=0x7f07004f;
+        public static final int btn_nav_2=0x7f070050;
         public static final int btn_new=0x7f070035;
         public static final int btn_toggledislike=0x7f07003e;
         public static final int btn_togglelike=0x7f07003c;
@@ -139,8 +139,8 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int caption=0x7f07000c;
         public static final int comment_box=0x7f070036;
         public static final int content_fragment=0x7f070012;
-        public static final int content_fragment_1=0x7f070051;
-        public static final int content_fragment_2=0x7f070050;
+        public static final int content_fragment_1=0x7f070052;
+        public static final int content_fragment_2=0x7f070051;
         public static final int conversations=0x7f070039;
         public static final int coordinates=0x7f07003b;
         public static final int date=0x7f07002f;
@@ -149,7 +149,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int edtServer=0x7f070020;
         public static final int edtUser=0x7f070022;
         public static final int fake_data_notice=0x7f070043;
-        public static final int footer=0x7f07004d;
+        public static final int footer=0x7f07004e;
         public static final int glob_progressbar=0x7f070011;
         public static final int gridview=0x7f070003;
         public static final int header=0x7f070032;
@@ -172,9 +172,9 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int pl_fragment=0x7f070042;
         public static final int preview=0x7f07004b;
         public static final int profileImage=0x7f07002d;
-        public static final int profile_content=0x7f070053;
+        public static final int profile_content=0x7f070054;
         public static final int profile_image=0x7f07000b;
-        public static final int profile_name=0x7f070052;
+        public static final int profile_name=0x7f070053;
         public static final int progressbar=0x7f07000e;
         public static final int proxy_settings=0x7f07002a;
         public static final int pullDownFromTop=0x7f070000;
@@ -203,7 +203,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int top_control_bar=0x7f07002c;
         public static final int userName=0x7f07002e;
         public static final int userNameRecipient=0x7f070034;
-        public static final int viewLatLon=0x7f070054;
+        public static final int viewLatLon=0x7f07004d;
         public static final int view_debug=0x7f070055;
         public static final int view_fragment_container=0x7f070016;
         public static final int webview=0x7f070004;

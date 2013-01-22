@@ -379,9 +379,9 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 	}
 */
 	@Override
-	public void OnLogin() {
+	public void onLogin() {
 		LoginListener target = (LoginListener) getSupportFragmentManager().findFragmentById(R.id.menu_fragment);
-		target.OnLogin();
+		target.onLogin();
 
 	}
 

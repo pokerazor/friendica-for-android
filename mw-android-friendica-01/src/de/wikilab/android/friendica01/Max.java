@@ -194,7 +194,7 @@ public class Max {
 							JSONObject r = (JSONObject) t.getJsonResult();
 							String name = r.getString("name");
 							((TextView)ctx.findViewById(R.id.selected_clipboard)).setText(name);
-							((LoginListener) ctx).OnLogin();
+							((LoginListener) ctx).onLogin();
 							
 							
 							final TwAjax profileImgDl = new TwAjax();

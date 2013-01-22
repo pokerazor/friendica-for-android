@@ -122,7 +122,7 @@ public class MainMenuFragment extends Fragment implements LoginListener {
 
 	
 	@Override
-	public void OnLogin() {
+	public void onLogin() {
 		UpdateList();
 		
 		lvw.setOnItemClickListener(new AdapterView.OnItemClickListener() {

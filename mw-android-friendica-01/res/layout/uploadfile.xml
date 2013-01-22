@@ -60,8 +60,14 @@ android:orientation="vertical">
 		        android:id="@+id/sendLatLon"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
+		        android:textOff="Location off"
 		        android:textOn="Location on"
-				android:textOff="Location off"				/>
+		        android:onClick="onToggleClicked" />
+		     <TextView
+                android:id="@+id/viewLatLon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/viewLatLon" />
 
 		    <Button
 		        android:id="@+id/btn_upload"
