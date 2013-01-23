@@ -1,7 +1,7 @@
 package de.wikilab.android.friendica01;
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import java.io.File;
 
 import android.content.Intent;
@@ -27,7 +27,7 @@ import android.widget.TextView;
 import com.google.android.gcm.GCMRegistrar;
 
 public class HomeActivity extends FragmentActivity implements FragmentParentListener, LoginListener {
-	private static final String TAG="Friendica/HomeActivity";
+	private static final String TAG = "Friendica/HomeActivity";
 
 	public final static String SENDER_ID = "179387721673";
 
@@ -37,7 +37,7 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 	public File takePhotoTarget;
 
 	boolean isLargeMode = false;
-	
+
 	/*
 	WelcomeFragment frag_welcome = new WelcomeFragment();
 	PostListFragment frag_posts = new PostListFragment();
@@ -48,9 +48,8 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 	MessageViewFragment frag_messages = new MessageViewFragment();
 	//PreferenceFragment frag_preferences = new PreferenceFragment();
 	 */
-	
-	String currentMMItem = null;
 
+	String currentMMItem = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,47 +59,49 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 
 		Max.initDataDirs();
 
-		Log.d(TAG, "screenLayout="+getResources().getConfiguration().screenLayout);
+		Log.d(TAG, "screenLayout=" + getResources().getConfiguration().screenLayout);
 		if (Max.isLarge(getResources().getConfiguration())) {
 			// on a large screen device ...
 			isLargeMode = true;
 		}
-	
+
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		String userName = prefs.getString("login_user", null);
 		if (userName == null || userName.length() < 1) {
 			Max.showLoginForm(this, "Please enter account data");
 		} else {
 			Max.tryLogin(this);
-			
+
 			if (savedInstanceState == null) {
 				navigate("Timeline");
 			} else {
 				currentMMItem = savedInstanceState.getString("currentMMItem");
-				if (currentMMItem != null) navigate(currentMMItem);
+				if (currentMMItem != null)
+					navigate(currentMMItem);
 			}
-			
+
 			GCMRegistrar.checkDevice(this);
 			GCMRegistrar.checkManifest(this);
 			final String regId = GCMRegistrar.getRegistrationId(this);
 			if (regId.equals("")) {
-			  Log.v(TAG, "Registering for GCM");
-			  GCMRegistrar.register(this, SENDER_ID);
+				Log.v(TAG, "Registering for GCM");
+				GCMRegistrar.register(this, SENDER_ID);
 			} else {
-			  Log.v(TAG, "Already registered");
+				Log.v(TAG, "Already registered");
 			}
-			
+
 		}
 
-	
 		View toggle = findViewById(R.id.toggle_left_bar);
-		if (toggle != null) toggle.setOnClickListener(toggleMenuBarHandler);
-		//toggle = findViewById(R.id.toggle_left_bar2);
-		//if (toggle != null) toggle.setOnClickListener(toggleMenuBarHandler);
+		if (toggle != null)
+			toggle.setOnClickListener(toggleMenuBarHandler);
+		// toggle = findViewById(R.id.toggle_left_bar2);
+		// if (toggle != null) toggle.setOnClickListener(toggleMenuBarHandler);
 		toggle = findViewById(R.id.left_bar_header);
-		if (toggle != null) toggle.setOnClickListener(toggleMenuBarHandler);
+		if (toggle != null)
+			toggle.setOnClickListener(toggleMenuBarHandler);
 
-		//ViewServer.get(this).addWindow(this);
+		// ViewServer.get(this).addWindow(this);
 
 		Log.i(TAG, "Should check for updates?");
 
@@ -114,8 +115,8 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 					if (res != null && res.startsWith("UPDATE=")) {
 						try {
 							int version = Integer.parseInt(res.substring(7));
-							int currentVersion = getPackageManager().getPackageInfo(getPackageName(), 0 ).versionCode;
-							Log.i(TAG, "UpdateCheck onlineVersion="+version+" currentVersion="+currentVersion);
+							int currentVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+							Log.i(TAG, "UpdateCheck onlineVersion=" + version + " currentVersion=" + currentVersion);
 							if (version > currentVersion) {
 								Max.alert(HomeActivity.this, "Open the app's website to download the newest version:<br><a href='https://github.com/max-weller/friendica-for-android/downloads'>https://github.com/max-weller/friendica-for-android/downloads</a><br><br>(Go to Preferences to disable update check)", "Update available!");
 							}
@@ -138,31 +139,31 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 			toggleMenuBarVisible();
 		}
 	};
-	
+
 	protected void toggleMenuBarVisible() {
 		View leftBar = findViewById(R.id.left_bar);
 		setMenuBarVisible(leftBar.getVisibility() == View.GONE);
 	}
-	
+
 	protected void setMenuBarVisible(boolean v) {
 		View leftBar = findViewById(R.id.left_bar);
 		if (v) {
 			Animation anim1 = AnimationUtils.loadAnimation(HomeActivity.this, android.R.anim.slide_in_left);
-	        anim1.setInterpolator((new AccelerateDecelerateInterpolator()));
-	        //anim1.setFillAfter(true);
-	        leftBar.setAnimation(anim1);
+			anim1.setInterpolator((new AccelerateDecelerateInterpolator()));
+			// anim1.setFillAfter(true);
+			leftBar.setAnimation(anim1);
 
 			leftBar.setVisibility(View.VISIBLE);
 		} else {
 			Animation anim1 = AnimationUtils.loadAnimation(HomeActivity.this, R.anim.slide_out_left);
-	        anim1.setInterpolator((new AccelerateDecelerateInterpolator()));
-	        anim1.setFillAfter(true);
-	        leftBar.setAnimation(anim1);
+			anim1.setInterpolator((new AccelerateDecelerateInterpolator()));
+			anim1.setFillAfter(true);
+			leftBar.setAnimation(anim1);
 
 			leftBar.setVisibility(View.GONE);
 		}
 	}
-	
+
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		outState.putString("currentMMItem", currentMMItem);
@@ -190,17 +191,16 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 			navigate((String) arg1);
 		}
 		if (message.equals("Loading Animation")) {
-			((ProgressBar) findViewById(R.id.glob_progressbar)).setVisibility(((Integer)arg1).intValue());
+			((ProgressBar) findViewById(R.id.glob_progressbar)).setVisibility(((Integer) arg1).intValue());
 		}
 		if (message.equals("Navigate Conversation")) {
 			navigateConversation((String) arg1);
 		}
 	}
 
-
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch(requestCode) {
+		switch (requestCode) {
 		case RQ_SELECT_PHOTO:
 			if (resultCode == RESULT_OK) {
 				Intent in = new Intent(HomeActivity.this, FriendicaImgUploadActivity.class);
@@ -220,13 +220,13 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 		}
 	}
 
-	void onNavMainFragment()  {
+	void onNavMainFragment() {
 		if (!isLargeMode) {
 			View leftBar = findViewById(R.id.left_bar);
-				leftBar.setVisibility(View.GONE);
+			leftBar.setVisibility(View.GONE);
 		}
 	}
-	
+
 	void navigate(String navTarget) {
 		currentMMItem = navTarget;
 
@@ -245,11 +245,11 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 		if (navTarget.equals(getString(R.string.mm_updatemystatus))) {
 			navigateStatusUpdate();
 		}
-		
+
 		if (navTarget.equals(getString(R.string.menuitem_map))) {
 			navigateMapActivity();
 		}
-		
+
 		if (navTarget.equals(getString(R.string.mm_friends))) {
 			navigateFriendList();
 		}
@@ -270,8 +270,8 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 			startActivityForResult(in, RQ_SELECT_PHOTO);
 		}
 		if (navTarget.equals(getString(R.string.mm_directmessages))) {
-			//Intent in = new Intent(HomeActivity.this, MessagesActivity.class);
-			//startActivity(in);
+			// Intent in = new Intent(HomeActivity.this, MessagesActivity.class);
+			// startActivity(in);
 			navigateMessages("msg:all");
 		}
 
@@ -281,9 +281,9 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 
 		if (navTarget.equals(getString(R.string.mm_logout))) {
 			SharedPreferences.Editor prefs = PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).edit();
-			//prefs.putString("login_server", null); //keep server and user ...
+			// prefs.putString("login_server", null); //keep server and user ...
 			prefs.putString("login_user", null);
-			prefs.putString("login_password", null); //...only remove password
+			prefs.putString("login_password", null); // ...only remove password
 			prefs.commit();
 
 			finish();
@@ -294,7 +294,8 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 	void setHeadertext(String ht) {
 		TextView subheading = (TextView) findViewById(R.id.header_text);
 
-		if (subheading != null) subheading.setText(ht);
+		if (subheading != null)
+			subheading.setText(ht);
 	}
 
 	private void navigateMainFragment(ContentFragment newFragment, String target) {
@@ -304,13 +305,13 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 		b.putString("target", target);
 		newFragment.setArguments(b);
 		t.replace(R.id.view_fragment_container, newFragment);
-		//t.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+		// t.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		t.setCustomAnimations(R.anim.slide_in_right, android.R.anim.slide_out_right);
 		t.addToBackStack(null);
 		t.commit();
 		newFragment.navigate(target);
 	}
-	
+
 	private void navigateFriendList() {
 		navigateMainFragment(new FriendListFragment(), "friendlist");
 	}
@@ -331,18 +332,16 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 		navigateMainFragment(new MessageViewFragment(), target);
 	}
 
-
 	private void navigateStatusUpdate() {
 		navigateMainFragment(new WritePostFragment(), "statusupdate");
 	}
-
 
 	private void navigatePreferences() {
 		Intent showContent = new Intent(getApplicationContext(), PreferencesActivity.class);
 		startActivity(showContent);
 
 	}
-	
+
 	@Override
 	public void onLogin() {
 		LoginListener target = (LoginListener) getSupportFragmentManager().findFragmentById(R.id.menu_fragment);
@@ -361,7 +360,7 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 		}
 		Fragment viewerFragment = (Fragment) getSupportFragmentManager().findFragmentById(R.id.view_fragment_container);
 		if (viewerFragment instanceof ContentFragment) {
-			if (((ContentFragment)viewerFragment).onBackPressed()) {
+			if (((ContentFragment) viewerFragment).onBackPressed()) {
 				return;
 			}
 		}
@@ -380,5 +379,5 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 
 	private void navigateMapActivity() {
 		startActivity(new Intent("de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.MapActivity"));
-	}	
+	}
 }

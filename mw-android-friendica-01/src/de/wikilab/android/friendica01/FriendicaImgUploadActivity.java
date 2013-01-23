@@ -34,6 +34,8 @@ public class FriendicaImgUploadActivity extends Activity implements LoginListene
 	Boolean deleteAfterUpload = false;
 	Boolean uploadTextMode = false;
 	private Boolean locationListenerAttached = false;
+	private LocationManager lm = null;
+	private Location location = null;
 
 	String uploadCbName = "";
 	String textToUpload = "";
@@ -58,9 +60,7 @@ public class FriendicaImgUploadActivity extends Activity implements LoginListene
 				{
 
 					if (!locationListenerAttached) {
-						LocationManager lm = (LocationManager) FriendicaImgUploadActivity.this.getSystemService(Context.LOCATION_SERVICE);
-
-						lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+						getLocationManager().requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
 						viewLatLon.setText(getString(R.string.viewLatLon) + "\n" + "Loading...");
 						locationListenerAttached = true;
@@ -114,15 +114,6 @@ public class FriendicaImgUploadActivity extends Activity implements LoginListene
 				uploadTextMode = false;
 				btn_upload.setEnabled(true);
 
-				if (sendLatLon.isChecked()) {
-					LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-					Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-					if (location == null) {
-						Toast.makeText(this, "Unable to get location info - please try again.", Toast.LENGTH_LONG).show();
-						return;
-					}
-				}
-
 			}
 		}
 
@@ -138,6 +129,10 @@ public class FriendicaImgUploadActivity extends Activity implements LoginListene
 				b.putString(FileUploadService.EXTRA_DESCTEXT, txtDesc.getText().toString());
 				b.putString(Intent.EXTRA_SUBJECT, txtSubject.getText().toString());
 
+				if (location != null) {
+					b.putString(FileUploadService.EXTRA_LOCLAT, String.valueOf(location.getLatitude()));
+					b.putString(FileUploadService.EXTRA_LOCLAT, String.valueOf(location.getLongitude()));
+				}
 				b.putParcelable(Intent.EXTRA_STREAM, fileToUpload);
 
 				uploadIntent.putExtras(b);
@@ -150,8 +145,6 @@ public class FriendicaImgUploadActivity extends Activity implements LoginListene
 			}
 		});
 
-	
-
 	}
 
 	@Override
@@ -163,8 +156,9 @@ public class FriendicaImgUploadActivity extends Activity implements LoginListene
 
 	private final LocationListener locationListener = new LocationListener() {
 		public void onLocationChanged(Location location) {
-			double longitude = location.getLongitude();
-			double latitude = location.getLatitude();
+			FriendicaImgUploadActivity.this.location = location;
+			Double longitude = location.getLongitude();
+			Double latitude = location.getLatitude();
 			viewLatLon.setText(getString(R.string.viewLatLon) + "\n" + "Lat=" + String.valueOf(latitude) + "  Long=" + String.valueOf(longitude));
 		}
 
@@ -244,10 +238,16 @@ public class FriendicaImgUploadActivity extends Activity implements LoginListene
 
 	void detachLocationListener() {
 		if (locationListenerAttached) {
-			LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-			lm.removeUpdates(locationListener);
+			getLocationManager().removeUpdates(locationListener);
 			this.locationListenerAttached = false;
 		}
+	}
+
+	LocationManager getLocationManager() {
+		if (lm == null) {
+			lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		}
+		return lm;
 	}
 
 	private String getTypeName(Object o) {
