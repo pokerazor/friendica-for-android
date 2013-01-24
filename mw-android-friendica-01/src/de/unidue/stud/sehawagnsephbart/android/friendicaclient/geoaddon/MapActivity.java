@@ -5,8 +5,11 @@ import java.util.ArrayList;
 
 import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.ResourceProxy;
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.bonuspack.overlays.ExtendedOverlayItem;
 import org.osmdroid.bonuspack.overlays.ItemizedOverlayWithBubble;
+import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
+import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -28,7 +31,7 @@ import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
 import de.wikilab.android.friendica01.R;
 
-public class MapActivity extends Activity {
+public class MapActivity extends Activity implements MapEventsReceiver {
 
 	public MapView mOsmv = null;
 	private LocationEventsOverlay locationEventsOverlay = null;
@@ -81,6 +84,9 @@ public class MapActivity extends Activity {
 		this.locationEventsOverlay.addTimelinePositions();
 		this.locationEventsOverlay.setFocusItemsOnTap(true);
 		this.mOsmv.getOverlays().add(this.locationEventsOverlay);
+		
+		MapEventsOverlay overlay = new MapEventsOverlay(this, this);
+		this.mOsmv.getOverlays().add(overlay);
 
 		/* breaks all markers
 		MinimapOverlay miniMapOverlay = new MinimapOverlay(this, mOsmv.getTileRequestCompleteHandler());
@@ -111,6 +117,8 @@ public class MapActivity extends Activity {
 			nodeMarker.setTitle("Posted:");
 			nodeMarker.setDescription(timelineEvent.getId() + ": " + timelineEvent.getText());
 			nodeMarker.setSubDescription(timelineEvent.getDateTime());
+			nodeMarker.setSubDescription(timelineEvent.getRelativeDate(this));
+
 			nodeMarker.setImage(timelineEvent.getImage());
 
 			markers.add(nodeMarker);
@@ -129,7 +137,9 @@ public class MapActivity extends Activity {
 		mRoad = null;
 		ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
 		for (TimelineEvent timelineEvent : timelineEvents) {
-			waypoints.add(timelineEvent.getLocation());
+			if(timelineEvent.getLocation() != null){
+				waypoints.add(timelineEvent.getLocation());
+			}
 		}
 		new UpdateRoadTask().execute(waypoints);
 	}
@@ -156,5 +166,17 @@ public class MapActivity extends Activity {
 			mRoad = result;
 			updateUIWithRoad(result);
 		}
+	}
+
+	@Override
+	public boolean longPressHelper(IGeoPoint eventLocation) {
+		Toast.makeText(this, "Map long pressed at "+eventLocation.getLatitudeE6()+", "+eventLocation.getLongitudeE6(), Toast.LENGTH_SHORT).show();
+		return false;
+	}
+
+	@Override
+	public boolean singleTapUpHelper(IGeoPoint eventLocation) {
+		Toast.makeText(this, "Map single tapped at "+eventLocation.getLatitudeE6()+", "+eventLocation.getLongitudeE6(), Toast.LENGTH_SHORT).show();
+		return false;
 	}
 }

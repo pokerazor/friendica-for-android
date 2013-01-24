@@ -49,44 +49,26 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 		ExtendedOverlayItem newItem = new ExtendedOverlayItem(title, snippet, p, owner);
 		itemList.add(newItem);
 		populate();
-
 	}
 
 	public TimelineEvent addItem(JSONObject jj) {
-		TimelineEvent tEvent = new TimelineEvent();
-		try {
-			String coordinates = jj.getString("coordinates");
-			String createdat = jj.getString("created_at");
-
-			if (!coordinates.equals("")) {
-				String[] splitcoordinates = coordinates.split(" ");
-				GeoPoint gp = new GeoPoint(Double.parseDouble(splitcoordinates[0]), Double.parseDouble(splitcoordinates[1]));
-				tEvent.setId(Integer.parseInt(jj.getString("id")));
-				tEvent.setLocation(gp);
-				tEvent.setType(TimelineEvent.TYPE_STATUS);
-				tEvent.setText(jj.getString("text"));
-				tEvent.setDateTime(createdat);
-				ImageView target = new ImageView(owner);
-
-				// TODO handle asynchronously
-				PostListAdapter.getProfileImageFromPost(jj, target, owner);
-
-				tEvent.setImage(target.getDrawable());
-				timelineEvents.add(tEvent);
-// addItem(tEvent.getId().toString(), tEvent.getText(), gp);
-
-			}
+		TimelineEvent tEvent = new TimelineEvent(jj);
+		try {			// TODO handle asynchronously
+			ImageView target = new ImageView(owner);
+			PostListAdapter.getProfileImageFromPost(jj, target, owner);
+			tEvent.setImage(target.getDrawable());
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		if (tEvent.getLocation() != null) {
+			timelineEvents.add(tEvent);
 		}
 		return tEvent;
 	}
 
 	public void addTimelinePositions() {
 		final TwAjax t = new TwAjax(owner, true, true);
-
 		t.getUrlContent(Max.getServer(owner) + "/api/routes/activeevents", new Runnable() {
-
 			@Override
 			public void run() {
 				try {
@@ -104,17 +86,13 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 					}
 					owner.goOn(timelineEvents);
 				} catch (Exception e) {
-
 					e.printStackTrace();
 				}
 			}
-
 		});
-
 	}
 
 	public ArrayList<GeoPoint> getLocationCoordinates() {
 		return waypoints;
 	}
-
 }
