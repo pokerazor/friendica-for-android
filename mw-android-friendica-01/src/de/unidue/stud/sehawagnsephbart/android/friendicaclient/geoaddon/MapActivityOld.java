@@ -122,7 +122,7 @@ public class MapActivityOld extends Activity {
 		this.mOsmv.setMultiTouchControls(true);
 		this.mOsmv.getOverlays().add(this.mLocationOverlay);
 		
-		this.locEvOv.addTestItem();
+//		this.locEvOv.addTestItem();
 		this.locEvOv.addTimelinePositions();
 		
 		rl.addView(this.mOsmv, new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));

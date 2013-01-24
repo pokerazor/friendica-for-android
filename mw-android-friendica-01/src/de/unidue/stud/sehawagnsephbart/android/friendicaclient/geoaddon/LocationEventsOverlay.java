@@ -23,8 +23,9 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 
 	protected List<OverlayItem> itemList = null;
 	private MapActivity owner = null;
+	
+	ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
 
-	protected ItemizedOverlayWithBubble<ExtendedOverlayItem> roadNodeMarkers;
 
 	public LocationEventsOverlay(List<OverlayItem> aList, final Activity owner, ResourceProxy mResourceProxy) {
 		super(aList, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
@@ -51,16 +52,6 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 
 	}
 
-	public void addTestItem() {
-		// addItem("testpunkt", "testpunkt", new GeoPoint(51.4624925,
-		// 7.0169541));
-		// addItem("testpunkt1", "testpunkt1", new GeoPoint(41.4624925,
-		// 7.0169541));
-		// addItem("testpunkt", "testpunkt", new GeoPoint(11.4624925,
-		// 7.0169541));
-
-	}
-
 	public void addTimelinePositions() {
 		final TwAjax t = new TwAjax(owner, true, true);
 
@@ -71,13 +62,7 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 				try {
 					JSONArray j = (JSONArray) t.getJsonResult();
 
-					ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
-					/*
-					 * waypoints.add(new GeoPoint(48.13, -1.63));
-					 * waypoints.add(new GeoPoint(48.4, -1.9));
-					 * owner.mOsmv.getController().setCenter( new GeoPoint(48.4,
-					 * -1.9));
-					 */
+
 					ArrayList<JSONObject> jsonObjectArray = new ArrayList<JSONObject>(j.length());
 					GeoPoint gp = null;
 					for (int i = 0; i < j.length(); i++) {
@@ -90,13 +75,13 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 
 							addItem(jj.getString("id"), jj.getString("text"), gp);
 							owner.coordinates.add(gp);
-							System.out.println(Double.parseDouble(splitcoordinates[0]));
+							//System.out.println(Double.parseDouble(splitcoordinates[0]));
 							owner.getPathOverlay().addPoint(gp);
 							waypoints.add(gp);
 
 						}
 					}
-					owner.goOn();
+					owner.goOn(waypoints);
 
 				} catch (Exception e) {
 
@@ -106,6 +91,10 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 
 		});
 
+	}
+	
+	public ArrayList<GeoPoint> getLocationCoordinates(){
+		return waypoints;
 	}
 
 }
