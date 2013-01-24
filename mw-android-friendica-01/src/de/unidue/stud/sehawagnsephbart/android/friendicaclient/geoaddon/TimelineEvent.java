@@ -2,6 +2,8 @@ package de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon;
 
 import org.osmdroid.util.GeoPoint;
 
+import android.graphics.drawable.Drawable;
+
 public class TimelineEvent {
 
 	public static final Integer TYPE_DEFAULT = 0;
@@ -12,7 +14,15 @@ public class TimelineEvent {
 	protected Integer type;
 	protected String text;
 	protected String dateTime;
-	protected boolean image;
+	protected Drawable image;
+	public Drawable getImage() {
+		return image;
+	}
+
+	public void setImage(Drawable image) {
+		this.image = image;
+	}
+
 	protected GeoPoint location;
 	protected Integer id;
 

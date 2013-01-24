@@ -9,7 +9,6 @@ import org.osmdroid.bonuspack.overlays.ItemizedOverlayWithBubble;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
-import org.osmdroid.bonuspack.routing.RoadNode;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
@@ -94,10 +93,9 @@ public class MapActivity extends Activity {
 			nodeMarker.setMarker(marker);
 			nodeMarker.setTitle("Posted:");
 			nodeMarker.setDescription(timelineEvent.getId()+ ": " + timelineEvent.getText());
-			nodeMarker.setSubDescription("14. Mai, 15:36 Uhr");
+			nodeMarker.setSubDescription(timelineEvent.getDateTime());
+			nodeMarker.setImage(timelineEvent.getImage());
 
-			Drawable icon = getResources().getDrawable(R.drawable.ic_continue);
-			nodeMarker.setImage(icon);
 			markers.add(nodeMarker);
 		}
 		return markers;

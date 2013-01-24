@@ -14,8 +14,11 @@ import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
 
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
+import android.widget.ImageView;
 import android.widget.Toast;
 import de.wikilab.android.friendica01.Max;
+import de.wikilab.android.friendica01.PostListAdapter;
 import de.wikilab.android.friendica01.R;
 import de.wikilab.android.friendica01.TwAjax;
 
@@ -56,6 +59,8 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 		TimelineEvent tEvent = new TimelineEvent();
 		try {
 			String coordinates = jj.getString("coordinates");
+			String createdat = jj.getString("created_at");
+			
 			System.out.println("Hallo");
 			if (!coordinates.equals("")) {
 				String[] splitcoordinates = coordinates.split(" ");
@@ -64,6 +69,13 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 				tEvent.setLocation(gp);
 				tEvent.setType(TimelineEvent.TYPE_STATUS);
 				tEvent.setText(jj.getString("text"));
+				tEvent.setDateTime(createdat);
+				ImageView target=new ImageView(owner);
+				
+				//TODO handle asynchronously
+				PostListAdapter.getProfileImageFromPost(jj, target, owner);
+
+				tEvent.setImage(target.getDrawable());
 				timelineEvents.add(tEvent);
 //				addItem(tEvent.getId().toString(), tEvent.getText(), gp);
 

@@ -194,29 +194,10 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 		
 		if (H.profileImage != null) {
 			H.profileImage.setImageResource(R.drawable.ic_launcher);
-			try {
-				final String piurl = post.getJSONObject("user").getString("profile_image_url");
-				Log.i(TAG, "TRY Download profile img: " + piurl);
-				final TwAjax pidl = new TwAjax(getContext(), true, false);
-				pidl.ignoreSSLCerts = true;
-				
-				//NEW: download cached
-				final File pifile = new File(Max.IMG_CACHE_DIR + "/pi_" + Max.cleanFilename(piurl));
-				if (pifile.isFile()) {
-					Log.i(TAG, "OK  Load cached profile Img: " + piurl);
-					//profileImage.setImageURI(Uri.parse("file://" + pifile.getAbsolutePath()));
-					H.profileImage.setImageDrawable(new BitmapDrawable(pifile.getAbsolutePath()));
-				} else {
-					pidl.urlDownloadToFile(piurl, pifile.getAbsolutePath(), new Runnable() {
-						@Override
-						public void run() {
-							Log.i(TAG, "OK  Download profile Img: " + piurl);
-							H.profileImage.setImageDrawable(new BitmapDrawable(pifile.getAbsolutePath()));
-						}
-					});
-				}
-			} catch (JSONException e) {
-			}
+			
+			getProfileImageFromPost(post, H.profileImage,getContext());
+			
+
 		}
 		
 		if (H.userName != null) {
@@ -278,6 +259,32 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 		}
 		
 		return convertView;
+	}
+	
+	public static void getProfileImageFromPost( JSONObject post, final ImageView target, Context context ){
+		try {
+			final String piurl = post.getJSONObject("user").getString("profile_image_url");
+			Log.i(TAG, "TRY Download profile img: " + piurl);
+			final TwAjax pidl = new TwAjax(context, true, false);
+			pidl.ignoreSSLCerts = true;
+			
+			//NEW: download cached
+			final File pifile = new File(Max.IMG_CACHE_DIR + "/pi_" + Max.cleanFilename(piurl));
+			if (pifile.isFile()) {
+				Log.i(TAG, "OK  Load cached profile Img: " + piurl);
+				//profileImage.setImageURI(Uri.parse("file://" + pifile.getAbsolutePath()));
+				target.setImageDrawable(new BitmapDrawable(pifile.getAbsolutePath()));
+			} else {
+				pidl.urlDownloadToFile(piurl, pifile.getAbsolutePath(), new Runnable() {
+					@Override
+					public void run() {
+						Log.i(TAG, "OK  Download profile Img: " + piurl);
+						target.setImageDrawable(new BitmapDrawable(pifile.getAbsolutePath()));
+					}
+				});
+			}
+		} catch (JSONException e) {
+		}
 	}
 	
 	private void downloadPics(final ViewHolder H, Spannable htmlSpannable) {
