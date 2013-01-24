@@ -23,9 +23,9 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 
 	protected List<OverlayItem> itemList = null;
 	private MapActivity owner = null;
-	
-	ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
 
+	ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
+	ArrayList<TimelineEvent> timelineEvents = new ArrayList<TimelineEvent>();
 
 	public LocationEventsOverlay(List<OverlayItem> aList, final Activity owner, ResourceProxy mResourceProxy) {
 		super(aList, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
@@ -52,6 +52,28 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 
 	}
 
+	public TimelineEvent addItem(JSONObject jj) {
+		TimelineEvent tEvent = new TimelineEvent();
+		try {
+			String coordinates = jj.getString("coordinates");
+			System.out.println("Hallo");
+			if (!coordinates.equals("")) {
+				String[] splitcoordinates = coordinates.split(" ");
+				GeoPoint gp = new GeoPoint(Double.parseDouble(splitcoordinates[0]), Double.parseDouble(splitcoordinates[1]));
+				tEvent.setId(Integer.parseInt(jj.getString("id")));
+				tEvent.setLocation(gp);
+				tEvent.setType(TimelineEvent.TYPE_STATUS);
+				tEvent.setText(jj.getString("text"));
+				timelineEvents.add(tEvent);
+//				addItem(tEvent.getId().toString(), tEvent.getText(), gp);
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return tEvent;
+	}
+
 	public void addTimelinePositions() {
 		final TwAjax t = new TwAjax(owner, true, true);
 
@@ -61,28 +83,18 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 			public void run() {
 				try {
 					JSONArray j = (JSONArray) t.getJsonResult();
-
-
-					ArrayList<JSONObject> jsonObjectArray = new ArrayList<JSONObject>(j.length());
-					GeoPoint gp = null;
 					for (int i = 0; i < j.length(); i++) {
 						JSONObject jj = j.getJSONObject(i);
-						String coordinates = jj.getString("coordinates");
-						if (!coordinates.equals("")) {
-							String[] splitcoordinates = coordinates.split(" ");
-							jsonObjectArray.add(jj);
-							gp = new GeoPoint(Double.parseDouble(splitcoordinates[0]), Double.parseDouble(splitcoordinates[1]));
-
-							addItem(jj.getString("id"), jj.getString("text"), gp);
-							owner.coordinates.add(gp);
-							//System.out.println(Double.parseDouble(splitcoordinates[0]));
-							owner.getPathOverlay().addPoint(gp);
-							waypoints.add(gp);
-
+						{
+							TimelineEvent tEvent = addItem(jj);
+							if (tEvent.getLocation() != null) {
+								owner.coordinates.add(tEvent.getLocation());
+								owner.getPathOverlay().addPoint(tEvent.getLocation());
+								waypoints.add(tEvent.getLocation());
+							}
 						}
 					}
-					owner.goOn(waypoints);
-
+					owner.goOn(timelineEvents);
 				} catch (Exception e) {
 
 					e.printStackTrace();
@@ -92,8 +104,8 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 		});
 
 	}
-	
-	public ArrayList<GeoPoint> getLocationCoordinates(){
+
+	public ArrayList<GeoPoint> getLocationCoordinates() {
 		return waypoints;
 	}
 

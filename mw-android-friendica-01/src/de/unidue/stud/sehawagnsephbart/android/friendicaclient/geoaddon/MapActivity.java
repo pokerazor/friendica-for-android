@@ -74,28 +74,28 @@ public class MapActivity extends Activity {
 		this.setContentView(rl);
 	}
 
-	public void goOn(ArrayList<GeoPoint> coordinates) {
+	public void goOn(ArrayList<TimelineEvent> timelineEvents) {
 		// owner.mOsmv.getOverlays().add(getPathOverlay());
 
-		getRoadAsync(coordinates);
+		getRoadAsync(timelineEvents);
 
-		final ArrayList<ExtendedOverlayItem> roadItems = generateMarkers(coordinates);
+		final ArrayList<ExtendedOverlayItem> roadItems = generateMarkers(timelineEvents);
 		ItemizedOverlayWithBubble<ExtendedOverlayItem> roadNodes = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(this, roadItems, mOsmv);
 		mOsmv.getOverlays().add(roadNodes);
 	}
 
-	ArrayList<ExtendedOverlayItem> generateMarkers(ArrayList<GeoPoint> coordinates) {
+	ArrayList<ExtendedOverlayItem> generateMarkers(ArrayList<TimelineEvent> timelineEvents) {
 		Drawable marker = getResources().getDrawable(R.drawable.marker_node);
 		ArrayList<ExtendedOverlayItem> markers = new ArrayList<ExtendedOverlayItem>();
-		for (int i = 0; i < coordinates.size(); i++) {
-			GeoPoint node = coordinates.get(i);
-			ExtendedOverlayItem nodeMarker = new ExtendedOverlayItem("", "", node, this);
+		for (TimelineEvent timelineEvent : timelineEvents) {
+
+			ExtendedOverlayItem nodeMarker = new ExtendedOverlayItem("", "", timelineEvent.getLocation(), this);
 			nodeMarker.setMarkerHotspot(OverlayItem.HotspotPlace.CENTER);
 			nodeMarker.setMarker(marker);
 			nodeMarker.setTitle("Posted:");
-			nodeMarker.setDescription("Hier ist es total schön.");
+			nodeMarker.setDescription(timelineEvent.getId()+ ": " + timelineEvent.getText());
 			nodeMarker.setSubDescription("14. Mai, 15:36 Uhr");
-			
+
 			Drawable icon = getResources().getDrawable(R.drawable.ic_continue);
 			nodeMarker.setImage(icon);
 			markers.add(nodeMarker);
@@ -110,8 +110,13 @@ public class MapActivity extends Activity {
 		return myPath;
 	}
 
-	public void getRoadAsync(ArrayList<GeoPoint> waypoints) {
+	public void getRoadAsync(ArrayList<TimelineEvent> timelineEvents) {
 		mRoad = null;
+		ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
+		for (TimelineEvent timelineEvent : timelineEvents) {
+			waypoints.add(timelineEvent.getLocation());
+		}
+
 		new UpdateRoadTask().execute(waypoints);
 	}
 
