@@ -3,6 +3,7 @@ package de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon;
 
 import java.util.ArrayList;
 
+import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.bonuspack.overlays.ExtendedOverlayItem;
 import org.osmdroid.bonuspack.overlays.ItemizedOverlayWithBubble;
@@ -15,6 +16,7 @@ import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.PathOverlay;
+import org.osmdroid.views.overlay.ScaleBarOverlay;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -37,6 +39,8 @@ public class MapActivity extends Activity {
 	protected PathOverlay roadOverlay = null;
 
 	public ArrayList<GeoPoint> coordinates = new ArrayList<GeoPoint>();
+	private MyLocationOverlay mLocationOverlay;
+	private ScaleBarOverlay mScaleBarOverlay;
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
@@ -48,27 +52,40 @@ public class MapActivity extends Activity {
 
 		this.mOsmv = new MapView(this, 1024);
 		rl.addView(this.mOsmv, new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-		{
 
-			ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+		ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
 
-			this.locationEventsOverlay = new LocationEventsOverlay(items, this, mResourceProxy);
-			this.locationEventsOverlay.addTimelinePositions();
-			this.locationEventsOverlay.setFocusItemsOnTap(true);
+		this.mOsmv.setBuiltInZoomControls(true);
+		this.mOsmv.setMultiTouchControls(true);
 
-			this.mOsmv.setBuiltInZoomControls(true);
-			this.mOsmv.setMultiTouchControls(true);
+		this.mOsmv.setTileSource(TileSourceFactory.MAPNIK);
+		mMapController = this.mOsmv.getController();
+		mMapController.setZoom(16);
 
-			this.mOsmv.setTileSource(TileSourceFactory.MAPNIK);
-			mMapController = this.mOsmv.getController();
-			mMapController.setZoom(16);
+		this.mScaleBarOverlay = new ScaleBarOverlay(this, mResourceProxy);
+		this.mOsmv.getOverlays().add(mScaleBarOverlay);
 
-			// TODO change to center on last event location
-			mMapController.setCenter(new GeoPoint(51.4624925, 7.0169541));
+		this.mScaleBarOverlay.setScaleBarOffset(getResources().getDisplayMetrics().widthPixels / 2 - getResources().getDisplayMetrics().xdpi / 2, 10);
 
-			this.mOsmv.getOverlays().add(this.locationEventsOverlay);
+		this.mLocationOverlay = new MyLocationOverlay(this, this.mOsmv, mResourceProxy);
+		this.mLocationOverlay.enableCompass();
+		this.mLocationOverlay.enableMyLocation();
+		this.mLocationOverlay.enableFollowLocation();
 
-		}
+		this.mOsmv.getOverlays().add(this.mLocationOverlay);
+
+		// TODO change to center on last event location
+		mMapController.setCenter(new GeoPoint(51.4624925, 7.0169541));
+
+		this.locationEventsOverlay = new LocationEventsOverlay(items, this, mResourceProxy);
+		this.locationEventsOverlay.addTimelinePositions();
+		this.locationEventsOverlay.setFocusItemsOnTap(true);
+		this.mOsmv.getOverlays().add(this.locationEventsOverlay);
+
+		/* breaks all markers
+		MinimapOverlay miniMapOverlay = new MinimapOverlay(this, mOsmv.getTileRequestCompleteHandler());
+		this.mOsmv.getOverlays().add(miniMapOverlay);
+		*/
 
 		this.setContentView(rl);
 	}
@@ -92,7 +109,7 @@ public class MapActivity extends Activity {
 			nodeMarker.setMarkerHotspot(OverlayItem.HotspotPlace.CENTER);
 			nodeMarker.setMarker(marker);
 			nodeMarker.setTitle("Posted:");
-			nodeMarker.setDescription(timelineEvent.getId()+ ": " + timelineEvent.getText());
+			nodeMarker.setDescription(timelineEvent.getId() + ": " + timelineEvent.getText());
 			nodeMarker.setSubDescription(timelineEvent.getDateTime());
 			nodeMarker.setImage(timelineEvent.getImage());
 
@@ -114,7 +131,6 @@ public class MapActivity extends Activity {
 		for (TimelineEvent timelineEvent : timelineEvents) {
 			waypoints.add(timelineEvent.getLocation());
 		}
-
 		new UpdateRoadTask().execute(waypoints);
 	}
 
@@ -126,27 +142,19 @@ public class MapActivity extends Activity {
 			Toast.makeText(this.mOsmv.getContext(), "We have a problem to get the route", Toast.LENGTH_SHORT).show();
 		}
 		roadOverlay = RoadManager.buildRoadOverlay(road, this.mOsmv.getContext());
-
 		mOsmv.getOverlays().add(roadOverlay);
-
 		this.mOsmv.invalidate();
-
 	}
 
 	private class UpdateRoadTask extends AsyncTask<Object, Void, Road> {
-
 		@SuppressWarnings("unchecked")
 		protected Road doInBackground(Object... params) {
-
 			RoadManager roadManager = new OSRMRoadManager();
-
 			return roadManager.getRoad(((ArrayList<GeoPoint>) params[0]));
 		}
-
 		protected void onPostExecute(Road result) {
 			mRoad = result;
 			updateUIWithRoad(result);
 		}
 	}
-
 }

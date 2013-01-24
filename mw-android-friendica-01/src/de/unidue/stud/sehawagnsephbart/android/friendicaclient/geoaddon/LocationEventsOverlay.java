@@ -7,19 +7,16 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.bonuspack.overlays.ExtendedOverlayItem;
-import org.osmdroid.bonuspack.overlays.ItemizedOverlayWithBubble;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
 
 import android.app.Activity;
-import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 import android.widget.Toast;
 import de.wikilab.android.friendica01.Max;
 import de.wikilab.android.friendica01.PostListAdapter;
-import de.wikilab.android.friendica01.R;
 import de.wikilab.android.friendica01.TwAjax;
 
 public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem> {
@@ -60,8 +57,7 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 		try {
 			String coordinates = jj.getString("coordinates");
 			String createdat = jj.getString("created_at");
-			
-			System.out.println("Hallo");
+
 			if (!coordinates.equals("")) {
 				String[] splitcoordinates = coordinates.split(" ");
 				GeoPoint gp = new GeoPoint(Double.parseDouble(splitcoordinates[0]), Double.parseDouble(splitcoordinates[1]));
@@ -70,14 +66,14 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 				tEvent.setType(TimelineEvent.TYPE_STATUS);
 				tEvent.setText(jj.getString("text"));
 				tEvent.setDateTime(createdat);
-				ImageView target=new ImageView(owner);
-				
-				//TODO handle asynchronously
+				ImageView target = new ImageView(owner);
+
+				// TODO handle asynchronously
 				PostListAdapter.getProfileImageFromPost(jj, target, owner);
 
 				tEvent.setImage(target.getDrawable());
 				timelineEvents.add(tEvent);
-//				addItem(tEvent.getId().toString(), tEvent.getText(), gp);
+// addItem(tEvent.getId().toString(), tEvent.getText(), gp);
 
 			}
 		} catch (Exception e) {
@@ -89,7 +85,7 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 	public void addTimelinePositions() {
 		final TwAjax t = new TwAjax(owner, true, true);
 
-		t.getUrlContent(Max.getServer(owner) + "/api/statuses/home_timeline.json", new Runnable() {
+		t.getUrlContent(Max.getServer(owner) + "/api/routes/activeevents", new Runnable() {
 
 			@Override
 			public void run() {
