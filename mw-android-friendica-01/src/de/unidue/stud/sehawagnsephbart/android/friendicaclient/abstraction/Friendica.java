@@ -71,15 +71,12 @@ public class Friendica {
 
 	public class ResultObject<TargetResultClass extends Object> {
 		private TargetResultClass result = null;
-
 		public TargetResultClass getResult() {
 			return result;
 		}
-
 		public void setResult(TargetResultClass result) {
 			this.result = result;
 		}
-
 	}
 
 	public interface JsonFinishReaction<TargetResultClass> {
