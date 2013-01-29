@@ -14,11 +14,22 @@ import android.widget.TextView;
 import de.wikilab.android.friendica01.R;
 
 public class GenericJsonAdapter extends ArrayAdapter<JSONObject> {
-	
-	protected static class ViewHolder {
-		TextView rawjson;
-	}
+	protected Integer elementLayoutId=R.layout.gen_jsonobject;
+	protected GenericJsonViewHolder H=null;
 
+	protected static class GenericJsonViewHolder {
+		protected TextView rawjson=null;
+		public GenericJsonViewHolder() {
+		}
+	}
+	
+	public void setElementLayoutId(Integer elementLayoutId){
+		this.elementLayoutId=elementLayoutId;
+	}
+	public Integer getElementLayoutId(){
+		return this.elementLayoutId;
+	}
+	
 	public GenericJsonAdapter(Context context, List<JSONObject> objects) {
 		super(context, R.layout.gen_jsonobject, objects);
 
@@ -39,18 +50,15 @@ public class GenericJsonAdapter extends ArrayAdapter<JSONObject> {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		final ViewHolder H;
 		if (convertView == null) {
 			LayoutInflater inf = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-			H = new ViewHolder();
-			convertView = inf.inflate(R.layout.gen_jsonobject, null);
-
+			H = new GenericJsonViewHolder();
+			convertView = inf.inflate(getElementLayoutId(), null);
 			H.rawjson = (TextView) convertView.findViewById(R.id.rawjson);
-
 			convertView.setTag(H);
 		} else {
-			H = (ViewHolder) convertView.getTag();
+			H = (GenericJsonViewHolder) convertView.getTag();
 		}
 
 		JSONObject post = (JSONObject) getItem(position);

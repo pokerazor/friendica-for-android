@@ -1,7 +1,6 @@
 package de.wikilab.android.friendica01;
 
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+/* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -158,6 +157,8 @@ public class FileUploadService extends IntentService {
 		fileToUpload = (Uri) intentPara.getParcelable(Intent.EXTRA_STREAM);
 		descText = intentPara.getString(EXTRA_DESCTEXT);
 		subject = intentPara.getString(Intent.EXTRA_SUBJECT);
+		
+		System.out.println(intentPara);
 
 		if (targetFilename == null || targetFilename.equals(""))
 			targetFilename = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date()) + ".txt";
@@ -179,7 +180,8 @@ public class FileUploadService extends IntentService {
 				uploader.addPostData("lat", String.valueOf(intentPara.getString(EXTRA_LOCLAT)));
 				uploader.addPostData("long", String.valueOf(intentPara.getString(EXTRA_LOCLAN)));
 			}
-			uploader.uploadFile(Max.getServer(this) + "/api/statuses/update", null);
+
+			uploader.uploadFile(Max.getServer(this) + "/api/statuses/update", null); 
 			Log.i("Andfrnd/UploadFile", "after uploadFile");
 			Log.i("Andfrnd/UploadFile", "isSuccess() = " + uploader.isSuccess());
 			Log.i("Andfrnd/UploadFile", "getError() = " + uploader.getError());
