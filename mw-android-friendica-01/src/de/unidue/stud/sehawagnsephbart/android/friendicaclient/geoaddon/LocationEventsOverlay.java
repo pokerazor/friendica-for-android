@@ -15,6 +15,7 @@ import org.osmdroid.views.overlay.OverlayItem;
 import android.app.Activity;
 import android.widget.ImageView;
 import android.widget.Toast;
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica;
 import de.wikilab.android.friendica01.Max;
 import de.wikilab.android.friendica01.PostListAdapter;
 import de.wikilab.android.friendica01.TwAjax;
@@ -55,8 +56,11 @@ public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem>
 		TimelineEvent tEvent = new TimelineEvent(jj);
 		try {			// TODO handle asynchronously
 			ImageView target = new ImageView(owner);
-			PostListAdapter.getProfileImageFromPost(jj, target, owner);
+			Friendica.getProfileImageFromPost(jj, target, owner);
+//			Friendica.placeImageFromURI(url, target, owner, "itemImage");
+			tEvent.loadImageIntoTarget(target,owner);
 			tEvent.setImage(target.getDrawable());
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

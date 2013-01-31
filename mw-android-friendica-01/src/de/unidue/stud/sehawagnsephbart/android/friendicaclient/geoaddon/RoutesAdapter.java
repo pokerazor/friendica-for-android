@@ -8,7 +8,9 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.CheckBox;
+import android.widget.CheckedTextView;
 import android.widget.TextView;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.GenericJsonAdapter;
 import de.wikilab.android.friendica01.R;
@@ -18,7 +20,7 @@ public class RoutesAdapter extends GenericJsonAdapter {
 
 	protected static class RouteViewHolder extends GenericJsonViewHolder {
 		protected Integer routeId = null;
-		protected TextView routeName = null;
+		protected CheckedTextView routeName = null;
 		protected CheckBox routeActiveCheckbox = null;
 		protected Boolean routeActive = false;
 
@@ -41,8 +43,23 @@ public class RoutesAdapter extends GenericJsonAdapter {
 
 			H = new RouteViewHolder();
 			convertView = inf.inflate(getElementLayoutId(), null);
-			H.routeName = (TextView) convertView.findViewById(R.id.rawjson);
-			H.routeActiveCheckbox = (CheckBox) convertView.findViewById(R.id.active);
+			
+			H.routeName = (CheckedTextView) convertView.findViewById(android.R.id.text1);
+
+//			H.routeName = (TextView) convertView.findViewById(R.id.rawjson);
+//			H.routeActiveCheckbox = (CheckBox) convertView.findViewById(android.R.id.);
+			/*
+			H.routeActiveCheckbox.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					System.out.println(v.getTag());
+					 ViewParent parentList = v.getParent().getParent();
+					 System.out.println(parentList.getClass());
+					
+				}
+			});
+			*/
 
 			convertView.setTag(H);
 		} else {
@@ -55,7 +72,8 @@ public class RoutesAdapter extends GenericJsonAdapter {
 			H.routeId = route.getInt("id");
 			H.routeName.setText(route.getString("name"));
 			H.routeActive = route.getInt("active") == 1;
-			H.routeActiveCheckbox.setChecked(H.routeActive);
+			H.routeName.setChecked(H.routeActive);
+//			H.routeActiveCheckbox.setTag(H.routeId);
 		} catch (Exception e) {
 			H.routeName.setText("xxInvalid Dataset!");
 		}

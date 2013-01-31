@@ -3,10 +3,13 @@ package de.wikilab.android.friendica01;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica;
 
 import android.content.Context;
 import android.content.Intent;
@@ -198,7 +201,7 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 		if (H.profileImage != null) {
 			H.profileImage.setImageResource(R.drawable.ic_launcher);
 
-			getProfileImageFromPost(post, H.profileImage, getContext());
+			Friendica.getProfileImageFromPost(post, H.profileImage, getContext());
 
 		}
 
@@ -255,106 +258,25 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 		return convertView;
 	}
 
-	public static void getProfileImageFromPost(JSONObject post, final ImageView target, Context context) {
-		try {
-			final String piurl = post.getJSONObject("user").getString("profile_image_url");
-			Log.i(TAG, "TRY Download profile img: " + piurl);
-			final TwAjax pidl = new TwAjax(context, true, false);
-			pidl.ignoreSSLCerts = true;
 
-			// NEW: download cached
-			final File pifile = new File(Max.IMG_CACHE_DIR + "/pi_" + Max.cleanFilename(piurl));
-			if (pifile.isFile()) {
-				Log.i(TAG, "OK  Load cached profile Img: " + piurl);
-				// profileImage.setImageURI(Uri.parse("file://" + pifile.getAbsolutePath()));
-				target.setImageDrawable(new BitmapDrawable(pifile.getAbsolutePath()));
-			} else {
-				pidl.urlDownloadToFile(piurl, pifile.getAbsolutePath(), new Runnable() {
-					@Override
-					public void run() {
-						Log.i(TAG, "OK  Download profile Img: " + piurl);
-						target.setImageDrawable(new BitmapDrawable(pifile.getAbsolutePath()));
-					}
-				});
-			}
-		} catch (JSONException e) {
-		}
-	}
 
 	private void downloadPics(final ViewHolder H, Spannable htmlSpannable) {
 		int pos = 0;
-		for (int i = 0; i <= 2; i++)
+		for (int i = 0; i <= 2; i++) {
 			H.picture[i].setVisibility(View.GONE);
+		}
+		ImageSpan[] images=Friendica.getImagesFromPost(htmlSpannable);
 
-		for (ImageSpan img : htmlSpannable.getSpans(0, htmlSpannable.length(), ImageSpan.class)) {
+		for (ImageSpan img : images) {
 			htmlSpannable.removeSpan(img);
 
-			if (pos > 2)
+			if (pos > 2) {
 				break;
-
-			final TwAjax pidl = new TwAjax(getContext(), true, false);
-			pidl.ignoreSSLCerts = true;
-			final String piurl = img.getSource();
-			final int targetImg = pos;
-
-			if (piurl.startsWith("data:image")) {
-				Log.i(TAG, "TRY Extracting embedded post Img: " + piurl);
-				final int imgStart = piurl.indexOf("base64,") + 7; // SHOULD CHECK FOR FAILURE TO FIND base64,
-				final String encodedImg = piurl.substring(imgStart);
-				final int imgHash = encodedImg.hashCode();
-				final String imgHashString = Integer.toString(imgHash);
-
-				final File pifile = new File(Max.IMG_CACHE_DIR + "/pi_" + Max.cleanFilename(imgHashString));
-				H.picture[targetImg].setTag(pifile.getAbsolutePath());
-				if (pifile.isFile()) {
-					Log.i(TAG, "OK  Load cached embedded post Img: " + imgHashString);
-					H.picture[targetImg].setImageDrawable(new BitmapDrawable(pifile.getAbsolutePath()));
-					H.picture[targetImg].setVisibility(View.VISIBLE);
-				} else {
-					Log.i(TAG, "OK  Decoding embedded post Img: " + Integer.toString(imgHash));
-					final byte[] imgAsBytes = Base64.decode(encodedImg.getBytes(), Base64.DEFAULT);
-					try {
-						FileOutputStream pifileOut = new FileOutputStream(pifile.getAbsolutePath());
-						pifileOut.write(imgAsBytes);
-						pifileOut.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-
-					// H.picture[targetImg].setImageDrawable(new BitmapDrawable(BitmapFactory.decodeByteArray(imgAsBytes, 0, imgAsBytes.length)));
-					H.picture[targetImg].setImageDrawable(new BitmapDrawable(pifile.getAbsolutePath()));
-					H.picture[targetImg].setVisibility(View.VISIBLE);
-				}
-			} else {
-				Log.i(TAG, "TRY Downloading post Img: " + piurl);
-				final File pifile = new File(Max.IMG_CACHE_DIR + "/pi_" + Max.cleanFilename(piurl));
-				H.picture[targetImg].setTag(pifile.getAbsolutePath());
-				if (pifile.isFile()) {
-					Log.i(TAG, "OK  Load cached post Img: " + piurl);
-					BitmapDrawable bmp = new BitmapDrawable(pifile.getAbsolutePath());
-					if (bmp.getBitmap() != null && bmp.getBitmap().getWidth() > 30) { // minWidth 30px to remove facebook's ugly icons
-						H.picture[targetImg].setImageDrawable(bmp);
-						H.picture[targetImg].setVisibility(View.VISIBLE);
-					}
-				} else {
-					pidl.urlDownloadToFile(piurl, pifile.getAbsolutePath(), new Runnable() {
-						@Override
-						public void run() {
-							Log.i(TAG, "OK  Download post Img: " + piurl);
-							BitmapDrawable bmp = new BitmapDrawable(pifile.getAbsolutePath());
-							if (bmp.getBitmap() != null && bmp.getBitmap().getWidth() > 30) { // minWidth 30px to remove facebook's ugly icons
-								H.picture[targetImg].setImageDrawable(bmp);
-								H.picture[targetImg].setVisibility(View.VISIBLE);
-							}
-						}
-					});
-				}
 			}
 
+			Friendica.placeImageFromURI(img.getSource(), H.picture[pos],getContext(),"pi");
+
 			pos++;
-
 		}
-
 	}
-
 }

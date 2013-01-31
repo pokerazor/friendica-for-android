@@ -1,5 +1,8 @@
 package de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -9,12 +12,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.net.Uri.Builder;
+import android.text.Spannable;
+import android.text.style.ImageSpan;
+import android.util.Base64;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import de.wikilab.android.friendica01.Max;
 import de.wikilab.android.friendica01.TwAjax;
 
 public class Friendica {
+	private static final String TAG = "Friendica/MainAbstraction";
+
 	final static String API_PATH = "/api/";
 	final static String API_TYPE_JSON = ".json";
 	final Integer ITEMS_PER_PAGE = 20;
@@ -71,9 +83,11 @@ public class Friendica {
 
 	public class ResultObject<TargetResultClass extends Object> {
 		private TargetResultClass result = null;
+
 		public TargetResultClass getResult() {
 			return result;
 		}
+
 		public void setResult(TargetResultClass result) {
 			this.result = result;
 		}
@@ -115,6 +129,81 @@ public class Friendica {
 			result.setResult(resultArray);
 			jsonFinishReaction.onFinished(result);
 			finished = true;
+		}
+	}
+
+	public static void getProfileImageFromPost(JSONObject post, final ImageView target, Context context) {
+		try {
+			final String piurl = post.getJSONObject("user").getString("profile_image_url");
+			placeImageFromURI(piurl, target, context, "pi");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static String getImageURIFromPost(Spannable htmlSpannable){
+		return getImagesFromPost(htmlSpannable)[0].getSource();
+	}
+	
+	public static ImageSpan[] getImagesFromPost(Spannable htmlSpannable){
+		ImageSpan[] images=htmlSpannable.getSpans(0, htmlSpannable.length(), ImageSpan.class);
+		return images;
+	}
+	
+	static public void placeImageFromURI(final String uri, final ImageView target, Context context, String prefix) {
+		final TwAjax pidl = new TwAjax(context, true, false);
+		pidl.ignoreSSLCerts = true;
+
+		if (uri.startsWith("data:image")) {
+			Log.i(TAG, "TRY Extracting embedded Img: " + uri);
+			final int imgStart = uri.indexOf("base64,") + 7; // TODO SHOULD CHECK FOR FAILURE TO FIND base64,
+			final String encodedImg = uri.substring(imgStart);
+			final int imgHash = encodedImg.hashCode();
+			final String imgHashString = Integer.toString(imgHash);
+
+			final File pifile = new File(Max.IMG_CACHE_DIR + "/" + prefix + "_" + Max.cleanFilename(imgHashString));
+			target.setTag(pifile.getAbsolutePath());
+			if (pifile.isFile()) {
+				Log.i(TAG, "OK  Load cached embedded Img: " + imgHashString);
+				target.setImageDrawable(new BitmapDrawable(pifile.getAbsolutePath()));
+				target.setVisibility(View.VISIBLE);
+			} else {
+				Log.i(TAG, "OK  Decoding embedded Img: " + Integer.toString(imgHash));
+				final byte[] imgAsBytes = Base64.decode(encodedImg.getBytes(), Base64.DEFAULT);
+				try {
+					FileOutputStream pifileOut = new FileOutputStream(pifile.getAbsolutePath());
+					pifileOut.write(imgAsBytes);
+					pifileOut.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				target.setImageDrawable(new BitmapDrawable(pifile.getAbsolutePath()));
+				target.setVisibility(View.VISIBLE);
+			}
+		} else {
+			Log.i(TAG, "TRY Downloading Img: " + uri);
+			final File pifile = new File(Max.IMG_CACHE_DIR + "/" + prefix + "_" + Max.cleanFilename(uri));
+			target.setTag(pifile.getAbsolutePath());
+			if (pifile.isFile()) {
+				Log.i(TAG, "OK  Load cached post Img: " + uri);
+				BitmapDrawable bmp = new BitmapDrawable(pifile.getAbsolutePath());
+				if (bmp.getBitmap() != null && bmp.getBitmap().getWidth() > 30) { // minWidth 30px to remove facebook's ugly icons
+					target.setImageDrawable(bmp);
+					target.setVisibility(View.VISIBLE);
+				}
+			} else {
+				pidl.urlDownloadToFile(uri, pifile.getAbsolutePath(), new Runnable() {
+					@Override
+					public void run() {
+						Log.i(TAG, "OK  Download Img: " + uri);
+						BitmapDrawable bmp = new BitmapDrawable(pifile.getAbsolutePath());
+						if (bmp.getBitmap() != null && bmp.getBitmap().getWidth() > 30) { // minWidth 30px to remove facebook's ugly icons
+							target.setImageDrawable(bmp);
+							target.setVisibility(View.VISIBLE);
+						}
+					}
+				});
+			}
 		}
 	}
 }
