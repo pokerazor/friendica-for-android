@@ -1,4 +1,3 @@
-// Created by plusminus on 00:23:14 - 03.10.2008
 package de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon;
 
 import java.util.ArrayList;
@@ -13,6 +12,7 @@ import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
+
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
@@ -22,10 +22,18 @@ import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 
 import android.app.Activity;
+import android.content.Context;
+
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+
+import android.view.View;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
@@ -72,8 +80,9 @@ public class MapActivity extends Activity implements MapEventsReceiver {
 
 		this.mLocationOverlay = new MyLocationOverlay(this, this.mOsmv, mResourceProxy);
 		this.mLocationOverlay.enableCompass();
-		this.mLocationOverlay.enableMyLocation();
-		this.mLocationOverlay.enableFollowLocation();
+		// this.mLocationOverlay.enableMyLocation();
+
+		//this.mLocationOverlay.enableFollowLocation();
 
 		this.mOsmv.getOverlays().add(this.mLocationOverlay);
 
@@ -84,18 +93,90 @@ public class MapActivity extends Activity implements MapEventsReceiver {
 		this.locationEventsOverlay.addTimelinePositions();
 		this.locationEventsOverlay.setFocusItemsOnTap(true);
 		this.mOsmv.getOverlays().add(this.locationEventsOverlay);
-		
+
 		MapEventsOverlay overlay = new MapEventsOverlay(this, this);
 		this.mOsmv.getOverlays().add(overlay);
 
-		/* breaks all markers
-		MinimapOverlay miniMapOverlay = new MinimapOverlay(this, mOsmv.getTileRequestCompleteHandler());
-		this.mOsmv.getOverlays().add(miniMapOverlay);
-		*/
+		/*
+		 * breaks all markers MinimapOverlay miniMapOverlay = new
+		 * MinimapOverlay(this, mOsmv.getTileRequestCompleteHandler());
+		 * this.mOsmv.getOverlays().add(miniMapOverlay);
+		 */
 
 		this.setContentView(rl);
 	}
 
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.map_activity_menu, menu);
+		return true;
+	}
+
+	public boolean onOptionsItemSelected(MenuItem item) {
+		Context context = getApplicationContext();
+		switch (item.getItemId()) {
+		case R.id.map_mode:
+			return true;
+		case R.id.position:
+			if (this.mLocationOverlay.isMyLocationEnabled() == true) {
+				this.mLocationOverlay.disableMyLocation();
+				this.mLocationOverlay.disableFollowLocation();
+				CharSequence text = "Location disabled";
+				int duration = Toast.LENGTH_SHORT;
+				Toast toast = Toast.makeText(context, text, duration);
+				toast.show();
+			} else {
+				this.mLocationOverlay.enableMyLocation();
+				this.mLocationOverlay.enableFollowLocation();
+				CharSequence text = "Location enabled";
+				int duration = Toast.LENGTH_SHORT;
+				Toast toast = Toast.makeText(context, text, duration);
+				toast.show();
+			}
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+	
+	public void onRadioButtonClicked(View view) {
+	    // Is the button now checked?
+	    boolean checked = ((RadioButton) view).isChecked();
+	    
+	    // Check which radio button was clicked
+	    switch(view.getId()) {
+	    		//Mapnik
+	        case R.id.submenu1:
+	            if (checked)
+	            	
+	            break;
+	            //Bicycle map
+	        case R.id.submenu2:
+	            if (checked)
+	              
+	            break;
+	            //public transport
+	        case R.id.submenu3:
+	        	if (checked)
+	        		
+	        		break;
+	        	//Mapquest
+	        case R.id.submenu4:
+	        	if (checked)
+	        		
+	        		break;
+	        	//Mapquest Aerial
+	        case R.id.submenu5:
+	        	if (checked)
+	        		
+	        		break;
+	        	//Bing
+	        case R.id.submenu6:
+	        	if (checked)
+	        		
+	        		break;
+	    }
+	}
+	
 	public void goOn(ArrayList<TimelineEvent> timelineEvents) {
 		// owner.mOsmv.getOverlays().add(getPathOverlay());
 
@@ -137,7 +218,7 @@ public class MapActivity extends Activity implements MapEventsReceiver {
 		mRoad = null;
 		ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
 		for (TimelineEvent timelineEvent : timelineEvents) {
-			if(timelineEvent.getLocation() != null){
+			if (timelineEvent.getLocation() != null) {
 				waypoints.add(timelineEvent.getLocation());
 			}
 		}
@@ -162,6 +243,7 @@ public class MapActivity extends Activity implements MapEventsReceiver {
 			RoadManager roadManager = new OSRMRoadManager();
 			return roadManager.getRoad(((ArrayList<GeoPoint>) params[0]));
 		}
+
 		protected void onPostExecute(Road result) {
 			mRoad = result;
 			updateUIWithRoad(result);
@@ -170,13 +252,13 @@ public class MapActivity extends Activity implements MapEventsReceiver {
 
 	@Override
 	public boolean longPressHelper(IGeoPoint eventLocation) {
-		Toast.makeText(this, "Map long pressed at "+eventLocation.getLatitudeE6()+", "+eventLocation.getLongitudeE6(), Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, "Map long pressed at " + eventLocation.getLatitudeE6() + ", " + eventLocation.getLongitudeE6(), Toast.LENGTH_SHORT).show();
 		return false;
 	}
 
 	@Override
 	public boolean singleTapUpHelper(IGeoPoint eventLocation) {
-		Toast.makeText(this, "Map single tapped at "+eventLocation.getLatitudeE6()+", "+eventLocation.getLongitudeE6(), Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, "Map single tapped at " + eventLocation.getLatitudeE6() + ", " + eventLocation.getLongitudeE6(), Toast.LENGTH_SHORT).show();
 		return false;
 	}
 }

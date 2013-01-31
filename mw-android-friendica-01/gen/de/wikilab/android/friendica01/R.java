@@ -168,6 +168,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int listview=0x7f07002c;
         public static final int maintb=0x7f070038;
         public static final int map_fragment=0x7f07000a;
+        public static final int map_mode=0x7f07005a;
         public static final int menu_fragment=0x7f07001b;
         public static final int messages=0x7f07003b;
         public static final int notice_bar=0x7f07000d;
@@ -175,6 +176,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int picture2=0x7f070046;
         public static final int picture3=0x7f070047;
         public static final int pl_fragment=0x7f070043;
+        public static final int position=0x7f070061;
         public static final int preview=0x7f07004e;
         public static final int profileImage=0x7f07002e;
         public static final int profile_content=0x7f070057;
@@ -199,6 +201,12 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int star_count=0x7f070042;
         public static final int subheader=0x7f070034;
         public static final int subject=0x7f070032;
+        public static final int submenu1=0x7f07005b;
+        public static final int submenu2=0x7f07005c;
+        public static final int submenu3=0x7f07005d;
+        public static final int submenu4=0x7f07005e;
+        public static final int submenu5=0x7f07005f;
+        public static final int submenu6=0x7f070060;
         public static final int tableLayout1=0x7f07001d;
         public static final int tableRow1=0x7f07001e;
         public static final int tableRow2=0x7f070022;
@@ -213,7 +221,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int userNameRecipient=0x7f070035;
         public static final int viewLatLon=0x7f070059;
         public static final int viewLatLonPhoto=0x7f070050;
-        public static final int view_debug=0x7f07005a;
+        public static final int view_debug=0x7f070062;
         public static final int view_fragment_container=0x7f070017;
         public static final int webview=0x7f070004;
     }
@@ -265,7 +273,8 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int writepostinner=0x7f03002c;
     }
     public static final class menu {
-        public static final int uploadfile_menu=0x7f0b0000;
+        public static final int map_activity_menu=0x7f0b0000;
+        public static final int uploadfile_menu=0x7f0b0001;
     }
     public static final class raw {
         public static final int doorbell2=0x7f060000;
