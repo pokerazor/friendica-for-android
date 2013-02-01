@@ -24,7 +24,6 @@ public class TimelineEvent {
 	public static final Integer TYPE_LIKE = 5;
 
 	protected Integer type = -1;
-	protected String textthis = "";
 	protected String dateTime = "";
 	protected Long createdAt = (long) 0.0;
 

@@ -60,5 +60,9 @@
         <string name="contentDescription_profile_image">Profile Image</string>
         <string name="contentDescriptionUploadImagePreview">Preview of image to upload</string>
         <string name="input_label_post_title">Post Title (optional):</string>
+        <string name="imageAltText">Image</string>
+        <string name="titlePlaceholder">Title</string>
+        <string name="descriptionPlaceholder">Description</string>
+        <string name="addressPlaceholder">Address</string>
 
 </resources>

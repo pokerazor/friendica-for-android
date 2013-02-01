@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica;
 import de.wikilab.android.friendica01.Max;
-import de.wikilab.android.friendica01.PostListAdapter;
 import de.wikilab.android.friendica01.TwAjax;
 
 public class LocationEventsOverlay extends ItemizedOverlayWithFocus<OverlayItem> {

@@ -8,12 +8,9 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.CheckBox;
 import android.widget.CheckedTextView;
-import android.widget.TextView;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.GenericJsonAdapter;
-import de.wikilab.android.friendica01.R;
 
 public class RoutesAdapter extends GenericJsonAdapter {
 	protected RouteViewHolder H = null;
@@ -46,10 +43,10 @@ public class RoutesAdapter extends GenericJsonAdapter {
 			
 			H.routeName = (CheckedTextView) convertView.findViewById(android.R.id.text1);
 
-//			H.routeName = (TextView) convertView.findViewById(R.id.rawjson);
-//			H.routeActiveCheckbox = (CheckBox) convertView.findViewById(android.R.id.);
+//			event.routeName = (TextView) convertView.findViewById(R.id.rawjson);
+//			event.routeActiveCheckbox = (CheckBox) convertView.findViewById(android.R.id.);
 			/*
-			H.routeActiveCheckbox.setOnClickListener(new View.OnClickListener() {
+			event.routeActiveCheckbox.setOnClickListener(new View.OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {
@@ -73,7 +70,7 @@ public class RoutesAdapter extends GenericJsonAdapter {
 			H.routeName.setText(route.getString("name"));
 			H.routeActive = route.getInt("active") == 1;
 			H.routeName.setChecked(H.routeActive);
-//			H.routeActiveCheckbox.setTag(H.routeId);
+//			event.routeActiveCheckbox.setTag(event.routeId);
 		} catch (Exception e) {
 			H.routeName.setText("xxInvalid Dataset!");
 		}

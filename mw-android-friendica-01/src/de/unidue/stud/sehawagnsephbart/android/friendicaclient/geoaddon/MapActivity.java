@@ -2,28 +2,25 @@ package de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon;
 
 import java.util.ArrayList;
 
-import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.bonuspack.overlays.ExtendedOverlayItem;
 import org.osmdroid.bonuspack.overlays.ItemizedOverlayWithBubble;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
-
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 
 import android.app.Activity;
 import android.content.Context;
-
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -31,12 +28,11 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.Toast;
 import de.wikilab.android.friendica01.R;
 
 public class MapActivity extends Activity implements MapEventsReceiver {
@@ -80,9 +76,6 @@ public class MapActivity extends Activity implements MapEventsReceiver {
 
 		this.mLocationOverlay = new MyLocationOverlay(this, this.mOsmv, mResourceProxy);
 		this.mLocationOverlay.enableCompass();
-		// this.mLocationOverlay.enableMyLocation();
-
-		//this.mLocationOverlay.enableFollowLocation();
 
 		this.mOsmv.getOverlays().add(this.mLocationOverlay);
 
@@ -182,25 +175,28 @@ public class MapActivity extends Activity implements MapEventsReceiver {
 
 		getRoadAsync(timelineEvents);
 
-		final ArrayList<ExtendedOverlayItem> roadItems = generateMarkers(timelineEvents);
-		ItemizedOverlayWithBubble<ExtendedOverlayItem> roadNodes = new ItemizedOverlayWithBubble<ExtendedOverlayItem>(this, roadItems, mOsmv);
+		final ArrayList<TimelineEventItem> roadItems = generateMarkers(timelineEvents);
+		ItemizedOverlayWithBubble<TimelineEventItem> roadNodes = new ItemizedOverlayWithBubble<TimelineEventItem>(this, roadItems, mOsmv,new TimelineEventMapPopup(R.layout.map_popup, mOsmv));
 		mOsmv.getOverlays().add(roadNodes);
 	}
 
-	ArrayList<ExtendedOverlayItem> generateMarkers(ArrayList<TimelineEvent> timelineEvents) {
+	ArrayList<TimelineEventItem> generateMarkers(ArrayList<TimelineEvent> timelineEvents) {
 		Drawable marker = getResources().getDrawable(R.drawable.marker_node);
-		ArrayList<ExtendedOverlayItem> markers = new ArrayList<ExtendedOverlayItem>();
+		ArrayList<TimelineEventItem> markers = new ArrayList<TimelineEventItem>();
 		for (TimelineEvent timelineEvent : timelineEvents) {
+			ArrayList<TimelineEvent> curTimelineEvents=new ArrayList<TimelineEvent>();
+			curTimelineEvents.add(timelineEvent);
+			curTimelineEvents.add(timelineEvent);
 
-			ExtendedOverlayItem nodeMarker = new ExtendedOverlayItem("", "", timelineEvent.getLocation(), this);
+			TimelineEventItem nodeMarker = new TimelineEventItem(curTimelineEvents, this);
 			nodeMarker.setMarkerHotspot(OverlayItem.HotspotPlace.CENTER);
 			nodeMarker.setMarker(marker);
-			nodeMarker.setTitle("Posted:");
-			nodeMarker.setDescription(timelineEvent.getId() + ": " + timelineEvent.getText());
-			nodeMarker.setSubDescription(timelineEvent.getDateTime());
-			nodeMarker.setSubDescription(timelineEvent.getRelativeDate(this));
+	//		nodeMarker.setTitle("Posted:");
+	//		nodeMarker.setDescription(timelineEvent.getId() + ": " + timelineEvent.getText());
+	//		nodeMarker.setSubDescription(timelineEvent.getDateTime());
+	//		nodeMarker.setSubDescription(timelineEvent.getRelativeDate(this));
 
-			nodeMarker.setImage(timelineEvent.getImage());
+	//		nodeMarker.setImage(timelineEvent.getImage());
 
 			markers.add(nodeMarker);
 		}

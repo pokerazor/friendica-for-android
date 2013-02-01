@@ -63,7 +63,7 @@ public class MessageContentAdapter extends ArrayAdapter<JSONObject> {
 
 			H = new ViewHolder();
 			convertView = inf.inflate(R.layout.msg_contentitem, null);
-			//H.subject = (TextView) convertView.findViewById(R.id.subject);
+			//event.subject = (TextView) convertView.findViewById(R.id.subject);
 			H.userName = (TextView) convertView.findViewById(R.id.userName);
 			H.htmlContent = (TextView) convertView.findViewById(R.id.htmlContent);
 			H.profileImage = (ImageView) convertView.findViewById(R.id.profileImage);
@@ -131,14 +131,14 @@ public class MessageContentAdapter extends ArrayAdapter<JSONObject> {
 		
 		try {
 			
-			//Max.setHtmlWithImages(H.htmlContent, post.getString("statusnet_html"));
+			//Max.setHtmlWithImages(event.htmlContent, post.getString("statusnet_html"));
 			String filtered_html = post.getString("text");
 			if (filtered_html.length()>500) filtered_html=filtered_html.substring(0,500)+"<br><br><b>click to read more...</b>";
 			filtered_html = filtered_html.replace("\n", "<br>");
 			
 			Spanned spanned = Html.fromHtml(filtered_html);
 			H.htmlContent.setText(spanned);
-			//H.subject.setText(post.getString("title"));
+			//event.subject.setText(post.getString("title"));
 			
 		} catch (JSONException e) {
 			H.htmlContent.setText("Invalid Dataset!");

@@ -234,7 +234,7 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 
 		try {
 
-			// Max.setHtmlWithImages(H.htmlContent, post.getString("statusnet_html"));
+			// Max.setHtmlWithImages(event.htmlContent, post.getString("statusnet_html"));
 			String filtered_html = post.getString("statusnet_html");
 			filtered_html = filtered_html.replaceAll("(<br[^>]*>|</?div[^>]*>|</?p>)", "  ");
 			// filtered_html = filtered_html.replaceAll("<img[^>]+src=[\"']([^>\"']+)[\"'][^>]*>", "<a href='$1'>Bild: $1</a>");

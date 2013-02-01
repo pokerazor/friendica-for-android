@@ -47,7 +47,7 @@ public class RouteAdminFragment extends ContentFragment {
 				for (JSONObject jsonObject : myRoutes) {
 					System.out.println(jsonObject);
 				}
-				list.setAdapter(new GenericJsonAdapter(getActivity(), myRoutes));
+//				list.setAdapter(new GenericJsonAdapter(getActivity(), myRoutes));
 
 				list.setAdapter(new RoutesAdapter(getActivity(), myRoutes));
 
