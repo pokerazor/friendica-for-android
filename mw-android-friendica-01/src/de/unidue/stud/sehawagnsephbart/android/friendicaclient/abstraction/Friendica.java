@@ -150,6 +150,25 @@ public class Friendica {
 		return images;
 	}
 	
+	public static String getScaledImageURI(String imageUri,Integer scaleLevel){
+		Uri imageUriObject;
+		if(scaleLevel==0 || scaleLevel==1 || scaleLevel==2){ //0=fullsize, 2=small
+			imageUriObject=Uri.parse(imageUri);
+			String filename=imageUriObject.getLastPathSegment();
+			
+			String path=imageUriObject.getPath();
+			path=path.substring(0,path.length()-filename.length());
+			
+			String[] filenameParts = filename.split("\\.");
+			filenameParts[0]=filenameParts[0].substring(0, filenameParts[0].length()-1);
+			filenameParts[0]=filenameParts[0]+scaleLevel;
+
+			return imageUriObject.buildUpon().path(path).appendPath(filenameParts[0]+"."+filenameParts[1]).build().toString(); //Build and return new URI with original path and new filename
+
+		}
+		return imageUri;
+	}
+	
 	static public void placeImageFromURI(final String uri, final ImageView target, Context context, String prefix) {
 		final TwAjax pidl = new TwAjax(context, true, false);
 		pidl.ignoreSSLCerts = true;

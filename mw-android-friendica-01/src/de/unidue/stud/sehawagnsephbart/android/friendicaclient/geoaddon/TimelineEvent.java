@@ -56,6 +56,8 @@ public class TimelineEvent {
 
 			this.setDate(java.util.Date.parse(getDateTime()));
 			this.setImageFromHTML(jsonPost.getString("statusnet_html"));
+			
+//			System.err.println(jsonPost.getString("statusnet_html"));
 
 			String coordinates = jsonPost.getString("coordinates");
 
