@@ -10,20 +10,18 @@ import org.osmdroid.views.MapView;
 import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ImageView;
 import android.widget.ListView;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica;
 import de.wikilab.android.friendica01.R;
 
 /** @author Hanno - Felix Wagner */
 public class TimelineEventMapPopup extends InfoWindow {
-	TimelineEventAdapter adapter = null;
+	TimelineEventAdapter<TimelineEventMapPopup> adapter = null;
 
 	ListView listview = null;
 	ImageView fullsizeImage = null;
@@ -45,7 +43,7 @@ public class TimelineEventMapPopup extends InfoWindow {
 
 	@Override
 	public void onOpen(ExtendedOverlayItem item) {
-		this.adapter = new TimelineEventAdapter(this.mMapView.getContext(), ((TimelineEventItem) item).getTimelineEvents(),this);
+		this.adapter = new TimelineEventAdapter<TimelineEventMapPopup>(this.mMapView.getContext(), ((TimelineEventItem) item).getTimelineEvents(),this);
 		this.listview=(ListView) this.mView.findViewById(R.id.timelineEventsList);
 		this.fullsizeImage=(ImageView) this.mView.findViewById(R.id.fullsizeImage);
 		
@@ -72,12 +70,7 @@ public class TimelineEventMapPopup extends InfoWindow {
 		this.listview.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-//				Toast blabla = Toast.makeText(mView.getContext(), "TEMPlistview itemclicked "+arg0+arg1+arg2+arg3, Toast.LENGTH_SHORT);
-				Integer itemId=(Integer) arg1.findViewById(R.id.bubble_image).getTag(R.id.caption);
 				((ImageView) arg1.findViewById(R.id.bubble_image)).performClick();
-				Toast blabla = Toast.makeText(mView.getContext(), "itemclicked, id= "+itemId, Toast.LENGTH_SHORT);
-
-				blabla.show();
 			}
 		});
 		this.listview.setOnItemSelectedListener(new OnItemSelectedListener() {
