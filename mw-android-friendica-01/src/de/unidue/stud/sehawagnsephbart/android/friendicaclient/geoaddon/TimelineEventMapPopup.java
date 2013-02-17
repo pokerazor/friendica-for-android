@@ -72,8 +72,12 @@ public class TimelineEventMapPopup extends InfoWindow {
 		this.listview.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-/*				Toast blabla = Toast.makeText(mView.getContext(), "TEMPlistview itemclicked "+arg0+arg1+arg2+arg3, Toast.LENGTH_SHORT);
-				blabla.show();*/
+//				Toast blabla = Toast.makeText(mView.getContext(), "TEMPlistview itemclicked "+arg0+arg1+arg2+arg3, Toast.LENGTH_SHORT);
+				Integer itemId=(Integer) arg1.findViewById(R.id.bubble_image).getTag(R.id.caption);
+				((ImageView) arg1.findViewById(R.id.bubble_image)).performClick();
+				Toast blabla = Toast.makeText(mView.getContext(), "itemclicked, id= "+itemId, Toast.LENGTH_SHORT);
+
+				blabla.show();
 			}
 		});
 		this.listview.setOnItemSelectedListener(new OnItemSelectedListener() {

@@ -162,6 +162,11 @@ public class TimelineEventAdapter<mPopup> extends ArrayAdapter<TimelineEvent> {
 //					System.out.println(v.getParent());
 //					parent.removeAllViews();
 //					parent.removeAllViewsInLayout();
+					
+					touchedImage=((ImageView)v);
+					String originalURI=(String) touchedImage.getTag(R.id.subject);
+					Drawable image=touchedImage.getDrawable();
+					mPopup.setFullsizeImage(image,originalURI);
 
 				}
 			});
