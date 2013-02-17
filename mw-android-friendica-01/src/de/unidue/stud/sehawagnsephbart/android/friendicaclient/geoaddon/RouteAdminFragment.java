@@ -29,8 +29,7 @@ public class RouteAdminFragment extends ContentFragment {
 		myView = inflater.inflate(R.layout.route_admin, container, false);
 		list = (ListView) myView.findViewById(R.id.routesList);
 		list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-		friendicaAbstraction = new Friendica();
-		friendicaAbstraction.setContext(getActivity());
+		friendicaAbstraction = new Friendica(getActivity());
 
 		return myView;
 	}
@@ -45,7 +44,7 @@ public class RouteAdminFragment extends ContentFragment {
 			public void onFinished(ResultObject<ArrayList<JSONObject>> result) {
 				ArrayList<JSONObject> myRoutes = result.getResult();
 				for (JSONObject jsonObject : myRoutes) {
-					System.out.println(jsonObject);
+//					System.out.println(jsonObject);
 				}
 //				list.setAdapter(new GenericJsonAdapter(getActivity(), myRoutes));
 

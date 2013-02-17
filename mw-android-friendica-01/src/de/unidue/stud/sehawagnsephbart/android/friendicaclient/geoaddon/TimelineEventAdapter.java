@@ -73,6 +73,7 @@ public class TimelineEventAdapter<mPopup> extends ArrayAdapter<TimelineEvent> {
 			timEvViHo.bubble_image.setImageDrawable(item.getImage());
 			timEvViHo.bubble_image.setTag(R.id.caption, item.getId());
 			timEvViHo.bubble_image.setTag(R.id.subject, item.getImageURI());
+			timEvViHo.bubble_image.setTag(R.id.active, item.getType());
 			timEvViHo.bubble_image.setOnTouchListener(new OnTouchListener() {
 
 				@Override
@@ -85,10 +86,11 @@ public class TimelineEventAdapter<mPopup> extends ArrayAdapter<TimelineEvent> {
 				@Override
 				public void onClick(View v) {					
 					touchedImage=((ImageView)v);
-					String originalURI=(String) touchedImage.getTag(R.id.subject);
-					Drawable image=touchedImage.getDrawable();
-					mPopup.setFullsizeImage(image,originalURI);
-
+					if(touchedImage.getTag(R.id.active)==TimelineEvent.TYPE_IMAGE){
+						String originalURI=(String) touchedImage.getTag(R.id.subject);
+						Drawable image=touchedImage.getDrawable();
+						mPopup.setFullsizeImage(image,originalURI);
+					}
 				}
 			});
 

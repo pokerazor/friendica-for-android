@@ -383,6 +383,6 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 	}
 
 	private void navigateMapActivity() {
-		startActivity(new Intent("de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.MapActivity"));
+		startActivity(new Intent("de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.TimelineEventMapActivity"));
 	}
 }

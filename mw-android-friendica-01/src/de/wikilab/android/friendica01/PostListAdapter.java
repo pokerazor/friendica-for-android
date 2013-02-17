@@ -201,7 +201,7 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 		if (H.profileImage != null) {
 			H.profileImage.setImageResource(R.drawable.ic_launcher);
 
-			Friendica.getProfileImageFromPost(post, H.profileImage, getContext());
+			Friendica.displayProfileImageFromPost(post, H.profileImage, getContext());
 
 		}
 

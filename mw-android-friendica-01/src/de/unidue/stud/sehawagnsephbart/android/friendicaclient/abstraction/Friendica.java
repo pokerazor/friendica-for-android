@@ -32,6 +32,16 @@ public class Friendica {
 	final Integer ITEMS_PER_PAGE = 20;
 	Integer curLoadPage = 1;
 	private Context context = null;
+	
+	
+	public Friendica(){
+		
+	}
+	
+	public Friendica(Context context){
+		this();
+		this.setContext(context);
+	}
 
 	public Context getContext() {
 		return context;
@@ -59,7 +69,7 @@ public class Friendica {
 				}
 			}
 		});
-		if (jsonProcessor.getFinished()) {
+		if (jsonProcessor.getIsFinished()) {
 			System.out.println("Already finished");
 		}
 	}
@@ -103,6 +113,7 @@ public class Friendica {
 		private ResultObject<ArrayList<JSONObject>> result;
 		private ArrayList<JSONObject> resultArray = new ArrayList<JSONObject>();
 		private Boolean finished = false;
+		private Boolean error = false;
 
 		public JsonProcessor(TwAjax t, JsonFinishReaction<ArrayList<JSONObject>> finishReaction, ResultObject<ArrayList<JSONObject>> result) {
 			this.t = t;
@@ -110,29 +121,44 @@ public class Friendica {
 			this.result = result;
 		}
 
-		public Boolean getFinished() {
+		public Boolean getIsFinished() {
 			return finished;
+		}
+		
+		public Boolean getIsError() {
+			return error;
 		}
 
 		@Override
 		public void run() {
-			JSONArray jAr = (JSONArray) t.getJsonResult();
-			for (int i = 0; i < jAr.length(); i++) {
-				JSONObject jObj;
-				try {
-					jObj = jAr.getJSONObject(i);
-					resultArray.add(jObj);
-				} catch (JSONException e) {
-					e.printStackTrace();
+			Object jsonResult = t.getJsonResult();
+			if(jsonResult instanceof JSONArray){
+				JSONArray jAr = (JSONArray) jsonResult;
+				for (int i = 0; i < jAr.length(); i++) {
+					JSONObject jObj;
+					try {
+						jObj = jAr.getJSONObject(i);
+						resultArray.add(jObj);
+					} catch (JSONException e) {
+						e.printStackTrace();
+						
+					}
 				}
+				this.result.setResult(resultArray);
+				jsonFinishReaction.onFinished(this.result);
+				finished = true;
+			}else{
+				error=true; //e.g. {"error":"not implemented"}
+				
+				this.result.setResult(resultArray);
+				jsonFinishReaction.onFinished(this.result);
+				System.err.println(jsonResult);
+				finished = true;
 			}
-			result.setResult(resultArray);
-			jsonFinishReaction.onFinished(result);
-			finished = true;
 		}
 	}
 
-	public static void getProfileImageFromPost(JSONObject post, final ImageView target, Context context) {
+	public static void displayProfileImageFromPost(JSONObject post, final ImageView target, Context context) {
 		try {
 			final String piurl = post.getJSONObject("user").getString("profile_image_url");
 			placeImageFromURI(piurl, target, context, "pi");

@@ -168,11 +168,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.MapActivity"
+            android:name="de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.TimelineEventMapActivity"
             android:exported="false"
             android:label="@string/menuitem_map" >
             <intent-filter>
-                <action android:name="de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.MapActivity" />
+                <action android:name="de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.TimelineEventMapActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

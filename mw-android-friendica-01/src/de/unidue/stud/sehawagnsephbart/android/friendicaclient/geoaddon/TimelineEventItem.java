@@ -17,8 +17,8 @@ public class TimelineEventItem extends ExtendedOverlayItem {
 		super("", "", aGeoPoint, context);
 	}
 
-	public TimelineEventItem(ArrayList<TimelineEvent> timelineEvents, MapActivity mapActivity) {
-		this(timelineEvents.get(0).getLocation(), mapActivity);
+	public TimelineEventItem(ArrayList<TimelineEvent> timelineEvents, TimelineEventMapActivity timelineEventMapActivity) {
+		this(timelineEvents.get(0).getLocation(), timelineEventMapActivity);
 		mTimelineEvents = timelineEvents;
 	}
 

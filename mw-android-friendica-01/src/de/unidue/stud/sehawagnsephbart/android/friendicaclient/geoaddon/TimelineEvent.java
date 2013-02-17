@@ -22,6 +22,8 @@ public class TimelineEvent {
 	public static final Integer TYPE_FRIENDSHIP = 3;
 	public static final Integer TYPE_COMMENT = 4;
 	public static final Integer TYPE_LIKE = 5;
+	
+	protected ImageView tempImageHolder = null;
 
 	protected Integer type = -1;
 	protected String dateTime = "";
@@ -33,9 +35,11 @@ public class TimelineEvent {
 
 	protected GeoPoint location = null;
 	protected Integer id = -1;
-	private String text = "";
+	protected String text = "";
+	protected JSONObject jsonPost;
 
 	public TimelineEvent(JSONObject jsonPost) {
+		this.jsonPost=jsonPost;
 		try {
 
 			if (jsonPost.getString("verb").equals("http://activitystrea.ms/schema/1.0/like")) {
@@ -66,12 +70,21 @@ public class TimelineEvent {
 				GeoPoint gp = new GeoPoint(Double.parseDouble(splitcoordinates[0]), Double.parseDouble(splitcoordinates[1]));
 				this.setLocation(gp);
 			}
-
+			
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void processImage(Context context){ 		// TODO handle asynchronously
+		if(tempImageHolder==null){
+			tempImageHolder=new ImageView(context);
+		}
+		Friendica.displayProfileImageFromPost(jsonPost, tempImageHolder, context);
+		this.loadImageIntoTarget(tempImageHolder, context); // if event is image, override profile image with actual image
+		this.setImage(tempImageHolder.getDrawable());
 	}
 
 	private void setImageFromHTML(String html) {
@@ -91,7 +104,6 @@ public class TimelineEvent {
 	}
 	
 	public void loadImageIntoTarget(ImageView target, Context context) {
-
 		if(this.getType()==TYPE_IMAGE){
 			Friendica.placeImageFromURI(this.getImageURI(), target, context, "pi");
 		}
@@ -177,6 +189,11 @@ public class TimelineEvent {
 		this.imageURI = imageURI;
 	}
 
+	public ImageView getTempImageHolder() {
+		return tempImageHolder;
+	}
 
-
+	public void setTempImageHolder(ImageView tempImageHolder) {
+		this.tempImageHolder = tempImageHolder;
+	}
 }
