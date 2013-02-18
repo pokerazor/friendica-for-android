@@ -2,7 +2,6 @@ package de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon;
 
 import java.util.ArrayList;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IGeoPoint;
@@ -31,7 +30,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
@@ -39,9 +37,7 @@ import android.widget.Toast;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.JsonFinishReaction;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.ResultObject;
-import de.wikilab.android.friendica01.Max;
 import de.wikilab.android.friendica01.R;
-import de.wikilab.android.friendica01.TwAjax;
 
 public class TimelineEventMapActivity extends Activity implements MapEventsReceiver {
 	private Friendica friendicaAbstraction = null;
@@ -55,6 +51,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 
 	protected ItemizedOverlayWithBubble<TimelineEventItem> timelineEventItemsOverlay = null;
 	protected PathOverlay eventRoadRouteOverlay = null;
+	protected ArrayList<PathOverlay> eventRoadRouteOverlays = new ArrayList<PathOverlay>();
 	protected Road eventRoadRoute = null;
 
 	protected ArrayList<GeoPoint> eventItemLocations = new ArrayList<GeoPoint>();
@@ -73,6 +70,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Context context = getApplicationContext();
+		Toast toast = null;
 		switch (item.getItemId()) {
 		case R.id.map_mode:
 			return true;
@@ -80,16 +78,20 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 			if (this.myLocationOverlay.isMyLocationEnabled() == true) {
 				this.myLocationOverlay.disableMyLocation();
 				this.myLocationOverlay.disableFollowLocation();
-				CharSequence text = "Location disabled";
-				int duration = Toast.LENGTH_SHORT;
-				Toast toast = Toast.makeText(context, text, duration);
+				this.myLocationOverlay.disableCompass();
+				
+				mapView.getOverlayManager().remove(myLocationOverlay);
+				mapView.getOverlays().remove(myLocationOverlay);
+
+				toast = Toast.makeText(context, "Stop showing current location", Toast.LENGTH_SHORT);
 				toast.show();
 			} else {
 				this.myLocationOverlay.enableMyLocation();
 				this.myLocationOverlay.enableFollowLocation();
-				CharSequence text = "Location enabled";
-				int duration = Toast.LENGTH_SHORT;
-				Toast toast = Toast.makeText(context, text, duration);
+				this.myLocationOverlay.enableCompass();
+				mapView.getOverlayManager().add(myLocationOverlay);
+
+				toast = Toast.makeText(context, "Show current location", Toast.LENGTH_SHORT);
 				toast.show();
 			}
 		default:
@@ -160,19 +162,16 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 
 		this.scaleBarOverlay = new ScaleBarOverlay(this, mResourceProxy);
 		this.scaleBarOverlay.setScaleBarOffset(getResources().getDisplayMetrics().widthPixels / 2 - getResources().getDisplayMetrics().xdpi / 2, 10);
-		this.mapView.getOverlays().add(scaleBarOverlay);
+		this.mapView.getOverlayManager().add(scaleBarOverlay);
 
 		this.myLocationOverlay = new MyLocationOverlay(this, this.mapView, mResourceProxy);
 		this.myLocationOverlay.enableCompass();
-		this.mapView.getOverlays().add(this.myLocationOverlay);
+		this.mapView.getOverlayManager().add(this.myLocationOverlay);
 
 		this.renderTimelineEventPositions();
 
-		// TODO change to center on last event location
-		mMapController.setCenter(new GeoPoint(51.4624925, 7.0169541));
-
 		MapEventsOverlay overlay = new MapEventsOverlay(this, this);
-		this.mapView.getOverlays().add(overlay);
+		this.mapView.getOverlayManager().add(overlay);
 
 		this.setContentView(rl);
 	}
@@ -195,13 +194,11 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 
 				timelineEventItems = generateTimelineEventItems(timelineEvents);
 				timelineEventItemsOverlay = new ItemizedOverlayWithBubble<TimelineEventItem>(TimelineEventMapActivity.this, timelineEventItems, mapView, new TimelineEventMapPopup(R.layout.map_popup, mapView));
-				mapView.getOverlays().add(timelineEventItemsOverlay);
+				mapView.getOverlayManager().add(timelineEventItemsOverlay);
 				
 				BoundingBoxE6 boundingBox=BoundingBoxE6.fromGeoPoints(eventItemLocations);
 				mMapController.setCenter(boundingBox.getCenter());
 				mMapController.zoomToSpan(boundingBox);
-				
-
 			}
 		});
 	}
@@ -228,25 +225,42 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 			return;
 		}
 		if (road.mStatus == Road.STATUS_DEFAULT) {
-			Toast.makeText(this.mapView.getContext(), "We have a problem to get the route", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this.mapView.getContext(), "Event road route cannot be calculated (water in the way?)", Toast.LENGTH_SHORT).show();
 		}
-		eventRoadRouteOverlay = RoadManager.buildRoadOverlay(road, this.mapView.getContext());
-		mapView.getOverlays().add(eventRoadRouteOverlay);
+		eventRoadRouteOverlay = RoadManager.buildRoadOverlay(road, this);
+		
+		mapView.getOverlayManager().add(eventRoadRouteOverlay);
 		this.mapView.invalidate();
 	}
 
-	private class ComputeTimelineEventRoadRouteAsyncTask extends AsyncTask<Object, Void, Road> {
-		@SuppressWarnings("unchecked")
-		protected Road doInBackground(Object... timelineEventLocations) {
+	private class ComputeTimelineEventRoadRouteAsyncTask extends AsyncTask<ArrayList<GeoPoint>, Void, Road> {
+		protected Road doInBackground(ArrayList<GeoPoint>... timelineEventLocations) {
 			eventRoadRoute = null;
 
 			RoadManager roadManager = new OSRMRoadManager();
-			return roadManager.getRoad(((ArrayList<GeoPoint>) timelineEventLocations[0]));
+			Road completeRoad=roadManager.getRoad(timelineEventLocations[0]);
+			GeoPoint lastLocation=null;
+			ArrayList<GeoPoint> curLeg=new ArrayList<GeoPoint>();
+			
+			for (GeoPoint curLocation : timelineEventLocations[0]) {
+				curLeg.add(curLocation);
+				if(curLeg.size()==2){		
+					eventRoadRoute=roadManager.getRoad(curLeg);
+					eventRoadRouteOverlay=RoadManager.buildRoadOverlay(eventRoadRoute, TimelineEventMapActivity.this);
+					eventRoadRouteOverlays.add(eventRoadRouteOverlay);
+					
+					mapView.getOverlayManager().add(eventRoadRouteOverlay);
+					curLeg.remove(lastLocation);
+				}
+				lastLocation=curLocation;
+			}
+			
+			return roadManager.getRoad(timelineEventLocations[0]);
 		}
 
 		protected void onPostExecute(Road computedTimelineEventRoadRoute) {
 			eventRoadRoute = computedTimelineEventRoadRoute;
-			renderTimelineEventRoadRoute(computedTimelineEventRoadRoute);
+	//		renderTimelineEventRoadRoute(computedTimelineEventRoadRoute);
 		}
 	}
 
