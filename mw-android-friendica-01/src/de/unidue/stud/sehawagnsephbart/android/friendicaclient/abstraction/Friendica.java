@@ -141,7 +141,6 @@ public class Friendica {
 						resultArray.add(jObj);
 					} catch (JSONException e) {
 						e.printStackTrace();
-						
 					}
 				}
 				this.result.setResult(resultArray);

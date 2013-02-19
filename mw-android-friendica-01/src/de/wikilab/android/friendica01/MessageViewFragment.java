@@ -84,7 +84,7 @@ public class MessageViewFragment extends ContentFragment {
 
 					loadConversations();
 				} else {
-					Log.i(TAG, "OnLastItemVisibleListener -- skip! lf="+convloadFinished+" ad:"+lstConv.getAdapter().getClass().toString());
+					Log.i(TAG, "OnLastItemVisibleListener -- skip! lf="+convloadFinished+" listAdapter:"+lstConv.getAdapter().getClass().toString());
 				}
 			}
 		});
@@ -175,7 +175,7 @@ public class MessageViewFragment extends ContentFragment {
 	}
 
 	public void hideProgBar() {
-		/*reflvw.setAddStatesFromChildren(addsStates)
+		/*refreshListView.setAddStatesFromChildren(addsStates)
 		list.setVisibility(View.VISIBLE);
 		progbar.setVisibility(View.GONE);*/
 		if (curConvLoadPage == 1) rlConv.onRefreshComplete();

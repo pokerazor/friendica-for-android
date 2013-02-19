@@ -20,7 +20,7 @@ import android.widget.ListView;
 public class MessagesActivity extends FragmentActivity implements FragmentParentListener {
 	private static final String TAG="Friendica/MessagesActivity";
 	
-	PullToRefreshListView reflvw;
+	PullToRefreshListView refreshListView;
 	ListView lvw;
 	
 
@@ -31,8 +31,8 @@ public class MessagesActivity extends FragmentActivity implements FragmentParent
 		
 		setContentView(R.layout.messages);
 		
-		reflvw = (PullToRefreshListView) findViewById(R.id.listview);
-		lvw = reflvw.getRefreshableView();
+		refreshListView = (PullToRefreshListView) findViewById(R.id.listview);
+		lvw = refreshListView.getRefreshableView();
 		
 		final TwAjax t = new TwAjax(this, true, true);
 		t.getUrlContent(Max.getServer(this) + "/api/direct_messages/all?getText=true", new Runnable() {

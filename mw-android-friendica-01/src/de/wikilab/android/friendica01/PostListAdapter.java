@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.json.JSONException;
@@ -35,6 +36,8 @@ import android.widget.TextView;
 
 public class PostListAdapter extends ArrayAdapter<JSONObject> {
 	private static final String TAG = "Friendica/PostListAdapter";
+	
+	HashSet<Long> containedIds = new HashSet<Long>();
 
 	public boolean isPostDetails = false;
 
@@ -74,6 +77,26 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 		} catch (JSONException e) {
 			Log.e(TAG, "Item without ID!");
 			return 0;
+		}
+	}
+	
+	@Override
+	public void add(JSONObject toBeAdded){
+		Long hashId=(long) toBeAdded.hashCode();
+		try {
+			hashId=toBeAdded.getLong("id");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		if(!containedIds.contains(hashId)){
+			super.add(toBeAdded);
+			containedIds.add(hashId);
+		}
+	}
+	
+	public void addAll(ArrayList<JSONObject> toBeAdded){
+		for (JSONObject jsonObject : toBeAdded) {
+			this.add(jsonObject);
 		}
 	}
 

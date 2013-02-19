@@ -1,19 +1,13 @@
 package de.wikilab.android.friendica01;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map.Entry;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import android.net.Uri;
-import android.net.Uri.Builder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,7 +19,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.WrapperListAdapter;
 
@@ -33,12 +26,21 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase.OnLastItemVisibleLis
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica;
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.JsonFinishReaction;
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.ResultObject;
+
 public class PostListFragment extends ContentFragment {
 	private static final String TAG = "Friendica/PostListFragment";
 
-	PullToRefreshListView reflvw;
+	private static final Integer TIMELINE_MODE_HOME = 0;
+	private static final Integer TIMELINE_MODE_USER = 1;
+
+	protected Friendica friendicaAbstraction = null;
+
+	PullToRefreshListView refreshListView;
 	ListView list;
-	ListAdapter ad;
+	ListAdapter listAdapter;
 
 	String refreshTarget;
 
@@ -56,13 +58,15 @@ public class PostListFragment extends ContentFragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		myView = inflater.inflate(R.layout.pl_listviewinner, container, false);
-		reflvw = (PullToRefreshListView) myView.findViewById(R.id.listview);
-		list = reflvw.getRefreshableView();
-
 		Log.d(TAG, "==> onCreateView ");
 
-		reflvw.setOnRefreshListener(new OnRefreshListener() {
+		friendicaAbstraction = new Friendica(getActivity());
+
+		myView = inflater.inflate(R.layout.pl_listviewinner, container, false);
+		refreshListView = (PullToRefreshListView) myView.findViewById(R.id.listview);
+		list = refreshListView.getRefreshableView();
+
+		refreshListView.setOnRefreshListener(new OnRefreshListener() {
 			@Override
 			public void onRefresh() {
 				if (loadFinished) {
@@ -72,7 +76,7 @@ public class PostListFragment extends ContentFragment {
 			}
 		});
 
-		reflvw.setOnLastItemVisibleListener(new OnLastItemVisibleListener() {
+		refreshListView.setOnLastItemVisibleListener(new OnLastItemVisibleListener() {
 			@Override
 			public void onLastItemVisible() {
 				if (loadFinished && getPostListAdapter() != null) {
@@ -80,7 +84,7 @@ public class PostListFragment extends ContentFragment {
 					curLoadPage++;
 					onNavigate(refreshTarget);
 				} else {
-					Log.i(TAG, "OnLastItemVisibleListener -- skip! lf=" + loadFinished + " ad:" + list.getAdapter().getClass().toString());
+					Log.i(TAG, "OnLastItemVisibleListener -- skip! lf=" + loadFinished + " listAdapter:" + list.getAdapter().getClass().toString());
 				}
 			}
 		});
@@ -108,9 +112,12 @@ public class PostListFragment extends ContentFragment {
 			}
 		});
 
-		if (ad != null && getPostListAdapter() == null) {
+		listAdapter = new PostListAdapter(getActivity(), new ArrayList<JSONObject>());
+		list.setAdapter(listAdapter);
+
+		if (listAdapter != null && getPostListAdapter() == null) {
 			// navigate(refreshTarget);
-			list.setAdapter(ad);
+			list.setAdapter(listAdapter);
 		}
 
 		if (savedInstanceState != null && savedInstanceState.containsKey("listviewState")) {
@@ -118,11 +125,6 @@ public class PostListFragment extends ContentFragment {
 		}
 
 		return myView;
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
 	}
 
 	@Override
@@ -144,7 +146,7 @@ public class PostListFragment extends ContentFragment {
 			progbar.setVisibility(View.VISIBLE);
 		}*/
 		if (curLoadPage == 1)
-			reflvw.setRefreshing();
+			refreshListView.setRefreshing();
 		refreshTarget = target;
 		loadFinished = false;
 
@@ -165,12 +167,12 @@ public class PostListFragment extends ContentFragment {
 	}
 
 	public void hideProgBar() {
-		/*reflvw.setAddStatesFromChildren(addsStates)
+		/*refreshListView.setAddStatesFromChildren(addsStates)
 		list.setVisibility(View.VISIBLE);
 		progbar.setVisibility(View.GONE);*/
 		try {
 			if (curLoadPage == 1)
-				reflvw.onRefreshComplete();
+				refreshListView.onRefreshComplete();
 
 			SendMessage("Loading Animation", Integer.valueOf(View.INVISIBLE), null);
 		} catch (Exception ignoreException) {
@@ -192,86 +194,43 @@ public class PostListFragment extends ContentFragment {
 		return a;
 	}
 
-	private void setItems(JSONArray j) throws JSONException {
-		if (curLoadPage == 1 || getPostListAdapter() == null) {
-			ArrayList<JSONObject> jsonObjectArray = new ArrayList<JSONObject>(j.length());
-			containedIds.clear();
-			for (int i = 0; i < j.length(); i++) {
-				JSONObject jj = j.getJSONObject(i);
-				jsonObjectArray.add(jj);
-				containedIds.add(jj.getLong("id"));
-			}
-			ad = new PostListAdapter(getActivity(), jsonObjectArray);
-			list.setAdapter(ad);
-		} else {
-			PostListAdapter oldContent = getPostListAdapter();
-			for (int i = 0; i < j.length(); i++) {
-				JSONObject jj = j.getJSONObject(i);
-				if (containedIds.contains(jj.getLong("id")))
-					continue;
-				oldContent.add(jj);
-				containedIds.add(jj.getLong("id"));
-			}
-			oldContent.notifyDataSetChanged();
-			Toast.makeText(getActivity(), "Done loading more items - scroll down :)", Toast.LENGTH_SHORT).show();
-		}
+	private void setItems(ArrayList<JSONObject> resultArray) {
+		PostListAdapter curContent = getPostListAdapter();
+		curContent.addAll(resultArray);
+		curContent.notifyDataSetChanged();
+		Toast.makeText(getActivity(), "Done loading more items - scroll down :)", Toast.LENGTH_SHORT).show();
 		loadFinished = true;
 	}
 
-	public void loadTimeline() {
-		final TwAjax t = new TwAjax(getActivity(), true, true);
-		int ipp = ITEMS_PER_PAGE;
-		int cp = curLoadPage;
-		if (getPostListAdapter() == null) {
-			ipp = ITEMS_PER_PAGE * curLoadPage;
-			cp = 1;
+	public void loadTimeline(Integer mode, String userId) {
+		HashMap<String, String> arguments = new HashMap<String, String>();
+		arguments.put("count", String.valueOf(ITEMS_PER_PAGE));
+		arguments.put("page", String.valueOf(curLoadPage));
+		if (userId != null && !userId.equals("")) {
+			arguments.put("user_id", userId);
 		}
-		t.getUrlContent(Max.getServer(getActivity()) + "/api/statuses/home_timeline.json?count=" + String.valueOf(ipp) + "&page=" + String.valueOf(cp), new Runnable() {
+		String targetpath = "";
+		if (mode == TIMELINE_MODE_HOME) {
+			targetpath = "statuses/home_timeline";
+		} else if (mode == TIMELINE_MODE_USER) {
+			targetpath = "statuses/user_timeline";
+		}
+		friendicaAbstraction.executeAjaxQuery(targetpath, arguments, new JsonFinishReaction<ArrayList<JSONObject>>() {
 			@Override
-			public void run() {
-				try {
-					JSONArray j = (JSONArray) t.getJsonResult();
-
-					setItems(j);
-
-				} catch (Exception e) {
-					try {
-						list.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.pl_error_listitem, android.R.id.text1, new String[] { t.getURL(), "Error: " + e.getMessage(), Max.getStackTrace(e), t.getResult() == null ? "---" : Max.Hexdump(t.getResult().getBytes()) }));
-						e.printStackTrace();
-					} catch (Exception ignoreException) {
-					}
-				}
+			public void onFinished(ResultObject<ArrayList<JSONObject>> result) {
+				setItems(result.getResult());
 				hideProgBar();
 			}
 		});
+	}
 
+	public void loadTimeline() {
+		loadTimeline(TIMELINE_MODE_HOME, null);
 	}
 
 	public void loadWall(String userId) {
-		final TwAjax t = new TwAjax(getActivity(), true, true);
-		String url = Max.getServer(getActivity()) + "/api/statuses/user_timeline.json?count=" + String.valueOf(ITEMS_PER_PAGE) + "&page=" + String.valueOf(curLoadPage);
-		if (userId != null)
-			url += "&user_id=" + userId;
-		t.getUrlContent(url, new Runnable() {
-			@Override
-			public void run() {
-				try {
-					JSONArray j = (JSONArray) t.getJsonResult();
-
-					setItems(j);
-
-				} catch (Exception e) {
-					if (list != null)
-						list.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.pl_error_listitem, android.R.id.text1, new String[] { "Error: " + e.getMessage(), Max.Hexdump(t.getResult().getBytes()) }));
-					e.printStackTrace();
-				}
-				hideProgBar();
-			}
-		});
-
+		loadTimeline(TIMELINE_MODE_USER, userId);
 	}
-
-
 
 	void loadNotifications() {
 		final TwAjax t = new TwAjax(getActivity(), true, true);
@@ -288,11 +247,9 @@ public class PostListFragment extends ContentFragment {
 							notifs.add(Notification.fromXmlNode(el.getChildNodes().item(i)));
 						}
 					}
-
 					// ListView lvw = (ListView) findViewById(R.id.listview);
-					ad = new Notification.NotificationsListAdapter(getActivity(), notifs);
-					list.setAdapter(ad);
-
+					listAdapter = new Notification.NotificationsListAdapter(getActivity(), notifs);
+					list.setAdapter(listAdapter);
 				} catch (Exception e) {
 					if (list != null)
 						list.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.pl_error_listitem, android.R.id.text1, new String[] { "Error: " + e.getMessage(), Max.Hexdump(t.getResult().getBytes()) }));
@@ -301,7 +258,5 @@ public class PostListFragment extends ContentFragment {
 				hideProgBar();
 			}
 		});
-
 	}
-
 }

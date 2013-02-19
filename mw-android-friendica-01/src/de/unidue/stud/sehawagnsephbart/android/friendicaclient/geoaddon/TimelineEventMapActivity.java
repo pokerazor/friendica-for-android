@@ -40,7 +40,7 @@ import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Frien
 import de.wikilab.android.friendica01.R;
 
 public class TimelineEventMapActivity extends Activity implements MapEventsReceiver {
-	private Friendica friendicaAbstraction = null;
+	protected Friendica friendicaAbstraction = null;
 
 	protected MapView mapView = null;
 	protected ResourceProxy mResourceProxy = null;
