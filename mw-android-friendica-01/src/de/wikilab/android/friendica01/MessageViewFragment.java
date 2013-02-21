@@ -162,7 +162,7 @@ public class MessageViewFragment extends ContentFragment {
 
 	protected void onNavigate(String target) {
 		rlConv.setRefreshing();
-		SendMessage(ContentFragment.FRGM_MSG_SET_HEADERTEXT, getString(R.string.mm_directmessages), null);
+		SendMessage(FRGM_MSG_SET_HEADERTEXT, getString(R.string.mm_directmessages), null);
 		curConvLoadPage = 1;
 		
 		refreshTarget = target;

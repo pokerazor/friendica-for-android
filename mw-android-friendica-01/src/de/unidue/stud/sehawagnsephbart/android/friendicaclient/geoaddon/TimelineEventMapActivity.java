@@ -72,8 +72,11 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.map_activity_menu, menu);
 		MenuItem item = menu.getItem(1);
-		SubMenu routesmenu = menu.addSubMenu("Route Menu");
-		routesmenu.add("test1");
+		
+		SubMenu routesmenu = menu.addSubMenu(R.string.menuitem_routes);
+		routesmenu.add("Philipp");
+		routesmenu.add("Hanno");
+
 		return true;
 	}
 
