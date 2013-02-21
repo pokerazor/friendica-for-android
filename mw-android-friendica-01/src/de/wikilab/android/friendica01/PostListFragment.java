@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,8 +18,10 @@ import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.WrapperListAdapter;
 
@@ -49,6 +52,8 @@ public class PostListFragment extends ContentFragment {
 	boolean loadFinished = false;
 
 	HashSet<Long> containedIds = new HashSet<Long>();
+
+	private LinearLayout lastOpenedPost;
 
 	/*@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -107,7 +112,44 @@ public class PostListFragment extends ContentFragment {
 						}
 					});
 				} else {
-					SendMessage(FRGM_MSG_NAV_CONVERSATION, String.valueOf(id), null);
+					LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+					if (lastOpenedPost != null) {
+						LinearLayout oldItemDetailsBar = (LinearLayout) lastOpenedPost.findViewById(R.id.timelineItemDetailsBar);
+						lastOpenedPost.removeView(oldItemDetailsBar);
+
+					}
+
+					LinearLayout postView = (LinearLayout) view.findViewById(R.id.postLinearInner);
+					lastOpenedPost = (LinearLayout) postView;
+					/*
+					TextView textView = new TextView(getActivity());
+					textView.setText("Processing...");
+					postView.addView(textView);
+					*/
+					/*
+					postView.invalidate();
+					postView.requestLayout();
+					view.invalidate();
+					view.requestLayout();
+					textView.invalidate();
+					textView.requestLayout();
+					self.invalidate();
+					self.requestLayout();
+					*/
+// Toast.makeText(getActivity(), "Show conversation #" + String.valueOf(id) + "\n View: " + view + ", " + view.getId(), Toast.LENGTH_SHORT).show();
+/*
+To create a new LayoutInflater with an additional LayoutInflater.Factory for your own views, you can use cloneInContext(Context) to clone an existing ViewFactory, and then call setFactory(LayoutInflater.Factory) on it to include your Factory. 
+*/
+// View newView = inflater.inflate(R.layout.pl_listviewinner, bdf, false);
+
+					// View savedView = view;
+					View newView = inflater.inflate(R.layout.pd_listitemwrapper, null);
+					postView.addView(newView);
+					TextView coordinates = (TextView) postView.findViewById(R.id.coordinates);
+					coordinates.setText("My coords");
+
+// self.removeViewInLayout(view);
+// SendMessage(FRGM_MSG_NAV_CONVERSATION, String.valueOf(id), null);
 				}
 			}
 		});
@@ -253,7 +295,7 @@ public class PostListFragment extends ContentFragment {
 					// ListView lvw = (ListView) findViewById(R.id.listview);
 					listAdapter = new Notification.NotificationsListAdapter(getActivity(), notifs);
 					list.setAdapter(listAdapter);
-					
+
 				} catch (Exception e) {
 					if (list != null)
 						list.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.pl_error_listitem, android.R.id.text1, new String[] { "Error: " + e.getMessage(), Max.Hexdump(t.getResult().getBytes()) }));

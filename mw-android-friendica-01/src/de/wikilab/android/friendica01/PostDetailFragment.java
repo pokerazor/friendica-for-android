@@ -70,7 +70,7 @@ public class PostDetailFragment extends ContentFragment {
 		if (target != null && target.startsWith("conversation:")) {
 			conversationId = target.substring(13);
 			
-			SendMessage(ContentFragment.FRGM_MSG_SET_HEADERTEXT, "Post Details ("+String.valueOf(conversationId)+")", null);
+			SendMessage(FRGM_MSG_SET_HEADERTEXT, "Post Details ("+String.valueOf(conversationId)+")", null);
 			loadInitialPost();
 		}
 	}

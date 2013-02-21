@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica;
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.TimelineEvent;
 
 public class PostListAdapter extends ArrayAdapter<JSONObject> {
 	private static final String TAG = "Friendica/PostListAdapter";
@@ -190,6 +191,7 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 		}
 
 		JSONObject post = (JSONObject) getItem(position);
+		TimelineEvent timelineEvent=new TimelineEvent(post);
 		H.position = position;
 
 		if (H.profileImage != null) {

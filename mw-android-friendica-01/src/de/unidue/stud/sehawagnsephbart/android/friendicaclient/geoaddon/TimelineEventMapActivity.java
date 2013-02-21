@@ -32,6 +32,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
@@ -70,6 +71,11 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.map_activity_menu, menu);
+		
+		SubMenu routesmenu = menu.addSubMenu(R.string.menuitem_routes);
+		routesmenu.add("Philipp");
+		routesmenu.add("Hanno");
+
 		return true;
 	}
 
