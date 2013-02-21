@@ -8,6 +8,7 @@
             <group android:checkableBehavior="single">
                 <item
                     android:id="@+id/submenu1"
+                    android:checked = "true"
                     android:title="Mapnik"
                     />
                 <item
@@ -22,14 +23,14 @@
                 <item
                     android:id="@+id/submenu5"
                     android:title="Mapquest Aerial"/>
-                <item
-                    android:id="@+id/submenu6"
-                    android:title="Bing"/>
             </group>
         </menu>
     </item>
     <item
         android:id="@+id/position"
         android:title="Position"/>
+    <item
+        android:id="@+id/route"
+        android:title="Route Menu"/>
 
 </menu>

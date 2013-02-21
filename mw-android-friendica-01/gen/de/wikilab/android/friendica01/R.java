@@ -177,7 +177,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int picture2=0x7f070048;
         public static final int picture3=0x7f070049;
         public static final int pl_fragment=0x7f070045;
-        public static final int position=0x7f070063;
+        public static final int position=0x7f070062;
         public static final int preview=0x7f070050;
         public static final int profileImage=0x7f070030;
         public static final int profile_content=0x7f070059;
@@ -193,6 +193,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int rawjson=0x7f07000f;
         public static final int relativeLayout1=0x7f070028;
         public static final int right_bar=0x7f070015;
+        public static final int route=0x7f070063;
         public static final int routesList=0x7f07004d;
         public static final int search_box=0x7f070014;
         public static final int selProtocol=0x7f070020;
@@ -207,7 +208,6 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int submenu3=0x7f07005f;
         public static final int submenu4=0x7f070060;
         public static final int submenu5=0x7f070061;
-        public static final int submenu6=0x7f070062;
         public static final int tableLayout1=0x7f07001d;
         public static final int tableRow1=0x7f07001e;
         public static final int tableRow2=0x7f070022;

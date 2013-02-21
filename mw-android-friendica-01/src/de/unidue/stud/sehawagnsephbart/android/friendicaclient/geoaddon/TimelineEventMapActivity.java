@@ -11,6 +11,7 @@ import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
+import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
@@ -22,6 +23,7 @@ import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 
 import android.app.Activity;
+import android.content.ClipData.Item;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -94,51 +96,39 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 				toast = Toast.makeText(context, "Show current location", Toast.LENGTH_SHORT);
 				toast.show();
 			}
+			return true;
+		case R.id.submenu1:
+        	if (item.isChecked()) item.setChecked(false);
+        	 else { item.setChecked(true);
+        	 this.mapView.setTileSource(TileSourceFactory.MAPNIK);}
+            return true;
+        	
+        case R.id.submenu2:
+            if (item.isChecked()) item.setChecked(false);
+            else { item.setChecked(true);
+            this.mapView.setTileSource(TileSourceFactory.CYCLEMAP);}
+            return true;
+            
+        case R.id.submenu3:
+            if (item.isChecked()) item.setChecked(false);
+            else { item.setChecked(true);
+            this.mapView.setTileSource(TileSourceFactory.PUBLIC_TRANSPORT);}
+            return true;
+            
+        case R.id.submenu4:
+            if (item.isChecked()) item.setChecked(false);
+            else { item.setChecked(true);
+            this.mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);}
+            return true;
+            
+        case R.id.submenu5:
+            if (item.isChecked()) item.setChecked(false);
+            else{ item.setChecked(true);
+            this.mapView.setTileSource(TileSourceFactory.MAPQUESTAERIAL);}
+            return true;
+            
 		default:
 			return super.onOptionsItemSelected(item);
-		}
-	}
-
-	public void onRadioButtonClicked(View clickedItem) {
-		Boolean checked = ((RadioButton) clickedItem).isChecked(); // Is the button now checked?
-
-		switch (clickedItem.getId()) { 		// Check which radio button was clicked
-
-		// Mapnik
-		case R.id.submenu1:
-			if (checked) {
-			}
-
-			break;
-		// Bicycle map
-		case R.id.submenu2:
-			if (checked) {
-			}
-			break;
-		// public transport
-		case R.id.submenu3:
-			if (checked) {
-			}
-
-			break;
-		// Mapquest
-		case R.id.submenu4:
-			if (checked) {
-			}
-
-			break;
-		// Mapquest Aerial
-		case R.id.submenu5:
-			if (checked) {
-			}
-
-			break;
-		// Bing
-		case R.id.submenu6:
-			if (checked) {
-			}
-
-			break;
 		}
 	}
 
