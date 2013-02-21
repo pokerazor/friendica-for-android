@@ -32,5 +32,21 @@
     <item
         android:id="@+id/route"
         android:title="Route Menu"/>
-
-</menu>
+    <item
+        android:id="@+id/routemenu"
+        android:title="Route Mode">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/submenu6"
+                    android:checked = "true"
+                    android:title="Car"
+                    />
+                <item
+                    android:id="@+id/submenu7"
+                    android:title="Bicycle"/>
+            </group>
+        </menu>
+    </item>
+    
+    </menu>

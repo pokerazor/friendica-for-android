@@ -59,6 +59,8 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 	protected ArrayList<GeoPoint> eventItemLocations = new ArrayList<GeoPoint>();
 	protected ArrayList<TimelineEvent> timelineEvents = new ArrayList<TimelineEvent>();
 	protected ArrayList<TimelineEventItem> timelineEventItems = null;
+	
+	protected RoadManager roadManager = null;
 
 	public ArrayList<GeoPoint> getEventItemLocations() {
 		return eventItemLocations;
@@ -127,6 +129,21 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
             this.mapView.setTileSource(TileSourceFactory.MAPQUESTAERIAL);}
             return true;
             
+        case R.id.submenu6:
+            if (item.isChecked()) item.setChecked(false);
+            else{ item.setChecked(true);
+            System.out.println("CAR");}
+            return true;
+        
+        case R.id.submenu7:
+            if (item.isChecked()) item.setChecked(false);
+            else{ item.setChecked(true);
+            
+            roadManager.addRequestOption("routeType=bicycle");
+            new ComputeTimelineEventRoadRouteAsyncTask().execute(eventItemLocations);
+            System.out.println("BIKE");}
+            return true;
+            
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -163,6 +180,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 		MapEventsOverlay overlay = new MapEventsOverlay(this, this);
 		this.mapView.getOverlayManager().add(overlay);
 
+		this.roadManager = new OSRMRoadManager();
 		this.setContentView(rl);
 	}
 
@@ -227,8 +245,8 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 		protected Road doInBackground(ArrayList<GeoPoint>... timelineEventLocations) {
 			eventRoadRoute = null;
 
-			RoadManager roadManager = new OSRMRoadManager();
-			Road completeRoad=roadManager.getRoad(timelineEventLocations[0]);
+			//RoadManager roadManager = new OSRMRoadManager();
+			Road completeRoad = roadManager.getRoad(timelineEventLocations[0]);
 			GeoPoint lastLocation=null;
 			ArrayList<GeoPoint> curLeg=new ArrayList<GeoPoint>();
 			

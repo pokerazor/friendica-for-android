@@ -194,6 +194,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int relativeLayout1=0x7f070028;
         public static final int right_bar=0x7f070015;
         public static final int route=0x7f070063;
+        public static final int routemenu=0x7f070064;
         public static final int routesList=0x7f07004d;
         public static final int search_box=0x7f070014;
         public static final int selProtocol=0x7f070020;
@@ -208,6 +209,8 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int submenu3=0x7f07005f;
         public static final int submenu4=0x7f070060;
         public static final int submenu5=0x7f070061;
+        public static final int submenu6=0x7f070065;
+        public static final int submenu7=0x7f070066;
         public static final int tableLayout1=0x7f07001d;
         public static final int tableRow1=0x7f07001e;
         public static final int tableRow2=0x7f070022;
@@ -223,7 +226,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int userNameRecipient=0x7f070037;
         public static final int viewLatLon=0x7f07005b;
         public static final int viewLatLonPhoto=0x7f070052;
-        public static final int view_debug=0x7f070064;
+        public static final int view_debug=0x7f070067;
         public static final int view_fragment_container=0x7f070017;
         public static final int webview=0x7f070004;
     }
