@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
+import de.wikilab.android.friendica01.ContentFragment;
 import de.wikilab.android.friendica01.FragmentParentListener;
 import de.wikilab.android.friendica01.R;
 import de.wikilab.android.friendica01.WritePostFragment;
@@ -44,7 +45,7 @@ public class WritePostActivity extends FragmentActivity implements FragmentParen
 
 	@Override
 	public void OnFragmentMessage(String message, Object arg1, Object arg2) {
-		if (message.equals("Set Header Text")) {
+		if (message.equals(ContentFragment.FRGM_MSG_SET_HEADERTEXT)) {
 			//setHeadertext((String) arg1);
 		}
 		if (message.equals("Finished")) {

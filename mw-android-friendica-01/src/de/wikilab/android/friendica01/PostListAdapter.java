@@ -1,8 +1,5 @@
 package de.wikilab.android.friendica01;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,11 +7,8 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica;
-
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.text.Html;
 import android.text.Spannable;
@@ -23,7 +17,6 @@ import android.text.Spanned;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ImageSpan;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,11 +26,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica;
 
 public class PostListAdapter extends ArrayAdapter<JSONObject> {
 	private static final String TAG = "Friendica/PostListAdapter";
-	
-	HashSet<Long> containedIds = new HashSet<Long>();
 
 	public boolean isPostDetails = false;
 
@@ -62,7 +54,6 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 
 	public PostListAdapter(Context context, List<JSONObject> objects) {
 		super(context, R.layout.pl_listitem, objects);
-
 	}
 
 	@Override
@@ -77,26 +68,6 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 		} catch (JSONException e) {
 			Log.e(TAG, "Item without ID!");
 			return 0;
-		}
-	}
-	
-	@Override
-	public void add(JSONObject toBeAdded){
-		Long hashId=(long) toBeAdded.hashCode();
-		try {
-			hashId=toBeAdded.getLong("id");
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		if(!containedIds.contains(hashId)){
-			super.add(toBeAdded);
-			containedIds.add(hashId);
-		}
-	}
-	
-	public void addAll(ArrayList<JSONObject> toBeAdded){
-		for (JSONObject jsonObject : toBeAdded) {
-			this.add(jsonObject);
 		}
 	}
 
@@ -281,14 +252,12 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 		return convertView;
 	}
 
-
-
 	private void downloadPics(final ViewHolder H, Spannable htmlSpannable) {
 		int pos = 0;
 		for (int i = 0; i <= 2; i++) {
 			H.picture[i].setVisibility(View.GONE);
 		}
-		ImageSpan[] images=Friendica.getImagesFromPost(htmlSpannable);
+		ImageSpan[] images = Friendica.getImagesFromPost(htmlSpannable);
 
 		for (ImageSpan img : images) {
 			htmlSpannable.removeSpan(img);
@@ -297,7 +266,7 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 				break;
 			}
 
-			Friendica.placeImageFromURI(img.getSource(), H.picture[pos],getContext(),"pi");
+			Friendica.placeImageFromURI(img.getSource(), H.picture[pos], getContext(), "pi");
 
 			pos++;
 		}

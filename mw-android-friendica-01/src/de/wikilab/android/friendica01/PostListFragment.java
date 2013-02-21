@@ -93,21 +93,21 @@ public class PostListFragment extends ContentFragment {
 			@Override
 			public void onItemClick(AdapterView<?> self, View view, int position, long id) {
 				if (refreshTarget.equals("notifications")) {
-					SendMessage("Loading Animation", Integer.valueOf(View.VISIBLE), null);
+					SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
 					final Notification n = ((Notification.NotificationsListAdapter) getListAdapter()).getItem(position - 1);
 					n.resolveTarget(getActivity(), new Runnable() {
 						@Override
 						public void run() {
-							SendMessage("Loading Animation", Integer.valueOf(View.INVISIBLE), null);
+							SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.INVISIBLE), null);
 							if (n.targetComponent != null && n.targetComponent.equals("conversation:")) {
-								SendMessage("Navigate Conversation", String.valueOf(n.targetData), null);
+								SendMessage(FRGM_MSG_NAV_CONVERSATION, String.valueOf(n.targetData), null);
 							} else {
 								Max.alert(getActivity(), "Unable to navigate to notification target<br><br><a href='" + n.targetUrl + "'>" + n.targetUrl + "</a>", "Not implemented");
 							}
 						}
 					});
 				} else {
-					SendMessage("Navigate Conversation", String.valueOf(id), null);
+					SendMessage(FRGM_MSG_NAV_CONVERSATION, String.valueOf(id), null);
 				}
 			}
 		});
@@ -150,18 +150,18 @@ public class PostListFragment extends ContentFragment {
 		refreshTarget = target;
 		loadFinished = false;
 
-		SendMessage("Loading Animation", Integer.valueOf(View.VISIBLE), null);
+		SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
 		if (target != null && target.equals("mywall")) {
-			SendMessage("Set Header Text", getString(R.string.mm_mywall), null);
+			SendMessage(FRGM_MSG_SET_HEADERTEXT, getString(R.string.mm_mywall), null);
 			loadWall(null);
 		} else if (target != null && target.startsWith("userwall:")) {
-			SendMessage("Set Header Text", getString(R.string.mm_mywall), null);
+			SendMessage(FRGM_MSG_SET_HEADERTEXT, getString(R.string.mm_mywall), null);
 			loadWall(target.substring(9));
 		} else if (target != null && target.equals("notifications")) {
-			SendMessage("Set Header Text", getString(R.string.mm_notifications), null);
+			SendMessage(FRGM_MSG_SET_HEADERTEXT, getString(R.string.mm_notifications), null);
 			loadNotifications();
 		} else {
-			SendMessage("Set Header Text", getString(R.string.mm_timeline), null);
+			SendMessage(FRGM_MSG_SET_HEADERTEXT, getString(R.string.mm_timeline), null);
 			loadTimeline();
 		}
 	}
@@ -174,7 +174,7 @@ public class PostListFragment extends ContentFragment {
 			if (curLoadPage == 1)
 				refreshListView.onRefreshComplete();
 
-			SendMessage("Loading Animation", Integer.valueOf(View.INVISIBLE), null);
+			SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.INVISIBLE), null);
 		} catch (Exception ignoreException) {
 		}
 
@@ -202,10 +202,12 @@ public class PostListFragment extends ContentFragment {
 		loadFinished = true;
 	}
 
-	public void loadTimeline(Integer mode, String userId) {
+	public void loadTimeline(final Integer mode, final String userId) {
 		HashMap<String, String> arguments = new HashMap<String, String>();
 		arguments.put("count", String.valueOf(ITEMS_PER_PAGE));
 		arguments.put("page", String.valueOf(curLoadPage));
+		arguments.put("exclude_replies", "1");
+
 		if (userId != null && !userId.equals("")) {
 			arguments.put("user_id", userId);
 		}
@@ -215,13 +217,14 @@ public class PostListFragment extends ContentFragment {
 		} else if (mode == TIMELINE_MODE_USER) {
 			targetpath = "statuses/user_timeline";
 		}
+
 		friendicaAbstraction.executeAjaxQuery(targetpath, arguments, new JsonFinishReaction<ArrayList<JSONObject>>() {
 			@Override
 			public void onFinished(ResultObject<ArrayList<JSONObject>> result) {
 				setItems(result.getResult());
 				hideProgBar();
 			}
-		});
+		}, true);
 	}
 
 	public void loadTimeline() {
@@ -250,6 +253,7 @@ public class PostListFragment extends ContentFragment {
 					// ListView lvw = (ListView) findViewById(R.id.listview);
 					listAdapter = new Notification.NotificationsListAdapter(getActivity(), notifs);
 					list.setAdapter(listAdapter);
+					
 				} catch (Exception e) {
 					if (list != null)
 						list.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.pl_error_listitem, android.R.id.text1, new String[] { "Error: " + e.getMessage(), Max.Hexdump(t.getResult().getBytes()) }));

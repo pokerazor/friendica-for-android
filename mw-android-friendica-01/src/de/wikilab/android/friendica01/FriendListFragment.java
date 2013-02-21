@@ -50,7 +50,7 @@ public class FriendListFragment extends ContentFragment implements FragmentParen
 			list.setVisibility(View.GONE);
 			progbar.setVisibility(View.VISIBLE);
 		}
-		((FragmentParentListener)getActivity()).OnFragmentMessage("Set Header Text", getString(R.string.mm_friends), null);
+		((FragmentParentListener)getActivity()).OnFragmentMessage(ContentFragment.FRGM_MSG_SET_HEADERTEXT, getString(R.string.mm_friends), null);
 		loadFriendList(false);
 	}
 

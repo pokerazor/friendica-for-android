@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map.Entry;
 
 import org.json.JSONArray;
@@ -32,67 +33,19 @@ public class Friendica {
 	final Integer ITEMS_PER_PAGE = 20;
 	Integer curLoadPage = 1;
 	private Context context = null;
-	
-	
-	public Friendica(){
-		
-	}
-	
-	public Friendica(Context context){
-		this();
-		this.setContext(context);
-	}
-
-	public Context getContext() {
-		return context;
-	}
-
-	public void setContext(Context context) {
-		this.context = context;
-	}
-
-	public void testExecuteMethod() {
-		String userId = new String();
-		HashMap<String, String> queryElements = new HashMap<String, String>();
-		queryElements.put("count", String.valueOf(ITEMS_PER_PAGE));
-		queryElements.put("page", String.valueOf(curLoadPage));
-		if (userId != null && !userId.equals("")) {
-			queryElements.put("userId", userId);
-		}
-
-		JsonProcessor jsonProcessor = executeAjaxQuery("statuses/user_timeline", queryElements, new JsonFinishReaction<ArrayList<JSONObject>>() {
-			@Override
-			public void onFinished(ResultObject<ArrayList<JSONObject>> result) {
-				ArrayList<JSONObject> jAr = result.getResult();
-				for (JSONObject jsonObject : jAr) {
-					System.out.println(jsonObject);
-				}
-			}
-		});
-		if (jsonProcessor.getIsFinished()) {
-			System.out.println("Already finished");
-		}
-	}
-
-	public JsonProcessor executeAjaxQuery(String command, JsonFinishReaction<ArrayList<JSONObject>> finishReaction) {
-		return executeAjaxQuery(command, new HashMap<String, String>(), finishReaction);
-	}
-
-	public JsonProcessor executeAjaxQuery(String command, HashMap<String, String> queryElements, JsonFinishReaction<ArrayList<JSONObject>> finishReaction) {
-		ResultObject<ArrayList<JSONObject>> result = new ResultObject<ArrayList<JSONObject>>();
-		Uri uri = Uri.parse(Max.getServer(getContext()) + API_PATH + command + API_TYPE_JSON);
-		Builder uriBuilder = uri.buildUpon();
-		for (Entry<String, String> queryElement : queryElements.entrySet()) {
-			uriBuilder.appendQueryParameter(queryElement.getKey(), queryElement.getValue());
-		}
-		final TwAjax t = new TwAjax(getContext(), true, true);
-		JsonProcessor jsonProcessor = new JsonProcessor(t, finishReaction, result);
-		t.getUrlContent(uriBuilder.build().toString(), jsonProcessor);
-		return jsonProcessor;
-	}
+	private String lastCommand="";
 
 	public class ResultObject<TargetResultClass extends Object> {
 		private TargetResultClass result = null;
+		private Integer originalNumberOfElements =0;
+
+		public Integer getOriginalNumberOfElements() {
+			return originalNumberOfElements;
+		}
+
+		public void setOriginalNumberOfElements(Integer originalNumberOfElements) {
+			this.originalNumberOfElements = originalNumberOfElements;
+		}
 
 		public TargetResultClass getResult() {
 			return result;
@@ -108,12 +61,12 @@ public class Friendica {
 	}
 
 	public class JsonProcessor implements Runnable {
-		private TwAjax t;
-		private JsonFinishReaction<ArrayList<JSONObject>> jsonFinishReaction;
-		private ResultObject<ArrayList<JSONObject>> result;
-		private ArrayList<JSONObject> resultArray = new ArrayList<JSONObject>();
-		private Boolean finished = false;
-		private Boolean error = false;
+		protected TwAjax t;
+		protected JsonFinishReaction<ArrayList<JSONObject>> jsonFinishReaction;
+		protected ResultObject<ArrayList<JSONObject>> result;
+		protected ArrayList<JSONObject> resultArray = new ArrayList<JSONObject>();
+		protected Boolean finished = false;
+		protected Boolean error = false;
 
 		public JsonProcessor(TwAjax t, JsonFinishReaction<ArrayList<JSONObject>> finishReaction, ResultObject<ArrayList<JSONObject>> result) {
 			this.t = t;
@@ -124,37 +77,160 @@ public class Friendica {
 		public Boolean getIsFinished() {
 			return finished;
 		}
-		
+
 		public Boolean getIsError() {
 			return error;
+		}
+
+		protected void processResultObject(JSONObject jObj) {
+			resultArray.add(jObj);
 		}
 
 		@Override
 		public void run() {
 			Object jsonResult = t.getJsonResult();
-			if(jsonResult instanceof JSONArray){
+			if (jsonResult instanceof JSONArray) {
 				JSONArray jAr = (JSONArray) jsonResult;
 				for (int i = 0; i < jAr.length(); i++) {
 					JSONObject jObj;
 					try {
 						jObj = jAr.getJSONObject(i);
-						resultArray.add(jObj);
+						processResultObject(jObj);
 					} catch (JSONException e) {
 						e.printStackTrace();
 					}
 				}
-				this.result.setResult(resultArray);
-				jsonFinishReaction.onFinished(this.result);
-				finished = true;
-			}else{
-				error=true; //e.g. {"error":"not implemented"}
-				
-				this.result.setResult(resultArray);
-				jsonFinishReaction.onFinished(this.result);
+			} else {
+				error = true; // e.g. {"error":"not implemented"}
 				System.err.println(jsonResult);
-				finished = true;
 			}
+			onEnd();
 		}
+
+		public void onEnd() {
+			finished = true;
+
+			this.result.setResult(resultArray);
+			jsonFinishReaction.onFinished(this.result);
+		}
+	}
+
+	public class PostProcessor extends JsonProcessor {
+		protected HashMap<Long, JSONObject> containedIds = new HashMap<Long, JSONObject>();
+		protected Boolean onlyRootElements = true;
+		protected HashMap<String, String> queryElements = null;
+
+//		protected Integer actualPage = 0;
+
+//		protected Integer numberOfPosts = 0;
+		
+//		public void setPostNumberOffset(Integer offset){
+//			numberOfPosts=offset;
+//		}
+
+		public PostProcessor(TwAjax t, JsonFinishReaction<ArrayList<JSONObject>> finishReaction, ResultObject<ArrayList<JSONObject>> result, HashMap<String, String> queryElements, Integer postNumberOffset) {
+			super(t, finishReaction, result);
+			this.queryElements = queryElements;
+//			numberOfPosts = postNumberOffset;
+		}
+
+		public PostProcessor(TwAjax t, JsonFinishReaction<ArrayList<JSONObject>> finishReaction, ResultObject<ArrayList<JSONObject>> result, HashMap<String, String> queryElements) {
+			this(t, finishReaction, result, queryElements, 0);
+		}
+
+		@Override
+		protected void processResultObject(JSONObject jObj) {
+			Long hashId = (long) jObj.hashCode();
+			Long inReplyTo = (long) 0;
+/*
+			try {
+				hashId = jObj.getLong("id");
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			if (!containedIds.containsKey(hashId)) { // do not add elements which are already contained
+				try {
+					inReplyTo = jObj.getLong("in_reply_to_status_id");
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				if (inReplyTo == 0 || !onlyRootElements) { // only add root elements
+					*/
+					super.processResultObject(jObj);
+					containedIds.put(hashId, jObj);
+					/*
+//				}
+			}
+			*/
+		}
+
+		@Override
+		public void onEnd() {
+//			ArrayList<JSONObject> prevResult = this.result.getResult();
+			/*
+			if(prevResult!=null){
+				prevResult.addAll(resultArray);
+				resultArray=prevResult;
+			}
+			*/
+//			numberOfPosts = numberOfPosts + resultArray.size();
+//			if (numberOfPosts < Integer.parseInt(queryElements.get("count"))) { // not enough elements added				
+//				actualPage=Integer.parseInt(queryElements.get("page"))+1;
+//				queryElements.put("page",actualPage+"");
+				System.out.println("not enough elements added, running again");
+//				executeAjaxQuery(lastCommand, queryElements, jsonFinishReaction, onlyRootElements, result);
+//			}
+//			System.out.println("query-page "+queryElements.get("page"));
+//			System.out.println("actualPage "+actualPage);
+
+			super.onEnd();
+		}
+	}
+
+	public Friendica() {
+
+	}
+
+	public Friendica(Context context) {
+		this();
+		this.setContext(context);
+	}
+
+	public Context getContext() {
+		return context;
+	}
+
+	public void setContext(Context context) {
+		this.context = context;
+	}
+
+	public JsonProcessor executeAjaxQuery(String command, JsonFinishReaction<ArrayList<JSONObject>> finishReaction) {
+		return executeAjaxQuery(command, new HashMap<String, String>(), finishReaction, false);
+	}
+	
+	public JsonProcessor executeAjaxQuery(String command, HashMap<String, String> queryElements, JsonFinishReaction<ArrayList<JSONObject>> finishReaction, Boolean asPostList) {
+		ResultObject<ArrayList<JSONObject>> result = new ResultObject<ArrayList<JSONObject>>();
+		return executeAjaxQuery( command,  queryElements,finishReaction, asPostList, result);
+	}
+
+	public JsonProcessor executeAjaxQuery(String command, HashMap<String, String> queryElements, JsonFinishReaction<ArrayList<JSONObject>> finishReaction, Boolean asPostList,ResultObject<ArrayList<JSONObject>> result) {
+		JsonProcessor jsonProcessor = null;
+		lastCommand=command;
+		Uri uri = Uri.parse(Max.getServer(getContext()) + API_PATH + command + API_TYPE_JSON);
+		Builder uriBuilder = uri.buildUpon();
+		for (Entry<String, String> queryElement : queryElements.entrySet()) {
+			uriBuilder.appendQueryParameter(queryElement.getKey(), queryElement.getValue());
+		}
+		final TwAjax t = new TwAjax(getContext(), true, true);
+		if (asPostList) {
+			jsonProcessor = new PostProcessor(t, finishReaction, result, queryElements);
+//			jsonProcessor = new JsonProcessor(t, finishReaction, result);
+
+		} else {
+			jsonProcessor = new JsonProcessor(t, finishReaction, result);
+		}
+		t.getUrlContent(uriBuilder.build().toString(), jsonProcessor);
+		return jsonProcessor;
 	}
 
 	public static void displayProfileImageFromPost(JSONObject post, final ImageView target, Context context) {
@@ -165,35 +241,35 @@ public class Friendica {
 			e.printStackTrace();
 		}
 	}
-	
-	public static String getImageURIFromPost(Spannable htmlSpannable){
+
+	public static String getImageURIFromPost(Spannable htmlSpannable) {
 		return getImagesFromPost(htmlSpannable)[0].getSource();
 	}
-	
-	public static ImageSpan[] getImagesFromPost(Spannable htmlSpannable){
-		ImageSpan[] images=htmlSpannable.getSpans(0, htmlSpannable.length(), ImageSpan.class);
+
+	public static ImageSpan[] getImagesFromPost(Spannable htmlSpannable) {
+		ImageSpan[] images = htmlSpannable.getSpans(0, htmlSpannable.length(), ImageSpan.class);
 		return images;
 	}
-	
-	public static String getScaledImageURI(String imageUri,Integer scaleLevel){
-		Uri imageUriObject;
-		if(scaleLevel==0 || scaleLevel==1 || scaleLevel==2){ //0=fullsize, 2=small
-			imageUriObject=Uri.parse(imageUri);
-			String filename=imageUriObject.getLastPathSegment();
-			
-			String path=imageUriObject.getPath();
-			path=path.substring(0,path.length()-filename.length());
-			
-			String[] filenameParts = filename.split("\\.");
-			filenameParts[0]=filenameParts[0].substring(0, filenameParts[0].length()-1);
-			filenameParts[0]=filenameParts[0]+scaleLevel;
 
-			return imageUriObject.buildUpon().path(path).appendPath(filenameParts[0]+"."+filenameParts[1]).build().toString(); //Build and return new URI with original path and new filename
+	public static String getScaledImageURI(String imageUri, Integer scaleLevel) {
+		Uri imageUriObject;
+		if (scaleLevel == 0 || scaleLevel == 1 || scaleLevel == 2) { // 0=fullsize, 2=small
+			imageUriObject = Uri.parse(imageUri);
+			String filename = imageUriObject.getLastPathSegment();
+
+			String path = imageUriObject.getPath();
+			path = path.substring(0, path.length() - filename.length());
+
+			String[] filenameParts = filename.split("\\.");
+			filenameParts[0] = filenameParts[0].substring(0, filenameParts[0].length() - 1);
+			filenameParts[0] = filenameParts[0] + scaleLevel;
+
+			return imageUriObject.buildUpon().path(path).appendPath(filenameParts[0] + "." + filenameParts[1]).build().toString(); // Build and return new URI with original path and new filename
 
 		}
 		return imageUri;
 	}
-	
+
 	static public void placeImageFromURI(final String uri, final ImageView target, Context context, String prefix) {
 		final TwAjax pidl = new TwAjax(context, true, false);
 		pidl.ignoreSSLCerts = true;

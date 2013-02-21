@@ -127,7 +127,7 @@ public class MainMenuFragment extends Fragment implements LoginListener {
 		lvw.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int index, long arg3) {
-				((FragmentParentListener) getActivity()).OnFragmentMessage("Navigate Main Menu", MainList.get(index), null);
+				((FragmentParentListener) getActivity()).OnFragmentMessage(ContentFragment.FRGM_MSG_NAV_MAINMENU, MainList.get(index), null);
 				((HtmlStringArrayAdapter) lvw.getAdapter()).setSelectedItemIndex(index);
 				selectedItemIndex = index;
 			}

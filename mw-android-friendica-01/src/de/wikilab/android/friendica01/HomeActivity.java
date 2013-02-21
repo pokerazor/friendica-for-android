@@ -186,16 +186,16 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 	@Override
 	public void OnFragmentMessage(String message, Object arg1, Object arg2) {
 
-		if (message.equals("Set Header Text")) {
+		if (message.equals(ContentFragment.FRGM_MSG_SET_HEADERTEXT)) {
 			setHeadertext((String) arg1);
 		}
-		if (message.equals("Navigate Main Menu")) {
+		if (message.equals(ContentFragment.FRGM_MSG_NAV_MAINMENU)) {
 			navigate((String) arg1);
 		}
-		if (message.equals("Loading Animation")) {
+		if (message.equals(ContentFragment.FRGM_MSG_SHW_LOADING_ANIMATION)) {
 			((ProgressBar) findViewById(R.id.glob_progressbar)).setVisibility(((Integer) arg1).intValue());
 		}
-		if (message.equals("Navigate Conversation")) {
+		if (message.equals(ContentFragment.FRGM_MSG_NAV_CONVERSATION)) {
 			navigateConversation((String) arg1);
 		}
 	}

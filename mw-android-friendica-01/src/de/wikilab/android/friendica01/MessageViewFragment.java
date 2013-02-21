@@ -80,7 +80,7 @@ public class MessageViewFragment extends ContentFragment {
 
 					convloadFinished = false;
 
-					SendMessage("Loading Animation", Integer.valueOf(View.VISIBLE), null);
+					SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
 
 					loadConversations();
 				} else {
@@ -162,13 +162,13 @@ public class MessageViewFragment extends ContentFragment {
 
 	protected void onNavigate(String target) {
 		rlConv.setRefreshing();
-		SendMessage("Set Header Text", getString(R.string.mm_directmessages), null);
+		SendMessage(ContentFragment.FRGM_MSG_SET_HEADERTEXT, getString(R.string.mm_directmessages), null);
 		curConvLoadPage = 1;
 		
 		refreshTarget = target;
 		convloadFinished = false;
 
-		SendMessage("Loading Animation", Integer.valueOf(View.VISIBLE), null);
+		SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
 
 		loadConversations();
 
@@ -180,7 +180,7 @@ public class MessageViewFragment extends ContentFragment {
 		progbar.setVisibility(View.GONE);*/
 		if (curConvLoadPage == 1) rlConv.onRefreshComplete();
 
-		SendMessage("Loading Animation", Integer.valueOf(View.INVISIBLE), null);
+		SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.INVISIBLE), null);
 
 	}
 
@@ -254,7 +254,7 @@ public class MessageViewFragment extends ContentFragment {
 
 
 	public void loadMessages() {
-		SendMessage("Loading Animation", Integer.valueOf(View.VISIBLE), null);
+		SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
 
 		final TwAjax t = new TwAjax(getActivity(), true, true);
 		String target= "conversation?uri=" + URLEncoder.encode(messageParentUri) + "&";
@@ -272,7 +272,7 @@ public class MessageViewFragment extends ContentFragment {
 				}
 				if (curMsgLoadPage == 1) rlMsg.onRefreshComplete();
 
-				SendMessage("Loading Animation", Integer.valueOf(View.INVISIBLE), null);
+				SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.INVISIBLE), null);
 
 			}
 		});

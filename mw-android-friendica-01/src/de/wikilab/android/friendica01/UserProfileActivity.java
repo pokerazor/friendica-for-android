@@ -96,7 +96,7 @@ public class UserProfileActivity extends FragmentActivity implements FragmentPar
 	@Override
 	public void OnFragmentMessage(String message, Object arg1, Object arg2) {
 		
-		if (message.equals("Navigate Conversation")) {
+		if (message.equals(ContentFragment.FRGM_MSG_NAV_CONVERSATION)) {
 			Intent in = new Intent(this, GenericContentActivity.class);
 			in.putExtra("target", "conversation:" + arg1);
 			startActivity(in);

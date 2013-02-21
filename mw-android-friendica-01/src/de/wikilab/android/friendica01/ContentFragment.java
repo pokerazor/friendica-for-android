@@ -12,6 +12,13 @@ public abstract class ContentFragment extends Fragment {
 	protected View myView;
 	
 	String navigateOrder = null;
+
+	public static final String FRGM_MSG_SHW_LOADING_ANIMATION="Loading Animation";
+
+	public static final String FRGM_MSG_SET_HEADERTEXT="Set Header Text";
+
+	public static final String FRGM_MSG_NAV_MAINMENU="Navigate Main Menu";
+	public static final String FRGM_MSG_NAV_CONVERSATION="Navigate Conversation";
 	
 	@Override
 	public void onAttach(Activity activity) {

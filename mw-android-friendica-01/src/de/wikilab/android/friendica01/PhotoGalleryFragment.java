@@ -38,13 +38,13 @@ public class PhotoGalleryFragment extends ContentFragment  implements FragmentPa
 	
 	protected void onNavigate(String target) {
 		if (target != null && target.equals("mywall")) {
-			((FragmentParentListener)getActivity()).OnFragmentMessage("Set Header Text", getString(R.string.mm_mywall), null);
+			((FragmentParentListener)getActivity()).OnFragmentMessage(ContentFragment.FRGM_MSG_SET_HEADERTEXT, getString(R.string.mm_mywall), null);
 			//loadWall();
 		} else if (target != null && target.equals("notifications")) {
-			((FragmentParentListener)getActivity()).OnFragmentMessage("Set Header Text", getString(R.string.mm_notifications), null);
+			((FragmentParentListener)getActivity()).OnFragmentMessage(ContentFragment.FRGM_MSG_SET_HEADERTEXT, getString(R.string.mm_notifications), null);
 			//loadNotifications();
 		} else {
-			((FragmentParentListener)getActivity()).OnFragmentMessage("Set Header Text", getString(R.string.mm_myphotoalbums), null);
+			((FragmentParentListener)getActivity()).OnFragmentMessage(ContentFragment.FRGM_MSG_SET_HEADERTEXT, getString(R.string.mm_myphotoalbums), null);
 			loadExampleGallery();
 		}
 	}

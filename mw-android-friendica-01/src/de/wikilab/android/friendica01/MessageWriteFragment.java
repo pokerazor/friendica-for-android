@@ -63,7 +63,7 @@ public class MessageWriteFragment extends Fragment {
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		
-		((FragmentParentListener)activity).OnFragmentMessage("Set Header Text", getString(R.string.mm_updatemystatus), null);
+		((FragmentParentListener)activity).OnFragmentMessage(ContentFragment.FRGM_MSG_SET_HEADERTEXT, getString(R.string.mm_updatemystatus), null);
 	}
 	
 	private void sendMessage() {

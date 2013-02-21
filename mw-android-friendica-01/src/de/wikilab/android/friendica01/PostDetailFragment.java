@@ -46,7 +46,7 @@ public class PostDetailFragment extends ContentFragment {
 	}
 	
 	protected void sendComment() {
-		SendMessage("Loading Animation", Integer.valueOf(View.VISIBLE), null);
+		SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
 		final TwAjax t = new TwAjax(getActivity(), true, true);
 		t.addPostData("status", ((EditText) myView.findViewById(R.id.maintb)).getText().toString());
 		t.addPostData("source", "<a href='http://friendica-for-android.wiki-lab.net'>Friendica for Android</a>");
@@ -66,17 +66,17 @@ public class PostDetailFragment extends ContentFragment {
 		if (myView != null) {
 			
 		}
-		SendMessage("Loading Animation", Integer.valueOf(View.VISIBLE), null);
+		SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
 		if (target != null && target.startsWith("conversation:")) {
 			conversationId = target.substring(13);
 			
-			SendMessage("Set Header Text", "Post Details ("+String.valueOf(conversationId)+")", null);
+			SendMessage(ContentFragment.FRGM_MSG_SET_HEADERTEXT, "Post Details ("+String.valueOf(conversationId)+")", null);
 			loadInitialPost();
 		}
 	}
 
 	public void hideProgBar() {
-		SendMessage("Loading Animation", Integer.valueOf(View.INVISIBLE), null);
+		SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.INVISIBLE), null);
 	}
 
 	public void loadInitialPost() {
