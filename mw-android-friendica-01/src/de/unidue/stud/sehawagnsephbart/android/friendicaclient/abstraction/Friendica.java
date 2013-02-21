@@ -33,6 +33,8 @@ public class Friendica {
 	final Integer ITEMS_PER_PAGE = 20;
 	Integer curLoadPage = 1;
 	private Context context = null;
+	
+	//test
 	private String lastCommand="";
 
 	public class ResultObject<TargetResultClass extends Object> {
