@@ -32,6 +32,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
@@ -70,6 +71,9 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.map_activity_menu, menu);
+		MenuItem item = menu.getItem(1);
+		SubMenu routesmenu = menu.addSubMenu("Route Menu");
+		routesmenu.add("test1");
 		return true;
 	}
 
@@ -152,7 +156,6 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 				item.setChecked(true);
 				routingMode = 0;
 				renderTimelineEventRoadRoute();
-				System.out.println("CAR");
 			}
 			return true;
 
@@ -163,7 +166,6 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 				item.setChecked(true);
 				routingMode = 1;
 				renderTimelineEventRoadRoute();
-				System.out.println("BIKE");
 			}
 			return true;
 
