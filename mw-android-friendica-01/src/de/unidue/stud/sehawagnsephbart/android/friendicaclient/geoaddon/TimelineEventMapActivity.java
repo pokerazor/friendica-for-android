@@ -8,6 +8,7 @@ import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.bonuspack.overlays.ItemizedOverlayWithBubble;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
+import org.osmdroid.bonuspack.routing.MapQuestRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -59,8 +60,8 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 	protected ArrayList<GeoPoint> eventItemLocations = new ArrayList<GeoPoint>();
 	protected ArrayList<TimelineEvent> timelineEvents = new ArrayList<TimelineEvent>();
 	protected ArrayList<TimelineEventItem> timelineEventItems = null;
-	
-	protected RoadManager roadManager = null;
+
+	protected Integer routingMode = 0;
 
 	public ArrayList<GeoPoint> getEventItemLocations() {
 		return eventItemLocations;
@@ -83,7 +84,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 				this.myLocationOverlay.disableMyLocation();
 				this.myLocationOverlay.disableFollowLocation();
 				this.myLocationOverlay.disableCompass();
-				
+
 				mapView.getOverlayManager().remove(myLocationOverlay);
 				mapView.getOverlays().remove(myLocationOverlay);
 
@@ -100,50 +101,72 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 			}
 			return true;
 		case R.id.submenu1:
-        	if (item.isChecked()) item.setChecked(false);
-        	 else { item.setChecked(true);
-        	 this.mapView.setTileSource(TileSourceFactory.MAPNIK);}
-            return true;
-        	
-        case R.id.submenu2:
-            if (item.isChecked()) item.setChecked(false);
-            else { item.setChecked(true);
-            this.mapView.setTileSource(TileSourceFactory.CYCLEMAP);}
-            return true;
-            
-        case R.id.submenu3:
-            if (item.isChecked()) item.setChecked(false);
-            else { item.setChecked(true);
-            this.mapView.setTileSource(TileSourceFactory.PUBLIC_TRANSPORT);}
-            return true;
-            
-        case R.id.submenu4:
-            if (item.isChecked()) item.setChecked(false);
-            else { item.setChecked(true);
-            this.mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);}
-            return true;
-            
-        case R.id.submenu5:
-            if (item.isChecked()) item.setChecked(false);
-            else{ item.setChecked(true);
-            this.mapView.setTileSource(TileSourceFactory.MAPQUESTAERIAL);}
-            return true;
-            
-        case R.id.submenu6:
-            if (item.isChecked()) item.setChecked(false);
-            else{ item.setChecked(true);
-            System.out.println("CAR");}
-            return true;
-        
-        case R.id.submenu7:
-            if (item.isChecked()) item.setChecked(false);
-            else{ item.setChecked(true);
-            
-            roadManager.addRequestOption("routeType=bicycle");
-            new ComputeTimelineEventRoadRouteAsyncTask().execute(eventItemLocations);
-            System.out.println("BIKE");}
-            return true;
-            
+			if (item.isChecked())
+				item.setChecked(false);
+			else {
+				item.setChecked(true);
+				this.mapView.setTileSource(TileSourceFactory.MAPNIK);
+			}
+			return true;
+
+		case R.id.submenu2:
+			if (item.isChecked())
+				item.setChecked(false);
+			else {
+				item.setChecked(true);
+				this.mapView.setTileSource(TileSourceFactory.CYCLEMAP);
+			}
+			return true;
+
+		case R.id.submenu3:
+			if (item.isChecked())
+				item.setChecked(false);
+			else {
+				item.setChecked(true);
+				this.mapView.setTileSource(TileSourceFactory.PUBLIC_TRANSPORT);
+			}
+			return true;
+
+		case R.id.submenu4:
+			if (item.isChecked())
+				item.setChecked(false);
+			else {
+				item.setChecked(true);
+				this.mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
+			}
+			return true;
+
+		case R.id.submenu5:
+			if (item.isChecked())
+				item.setChecked(false);
+			else {
+				item.setChecked(true);
+				this.mapView.setTileSource(TileSourceFactory.MAPQUESTAERIAL);
+			}
+			return true;
+
+		case R.id.submenu6:
+			if (item.isChecked())
+				item.setChecked(false);
+			else {
+				item.setChecked(true);
+				routingMode = 0;
+				renderTimelineEventRoadRoute();
+				System.out.println("CAR");
+			}
+			return true;
+
+		case R.id.submenu7:
+			if (item.isChecked())
+				item.setChecked(false);
+			else {
+				item.setChecked(true);
+				routingMode = 1;
+				renderTimelineEventRoadRoute();
+				System.out.println("BIKE");
+			}
+			return true;
+
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -152,7 +175,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		friendicaAbstraction = new Friendica(this);
 
 		mResourceProxy = new ResourceProxyImpl(getApplicationContext());
@@ -180,7 +203,6 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 		MapEventsOverlay overlay = new MapEventsOverlay(this, this);
 		this.mapView.getOverlayManager().add(overlay);
 
-		this.roadManager = new OSRMRoadManager();
 		this.setContentView(rl);
 	}
 
@@ -198,13 +220,13 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 						eventItemLocations.add(tEvent.getLocation());
 					}
 				}
-				new ComputeTimelineEventRoadRouteAsyncTask().execute(eventItemLocations);
+				renderTimelineEventRoadRoute();
 
 				timelineEventItems = generateTimelineEventItems(timelineEvents);
 				timelineEventItemsOverlay = new ItemizedOverlayWithBubble<TimelineEventItem>(TimelineEventMapActivity.this, timelineEventItems, mapView, new TimelineEventMapPopup(R.layout.map_popup, mapView));
 				mapView.getOverlayManager().add(timelineEventItemsOverlay);
-				
-				BoundingBoxE6 boundingBox=BoundingBoxE6.fromGeoPoints(eventItemLocations);
+
+				BoundingBoxE6 boundingBox = BoundingBoxE6.fromGeoPoints(eventItemLocations);
 				mMapController.setCenter(boundingBox.getCenter());
 				mMapController.zoomToSpan(boundingBox);
 			}
@@ -217,7 +239,8 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 		for (TimelineEvent timelineEvent : timelineEvents) {
 			ArrayList<TimelineEvent> curTimelineEvents = new ArrayList<TimelineEvent>();
 			curTimelineEvents.add(timelineEvent);
-			curTimelineEvents.add(timelineEvent); // FIXME Duplicate only to show ListView
+			curTimelineEvents.add(timelineEvent); // FIXME Duplicate only to
+													// show ListView
 
 			TimelineEventItem timelineEventItem = new TimelineEventItem(curTimelineEvents, this);
 			timelineEventItem.setMarkerHotspot(OverlayItem.HotspotPlace.CENTER);
@@ -228,7 +251,16 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 		return allTimelineEventItems;
 	}
 
-	void renderTimelineEventRoadRoute(Road road) {
+	void renderTimelineEventRoadRoute() {
+		for (PathOverlay curOverlay : eventRoadRouteOverlays) {
+			mapView.getOverlayManager().remove(curOverlay);
+		}
+		eventRoadRouteOverlays.clear();
+
+		new ComputeTimelineEventRoadRouteAsyncTask().execute(eventItemLocations);
+	}
+
+	void renderTimelineEventCompleteRoadRoute(Road road) {
 		if (road == null) {
 			return;
 		}
@@ -236,7 +268,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 			Toast.makeText(this.mapView.getContext(), "Event road route cannot be calculated (water in the way?)", Toast.LENGTH_SHORT).show();
 		}
 		eventRoadRouteOverlay = RoadManager.buildRoadOverlay(road, this);
-		
+
 		mapView.getOverlayManager().add(eventRoadRouteOverlay);
 		this.mapView.invalidate();
 	}
@@ -245,30 +277,34 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 		protected Road doInBackground(ArrayList<GeoPoint>... timelineEventLocations) {
 			eventRoadRoute = null;
 
-			//RoadManager roadManager = new OSRMRoadManager();
+			RoadManager roadManager = new OSRMRoadManager();
+			if (routingMode == 1) {
+				roadManager = new MapQuestRoadManager();
+				roadManager.addRequestOption("routeType=bicycle");
+			}
 			Road completeRoad = roadManager.getRoad(timelineEventLocations[0]);
-			GeoPoint lastLocation=null;
-			ArrayList<GeoPoint> curLeg=new ArrayList<GeoPoint>();
-			
+			GeoPoint lastLocation = null;
+			ArrayList<GeoPoint> curLeg = new ArrayList<GeoPoint>();
+
 			for (GeoPoint curLocation : timelineEventLocations[0]) {
 				curLeg.add(curLocation);
-				if(curLeg.size()==2){		
-					eventRoadRoute=roadManager.getRoad(curLeg);
-					eventRoadRouteOverlay=RoadManager.buildRoadOverlay(eventRoadRoute, TimelineEventMapActivity.this);
+				if (curLeg.size() == 2) {
+					eventRoadRoute = roadManager.getRoad(curLeg);
+					eventRoadRouteOverlay = RoadManager.buildRoadOverlay(eventRoadRoute, TimelineEventMapActivity.this);
 					eventRoadRouteOverlays.add(eventRoadRouteOverlay);
-					
+
 					mapView.getOverlayManager().add(eventRoadRouteOverlay);
 					curLeg.remove(lastLocation);
 				}
-				lastLocation=curLocation;
+				lastLocation = curLocation;
 			}
-			
+
 			return roadManager.getRoad(timelineEventLocations[0]);
 		}
 
 		protected void onPostExecute(Road computedTimelineEventRoadRoute) {
 			eventRoadRoute = computedTimelineEventRoadRoute;
-	//		renderTimelineEventRoadRoute(computedTimelineEventRoadRoute);
+			// renderTimelineEventRoadRoute(computedTimelineEventRoadRoute);
 		}
 	}
 
@@ -283,34 +319,34 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 		Toast.makeText(this, "Map single tapped at " + eventLocation.getLatitudeE6() + ", " + eventLocation.getLongitudeE6(), Toast.LENGTH_SHORT).show();
 		return false;
 	}
-	
-	public GeoPoint[] getEventBoundingBox(){
-		GeoPoint[] boundingBox=new GeoPoint[2];
-		GeoPoint firstElement=this.eventItemLocations.iterator().next();
-		
-		Integer minLat=firstElement.getLatitudeE6();
-		Integer maxLat=firstElement.getLatitudeE6();
-		Integer minLon=firstElement.getLongitudeE6();
-		Integer maxLon=firstElement.getLongitudeE6();
+
+	public GeoPoint[] getEventBoundingBox() {
+		GeoPoint[] boundingBox = new GeoPoint[2];
+		GeoPoint firstElement = this.eventItemLocations.iterator().next();
+
+		Integer minLat = firstElement.getLatitudeE6();
+		Integer maxLat = firstElement.getLatitudeE6();
+		Integer minLon = firstElement.getLongitudeE6();
+		Integer maxLon = firstElement.getLongitudeE6();
 
 		for (GeoPoint eventLocation : this.eventItemLocations) {
 			System.out.println(eventLocation);
-			if(eventLocation.getLatitudeE6()<minLat){
-				minLat=eventLocation.getLatitudeE6();
+			if (eventLocation.getLatitudeE6() < minLat) {
+				minLat = eventLocation.getLatitudeE6();
 			}
-			if(eventLocation.getLatitudeE6()>maxLat){
-				maxLat=eventLocation.getLatitudeE6();
+			if (eventLocation.getLatitudeE6() > maxLat) {
+				maxLat = eventLocation.getLatitudeE6();
 			}
-			if(eventLocation.getLongitudeE6()<minLon){
-				minLon=eventLocation.getLongitudeE6();
+			if (eventLocation.getLongitudeE6() < minLon) {
+				minLon = eventLocation.getLongitudeE6();
 			}
-			if(eventLocation.getLongitudeE6()>maxLon){
-				maxLon=eventLocation.getLongitudeE6();
+			if (eventLocation.getLongitudeE6() > maxLon) {
+				maxLon = eventLocation.getLongitudeE6();
 			}
 		}
-		
-		boundingBox[0]=new GeoPoint(minLat, minLon);
-		boundingBox[1]=new GeoPoint(maxLat, maxLon);
+
+		boundingBox[0] = new GeoPoint(minLat, minLon);
+		boundingBox[1] = new GeoPoint(maxLat, maxLon);
 		System.out.println(boundingBox[0]);
 		System.out.println(boundingBox[1]);
 		return boundingBox;
