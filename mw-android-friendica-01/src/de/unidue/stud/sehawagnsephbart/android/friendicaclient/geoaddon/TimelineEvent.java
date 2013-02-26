@@ -28,11 +28,13 @@ public class TimelineEvent {
 
 	protected Integer type = -1;
 	protected String dateTime = "";
-	protected Long createdAt = (long) 0.0;
+	protected Long createdAt = (long) 0;
 
 	protected Drawable image = null;
 	protected String imageURI = "";
-	protected Long date = (long) 0.0;
+	protected Long date = (long) 0;
+	protected Long inReplyTo = (long) 0;
+
 
 	protected GeoPoint location = null;
 	protected Integer id = -1;
@@ -60,6 +62,8 @@ public class TimelineEvent {
 			this.setId(Integer.parseInt(jsonPost.getString("id")));
 			this.setText(jsonPost.getString("text"));
 			this.setDateTime(jsonPost.getString("created_at"));
+			this.setInReplyTo(jsonPost.getLong("in_reply_to_status_id"));
+
 
 			this.setDate(java.util.Date.parse(getDateTime()));
 
@@ -182,6 +186,14 @@ public class TimelineEvent {
 	public void setDateTime(String dateTime) {
 
 		this.dateTime = dateTime;
+	}
+
+	public Long getInReplyTo() {
+		return inReplyTo;
+	}
+
+	public void setInReplyTo(Long inReplyTo) {
+		this.inReplyTo = inReplyTo;
 	}
 
 	public Long getCreatedAt() {

@@ -235,7 +235,7 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 		} catch (Exception e) {
 			H.htmlContent.setText("Invalid Dataset!");
 		}
-
+		convertView.setTag(R.id.postLinearRoot, timelineEvent);
 		return convertView;
 	}
 }

@@ -14,10 +14,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -121,7 +124,7 @@ public class PostListFragment extends ContentFragment {
 
 		list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> self, View view, int position, long id) {
+			public void onItemClick(AdapterView<?> self, final View view, int position, long id) {
 				if (refreshTarget.equals("notifications")) {
 					SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
 					final Notification n = ((Notification.NotificationsListAdapter) getListAdapter()).getItem(position - 1);
@@ -143,7 +146,8 @@ public class PostListFragment extends ContentFragment {
 //						lastOpenedPost.removeView(lastOpenedPost.findViewById(R.id.postDetailListLayout));
 					}
 
-					LinearLayout postView = (LinearLayout) view.findViewById(R.id.postLinearInner);
+					final LinearLayout postView = (LinearLayout) view.findViewById(R.id.postLinearInner);
+					final TimelineEvent timelineEvent = (TimelineEvent) view.getTag(R.id.postLinearRoot);
 					if (postView != null) { //TODO only for comments, not for images yet
 						lastOpenedPost = (LinearLayout) postView;
 					
@@ -159,6 +163,14 @@ public class PostListFragment extends ContentFragment {
 */
 						
 						fillCommentList(id + "", (LinearLayout) detailsBar.findViewById(R.id.listview));
+						
+						((Button) postView.findViewById(R.id.btn_upload)).setOnClickListener(new OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								postComment(((EditText) postView.findViewById(R.id.comment_text)).getText().toString(),timelineEvent.getInReplyTo(), view);
+								Toast.makeText(getActivity(), "postButton clicked", Toast.LENGTH_SHORT).show();
+							}
+						});
 
 					}
 				}
@@ -179,6 +191,29 @@ public class PostListFragment extends ContentFragment {
 
 		return myView;
 	}
+	
+	protected void loadComments() {
+		
+	}
+	
+	
+	protected void postComment(String commentText, Long inReplyTo, View view) {
+		SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
+		final TwAjax t = new TwAjax(getActivity(), true, true);
+		t.addPostData("status", commentText);
+		t.addPostData("source", getString(R.string.app_title_html));
+		t.addPostData("in_reply_to_status_id", inReplyTo.toString());
+		((Button) myView.findViewById(R.id.btn_upload)).setEnabled(false);
+		t.postData(Max.getServer(getActivity()) + "/api/statuses/update", new Runnable() {
+			@Override
+			public void run() {
+				((EditText) myView.findViewById(R.id.comment_text)).setText("");
+				((Button) myView.findViewById(R.id.btn_upload)).setEnabled(true);
+				loadComments();
+			}
+		});
+	}
+	
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
