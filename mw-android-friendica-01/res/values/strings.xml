@@ -5,8 +5,8 @@
     <string name="nul"></string>
     <string name="timeline">Timeline</string>
     <string name="notifications">Notifications</string>
-    <string name="app_name">Friendica</string>
-    <string name="intf_fileupload2">Friendica</string>
+    <string name="app_name">AdventourUs</string>
+    <string name="intf_fileupload2">goAdventourUs</string>
     <string name="loading_data">Loading&#8230;</string>
     <string name="protocol">Protocol</string>
 
@@ -20,7 +20,7 @@
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="login">Log in</string>
-    <string name="app_title_html">Friendica</string>
+    <string name="app_title_html">goAdventourUs</string>
     <string name="upload_file">Upload a photo</string>
     <string name="upload_now">Start upload</string>
     <string name="viewLatLon">Post Current Location</string>

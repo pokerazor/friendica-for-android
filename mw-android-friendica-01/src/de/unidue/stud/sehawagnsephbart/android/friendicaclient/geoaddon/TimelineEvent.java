@@ -11,6 +11,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.format.DateUtils;
+import android.text.style.ImageSpan;
 import android.widget.ImageView;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica;
 
@@ -22,7 +23,7 @@ public class TimelineEvent {
 	public static final Integer TYPE_FRIENDSHIP = 3;
 	public static final Integer TYPE_COMMENT = 4;
 	public static final Integer TYPE_LIKE = 5;
-	
+
 	protected ImageView tempImageHolder = null;
 
 	protected Integer type = -1;
@@ -38,8 +39,10 @@ public class TimelineEvent {
 	protected String text = "";
 	protected JSONObject jsonPost;
 
+	protected String html = "";
+
 	public TimelineEvent(JSONObject jsonPost) {
-		this.jsonPost=jsonPost;
+		this.jsonPost = jsonPost;
 		try {
 
 			if (jsonPost.getString("verb").equals("http://activitystrea.ms/schema/1.0/like")) {
@@ -59,9 +62,11 @@ public class TimelineEvent {
 			this.setDateTime(jsonPost.getString("created_at"));
 
 			this.setDate(java.util.Date.parse(getDateTime()));
-			this.setImageFromHTML(jsonPost.getString("statusnet_html"));
-			
-//			System.err.println(jsonPost.getString("statusnet_html"));
+
+			this.setHtml(jsonPost.getString("statusnet_html"));
+			this.determineImage();
+
+// System.err.println(jsonPost.getString("statusnet_html"));
 
 			String coordinates = jsonPost.getString("coordinates");
 
@@ -70,25 +75,20 @@ public class TimelineEvent {
 				GeoPoint gp = new GeoPoint(Double.parseDouble(splitcoordinates[0]), Double.parseDouble(splitcoordinates[1]));
 				this.setLocation(gp);
 			}
-			
+
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public void processImage(Context context){ 		// TODO handle asynchronously
-		if(tempImageHolder==null){
-			tempImageHolder=new ImageView(context);
-		}
-		Friendica.displayProfileImageFromPost(jsonPost, tempImageHolder, context);
-		this.loadImageIntoTarget(tempImageHolder, context); // if event is image, override profile image with actual image
-		this.setImage(tempImageHolder.getDrawable());
+
+	public String getCleanedHtml() {
+		return html.replaceAll("(<br[^>]*>|</?div[^>]*>|</?p>)", "  ");
 	}
 
-	private void setImageFromHTML(String html) {
-		html = html.replaceAll("(<br[^>]*>|</?div[^>]*>|</?p>)", "  ");
+	public Spannable getSpannableHtml() {
+		html = getCleanedHtml();
 		Spanned spanned = Html.fromHtml(html);
 		Spannable htmlSpannable;
 		if (spanned instanceof SpannableStringBuilder) {
@@ -96,15 +96,38 @@ public class TimelineEvent {
 		} else {
 			htmlSpannable = new SpannableStringBuilder(spanned);
 		}
-		if (this.type == TYPE_IMAGE) {
-			this.setImageURI(Friendica.getImageURIFromPost(htmlSpannable));
+		return htmlSpannable;
+	}
 
+	private void determineImage() {
+		if (this.type == TYPE_IMAGE) {
+			this.setImageURI(Friendica.getImageURIFromPost(getSpannableHtml()));
 			// this.setImage(image);
 		}
 	}
-	
+
+	public void processImage(Context context) { 		// TODO handle asynchronously
+		if (tempImageHolder == null) {
+			tempImageHolder = new ImageView(context);
+		}
+		Friendica.displayProfileImageFromPost(jsonPost, tempImageHolder, context);
+		this.loadImageIntoTarget(tempImageHolder, context); // if event is image, override profile image with actual image
+		this.setImage(tempImageHolder.getDrawable());
+	}
+
+	public void placeImages(ImageView[] imageViews,Context context) {
+		ImageSpan[] images = Friendica.getImagesFromPost(getSpannableHtml());
+		
+		for (int i = 0; i < imageViews.length; i++) {
+			ImageView curImageView = imageViews[i];
+			if(images.length>i && images[i]!=null){
+				Friendica.placeImageFromURI(images[i].getSource(), curImageView, context, "pi");
+			}
+		}
+	}
+
 	public void loadImageIntoTarget(ImageView target, Context context) {
-		if(this.getType()==TYPE_IMAGE){
+		if (this.getType() == TYPE_IMAGE) {
 			Friendica.placeImageFromURI(this.getImageURI(), target, context, "pi");
 		}
 	}
@@ -187,6 +210,14 @@ public class TimelineEvent {
 
 	public void setImageURI(String imageURI) {
 		this.imageURI = imageURI;
+	}
+
+	public String getHtml() {
+		return html;
+	}
+
+	public void setHtml(String html) {
+		this.html = html;
 	}
 
 	public ImageView getTempImageHolder() {

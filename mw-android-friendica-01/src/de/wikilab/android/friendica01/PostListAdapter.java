@@ -1,7 +1,5 @@
 package de.wikilab.android.friendica01;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import org.json.JSONException;
@@ -10,13 +8,8 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.text.Html;
 import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
-import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,6 +48,7 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 
 	public PostListAdapter(Context context, List<JSONObject> objects) {
 		super(context, R.layout.pl_listitem, objects);
+		System.out.println("count="+this.getCount());
 	}
 
 	@Override
@@ -120,6 +114,7 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		final ViewHolder H;
+		System.out.println("getView "+position+" "+convertView+" "+parent+" ");
 		if (convertView == null) {
 			LayoutInflater inf = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -157,6 +152,7 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 			}
 
 			if (isPostDetails && H.Type != ViewHolder.POST_TYPE_LIKE) {
+				/*
 				if (H.Type <= ViewHolder.POST_TYPE_IMAGE) {
 					H.userName.setTextSize(18);
 					H.htmlContent.setTextSize(18);
@@ -170,7 +166,7 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 
 				H.dateTime = (TextView) convertView.findViewById(R.id.date);
 				H.coordinates = (TextView) convertView.findViewById(R.id.coordinates);
-
+*/
 			}
 
 			convertView.setTag(H);
@@ -198,7 +194,6 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 			H.profileImage.setImageResource(R.drawable.ic_launcher);
 
 			Friendica.displayProfileImageFromPost(post, H.profileImage, getContext());
-
 		}
 
 		if (H.userName != null) {
@@ -214,7 +209,8 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 
 		if (H.dateTime != null) {
 			try {
-				H.dateTime.setText(DateUtils.getRelativeDateTimeString(parent.getContext(), java.util.Date.parse(post.getString("published")), DateUtils.SECOND_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, DateUtils.FORMAT_24HOUR));
+				H.dateTime.setText(timelineEvent.getRelativeDate(getContext()));
+//				H.dateTime.setText(DateUtils.getRelativeDateTimeString(parent.getContext(), java.util.Date.parse(post.getString("published")), DateUtils.SECOND_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, DateUtils.FORMAT_24HOUR));
 			} catch (Exception e) {
 				H.dateTime.setText("Invalid Dataset!");
 			}
@@ -229,20 +225,9 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 		}
 
 		try {
-
-			// Max.setHtmlWithImages(event.htmlContent, post.getString("statusnet_html"));
-			String filtered_html = post.getString("statusnet_html");
-			filtered_html = filtered_html.replaceAll("(<br[^>]*>|</?div[^>]*>|</?p>)", "  ");
-			// filtered_html = filtered_html.replaceAll("<img[^>]+src=[\"']([^>\"']+)[\"'][^>]*>", "<a href='$1'>Bild: $1</a>");
-			Spanned spanned = Html.fromHtml(filtered_html);
-			Spannable htmlSpannable;
-			if (spanned instanceof SpannableStringBuilder) {
-				htmlSpannable = (SpannableStringBuilder) spanned;
-			} else {
-				htmlSpannable = new SpannableStringBuilder(spanned);
-			}
+			Spannable htmlSpannable=timelineEvent.getSpannableHtml();
 			if (H.Type == ViewHolder.POST_TYPE_IMAGE) {
-				downloadPics(H, htmlSpannable);
+				timelineEvent.placeImages(H.picture,getContext());
 			}
 
 			H.htmlContent.setText(htmlSpannable);
@@ -252,25 +237,5 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 		}
 
 		return convertView;
-	}
-
-	private void downloadPics(final ViewHolder H, Spannable htmlSpannable) {
-		int pos = 0;
-		for (int i = 0; i <= 2; i++) {
-			H.picture[i].setVisibility(View.GONE);
-		}
-		ImageSpan[] images = Friendica.getImagesFromPost(htmlSpannable);
-
-		for (ImageSpan img : images) {
-			htmlSpannable.removeSpan(img);
-
-			if (pos > 2) {
-				break;
-			}
-
-			Friendica.placeImageFromURI(img.getSource(), H.picture[pos], getContext(), "pi");
-
-			pos++;
-		}
 	}
 }

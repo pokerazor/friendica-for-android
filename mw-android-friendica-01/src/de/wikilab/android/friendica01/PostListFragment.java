@@ -32,6 +32,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.JsonFinishReaction;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.ResultObject;
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.TimelineEvent;
 
 public class PostListFragment extends ContentFragment {
 	private static final String TAG = "Friendica/PostListFragment";
@@ -54,6 +55,30 @@ public class PostListFragment extends ContentFragment {
 	HashSet<Long> containedIds = new HashSet<Long>();
 
 	private LinearLayout lastOpenedPost;
+
+	public void fillCommentList(String conversationId, final LinearLayout list) {
+		HashMap<String, String> arguments = new HashMap<String, String>();
+		arguments.put("conversation", "true");
+		friendicaAbstraction.executeAjaxQuery("statuses/show/" + conversationId, arguments, new JsonFinishReaction<ArrayList<JSONObject>>() {
+			@Override
+			public void onFinished(ResultObject<ArrayList<JSONObject>> result) {
+				result.getResult().remove(0);
+
+				for (JSONObject curElement : result.getResult()) {
+					TimelineEvent timelineEvent=new TimelineEvent(curElement);
+
+					System.out.println(curElement);
+					TextView commentTextView=new TextView(getActivity());
+					commentTextView.setText(timelineEvent.getSpannableHtml());
+					list.addView(commentTextView);
+					list.requestLayout();
+				}
+	//			PostListAdapter pla = new PostListAdapter(getActivity(), result.getResult());
+	//			pla.isPostDetails = true;
+	//			list.setAdapter(pla);
+			}
+		}, true);
+	}
 
 	/*@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -113,43 +138,29 @@ public class PostListFragment extends ContentFragment {
 					});
 				} else {
 					LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-					if (lastOpenedPost != null) {
-						LinearLayout oldItemDetailsBar = (LinearLayout) lastOpenedPost.findViewById(R.id.timelineItemDetailsBar);
-						lastOpenedPost.removeView(oldItemDetailsBar);
-
+					if (lastOpenedPost != null) {						
+						lastOpenedPost.removeView(lastOpenedPost.findViewById(R.id.timelineItemDetailsBar));
+//						lastOpenedPost.removeView(lastOpenedPost.findViewById(R.id.postDetailListLayout));
 					}
 
 					LinearLayout postView = (LinearLayout) view.findViewById(R.id.postLinearInner);
-					lastOpenedPost = (LinearLayout) postView;
-					/*
-					TextView textView = new TextView(getActivity());
-					textView.setText("Processing...");
-					postView.addView(textView);
-					*/
-					/*
-					postView.invalidate();
-					postView.requestLayout();
-					view.invalidate();
-					view.requestLayout();
-					textView.invalidate();
-					textView.requestLayout();
-					self.invalidate();
-					self.requestLayout();
-					*/
-// Toast.makeText(getActivity(), "Show conversation #" + String.valueOf(id) + "\n View: " + view + ", " + view.getId(), Toast.LENGTH_SHORT).show();
+					if (postView != null) { //TODO only for comments, not for images yet
+						lastOpenedPost = (LinearLayout) postView;
+					
+//						View detailsBar = inflater.inflate(R.layout.pd_listitemwrapper, postView);
+						View detailsBar = inflater.inflate(R.layout.post_item_detail, postView);
+
+						TextView coordinates = (TextView) postView.findViewById(R.id.coordinates);
+						coordinates.setText("My coords");
 /*
-To create a new LayoutInflater with an additional LayoutInflater.Factory for your own views, you can use cloneInContext(Context) to clone an existing ViewFactory, and then call setFactory(LayoutInflater.Factory) on it to include your Factory. 
+						View detailView = inflater.inflate(R.layout.pd_listviewinner, postView);
+						PullToRefreshListView commentList = (PullToRefreshListView) detailView.findViewById(R.id.listview);
+						fillCommentList(id + "", commentList.getRefreshableView());
 */
-// View newView = inflater.inflate(R.layout.pl_listviewinner, bdf, false);
+						
+						fillCommentList(id + "", (LinearLayout) detailsBar.findViewById(R.id.listview));
 
-					// View savedView = view;
-					View newView = inflater.inflate(R.layout.pd_listitemwrapper, null);
-					postView.addView(newView);
-					TextView coordinates = (TextView) postView.findViewById(R.id.coordinates);
-					coordinates.setText("My coords");
-
-// self.removeViewInLayout(view);
-// SendMessage(FRGM_MSG_NAV_CONVERSATION, String.valueOf(id), null);
+					}
 				}
 			}
 		});
@@ -240,8 +251,16 @@ To create a new LayoutInflater with an additional LayoutInflater.Factory for you
 		PostListAdapter curContent = getPostListAdapter();
 		curContent.addAll(resultArray);
 		curContent.notifyDataSetChanged();
-		Toast.makeText(getActivity(), "Done loading more items - scroll down :)", Toast.LENGTH_SHORT).show();
+		Toast.makeText(getActivity(), "More posts retrieved. scroll down", Toast.LENGTH_SHORT).show();
 		loadFinished = true;
+	}
+
+	public void loadWall(String userId) {
+		loadTimeline(TIMELINE_MODE_USER, userId);
+	}
+
+	public void loadTimeline() {
+		loadTimeline(TIMELINE_MODE_HOME, null);
 	}
 
 	public void loadTimeline(final Integer mode, final String userId) {
@@ -267,14 +286,6 @@ To create a new LayoutInflater with an additional LayoutInflater.Factory for you
 				hideProgBar();
 			}
 		}, true);
-	}
-
-	public void loadTimeline() {
-		loadTimeline(TIMELINE_MODE_HOME, null);
-	}
-
-	public void loadWall(String userId) {
-		loadTimeline(TIMELINE_MODE_USER, userId);
 	}
 
 	void loadNotifications() {

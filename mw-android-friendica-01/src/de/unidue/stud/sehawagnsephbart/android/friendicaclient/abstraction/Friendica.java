@@ -179,7 +179,7 @@ public class Friendica {
 //			if (numberOfPosts < Integer.parseInt(queryElements.get("count"))) { // not enough elements added				
 //				actualPage=Integer.parseInt(queryElements.get("page"))+1;
 //				queryElements.put("page",actualPage+"");
-				System.out.println("not enough elements added, running again");
+//				System.out.println("not enough elements added, running again");
 //				executeAjaxQuery(lastCommand, queryElements, jsonFinishReaction, onlyRootElements, result);
 //			}
 //			System.out.println("query-page "+queryElements.get("page"));
