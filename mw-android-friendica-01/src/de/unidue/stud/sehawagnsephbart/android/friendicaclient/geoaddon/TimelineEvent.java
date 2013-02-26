@@ -54,7 +54,7 @@ public class TimelineEvent {
 			} else if (jsonPost.getString("statusnet_html").contains("<img")) {
 				this.setType(TYPE_IMAGE);
 			} else {
-				this.setType(TYPE_DEFAULT); // not used?
+				this.setType(TYPE_DEFAULT); //FIXME not used?
 				this.setType(TYPE_STATUS);
 
 			}

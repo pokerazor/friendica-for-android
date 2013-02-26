@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -60,6 +61,7 @@ public class PostListFragment extends ContentFragment {
 	private LinearLayout lastOpenedPost;
 
 	public void fillCommentList(String conversationId, final LinearLayout list) {
+		list.removeAllViews();
 		HashMap<String, String> arguments = new HashMap<String, String>();
 		arguments.put("conversation", "true");
 		friendicaAbstraction.executeAjaxQuery("statuses/show/" + conversationId, arguments, new JsonFinishReaction<ArrayList<JSONObject>>() {
@@ -69,16 +71,11 @@ public class PostListFragment extends ContentFragment {
 
 				for (JSONObject curElement : result.getResult()) {
 					TimelineEvent timelineEvent=new TimelineEvent(curElement);
-
-					System.out.println(curElement);
 					TextView commentTextView=new TextView(getActivity());
 					commentTextView.setText(timelineEvent.getSpannableHtml());
 					list.addView(commentTextView);
 					list.requestLayout();
 				}
-	//			PostListAdapter pla = new PostListAdapter(getActivity(), result.getResult());
-	//			pla.isPostDetails = true;
-	//			list.setAdapter(pla);
 			}
 		}, true);
 	}
@@ -167,7 +164,7 @@ public class PostListFragment extends ContentFragment {
 						((Button) postView.findViewById(R.id.btn_upload)).setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								postComment(((EditText) postView.findViewById(R.id.comment_text)).getText().toString(),timelineEvent.getInReplyTo(), view);
+								postComment(((EditText) postView.findViewById(R.id.comment_text)).getText().toString(),Long.valueOf(timelineEvent.getId()), view);
 								Toast.makeText(getActivity(), "postButton clicked", Toast.LENGTH_SHORT).show();
 							}
 						});
@@ -192,26 +189,24 @@ public class PostListFragment extends ContentFragment {
 		return myView;
 	}
 	
-	protected void loadComments() {
+	protected void postComment(String commentText, final Long inReplyTo, final View view) {
+//		Toast.makeText(getActivity(), "postComment "+commentText+" "+inReplyTo, Toast.LENGTH_SHORT).show();
 		
-	}
-	
-	
-	protected void postComment(String commentText, Long inReplyTo, View view) {
 		SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
 		final TwAjax t = new TwAjax(getActivity(), true, true);
 		t.addPostData("status", commentText);
 		t.addPostData("source", getString(R.string.app_title_html));
 		t.addPostData("in_reply_to_status_id", inReplyTo.toString());
-		((Button) myView.findViewById(R.id.btn_upload)).setEnabled(false);
+		((Button) view.findViewById(R.id.btn_upload)).setEnabled(false);
 		t.postData(Max.getServer(getActivity()) + "/api/statuses/update", new Runnable() {
 			@Override
 			public void run() {
-				((EditText) myView.findViewById(R.id.comment_text)).setText("");
-				((Button) myView.findViewById(R.id.btn_upload)).setEnabled(true);
-				loadComments();
+				((EditText) view.findViewById(R.id.comment_text)).setText("");
+				((Button) view.findViewById(R.id.btn_upload)).setEnabled(true);
+				fillCommentList(inReplyTo.toString(),(LinearLayout) view.findViewById(R.id.listview));
 			}
 		});
+		
 	}
 	
 
