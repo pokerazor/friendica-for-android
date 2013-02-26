@@ -18,14 +18,12 @@ import android.widget.ListView;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 public class PostDetailFragment extends ContentFragment {
-	private static final String TAG="Friendica/PostDetailFragment";
-	
+	private static final String TAG = "Friendica/PostDetailFragment";
 
 	PullToRefreshListView reflvw;
 	ListView list;
 
 	String refreshTarget;
-	
 
 	String conversationId;
 
@@ -34,17 +32,17 @@ public class PostDetailFragment extends ContentFragment {
 		myView = inflater.inflate(R.layout.pd_listviewinner, container, false);
 		reflvw = (PullToRefreshListView) myView.findViewById(R.id.listview);
 		list = reflvw.getRefreshableView();
-		
+
 		((Button) myView.findViewById(R.id.btn_upload)).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				sendComment();
 			}
 		});
-		
+
 		return myView;
 	}
-	
+
 	protected void sendComment() {
 		SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
 		final TwAjax t = new TwAjax(getActivity(), true, true);
@@ -64,13 +62,13 @@ public class PostDetailFragment extends ContentFragment {
 
 	protected void onNavigate(String target) {
 		if (myView != null) {
-			
+
 		}
 		SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
 		if (target != null && target.startsWith("conversation:")) {
 			conversationId = target.substring(13);
-			
-			SendMessage(FRGM_MSG_SET_HEADERTEXT, "Post Details ("+String.valueOf(conversationId)+")", null);
+
+			SendMessage(FRGM_MSG_SET_HEADERTEXT, "Post Details (" + String.valueOf(conversationId) + ")", null);
 			loadInitialPost();
 		}
 	}
@@ -86,30 +84,28 @@ public class PostDetailFragment extends ContentFragment {
 			public void run() {
 				try {
 					ArrayList<JSONObject> jsonObjectArray = new ArrayList<JSONObject>();
-					JSONObject jj = (JSONObject)t.getJsonResult();
-					
+					JSONObject jj = (JSONObject) t.getJsonResult();
+
 					jsonObjectArray.add(jj);
-					
-					//ListView lvw = (ListView) findViewById(R.id.listview);
-					
+
+					// ListView lvw = (ListView) findViewById(R.id.listview);
+
 					list.setAdapter(new PostListAdapter(getActivity(), jsonObjectArray));
-					
+
 					if (jj.has("statusnet_conversation_id") && jj.getString("statusnet_conversation_id").equals("0") == false) {
 						conversationId = jj.getString("statusnet_conversation_id");
 					}
-					
+
 					loadComments();
-					
-					
+
 				} catch (Exception e) {
-					list.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.pl_error_listitem, android.R.id.text1, new String[]{"Error: "+ e.getMessage(), Max.Hexdump(t.getResult().getBytes())}));
+					list.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.pl_error_listitem, android.R.id.text1, new String[] { "Error: " + e.getMessage(), Max.Hexdump(t.getResult().getBytes()) }));
 					e.printStackTrace();
 				}
 			}
 		});
 
 	}
-
 
 	public void loadComments() {
 		final TwAjax t = new TwAjax(getActivity(), true, true);
@@ -120,27 +116,28 @@ public class PostDetailFragment extends ContentFragment {
 					ArrayList<JSONObject> jsonObjectArray = new ArrayList<JSONObject>();
 					Object obj = t.getJsonResult();
 					if (obj instanceof JSONArray) {
-						JSONArray j = (JSONArray)obj;
-						
-						for(int i = 0; i < j.length(); i++)	jsonObjectArray.add(j.getJSONObject(i));
-						
-						//ListView lvw = (ListView) findViewById(R.id.listview);
+						JSONArray j = (JSONArray) obj;
+
+						for (int i = 0; i < j.length(); i++)
+							jsonObjectArray.add(j.getJSONObject(i));
+
+						// ListView lvw = (ListView) findViewById(R.id.listview);
 						PostListAdapter pla = new PostListAdapter(getActivity(), jsonObjectArray);
-						pla.isPostDetails=true;
+						pla.isPostDetails = true;
 						list.setAdapter(pla);
 					} else {
 						Max.alert(getActivity(), "Sorry, your Friendica server doesn't support conversation view!<br><br>Refer to this page for more information: <a href='http://friendica-for-android.wiki-lab.net/notes#conv-view-note'>http://friendica-for-android.wiki-lab.net/notes#conv-view-note</a>");
 					}
-					
+
 				} catch (Exception e) {
 					e.printStackTrace();
-					if (list != null) list.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.pl_error_listitem, android.R.id.text1, new String[]{"Error: "+ e.getMessage(), Max.Hexdump(t.getResult().getBytes())}));
+					if (list != null)
+						list.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.pl_error_listitem, android.R.id.text1, new String[] { "Error: " + e.getMessage(), Max.Hexdump(t.getResult().getBytes()) }));
 				}
 				hideProgBar();
 			}
 		});
 
 	}
-
 
 }

@@ -9,10 +9,10 @@ package com.handmark.pulltorefresh.library;
 public final class R {
 	public static final class id {
 		public static final int both = 0x7f070002;
-		public static final int pull_to_refresh_image = 0x7f07004f;
+		public static final int pull_to_refresh_image = 0x7f070050;
 		public static final int webview = 0x7f070004;
-		public static final int pull_to_refresh_sub_text = 0x7f07004e;
-		public static final int pull_to_refresh_text = 0x7f07004d;
+		public static final int pull_to_refresh_sub_text = 0x7f07004f;
+		public static final int pull_to_refresh_text = 0x7f07004e;
 		public static final int pullDownFromTop = 0x7f070000;
 		public static final int pullUpFromBottom = 0x7f070001;
 		public static final int gridview = 0x7f070003;
@@ -32,7 +32,7 @@ public final class R {
 		public static final int pull_to_refresh_from_bottom_release_label = 0x7f090004;
 	}
 	public static final class layout {
-		public static final int pull_to_refresh_header = 0x7f030024;
+		public static final int pull_to_refresh_header = 0x7f030025;
 	}
 	public static final class styleable {
 		public static final int PullToRefresh_ptrShowIndicator = 5;
