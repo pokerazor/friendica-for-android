@@ -30,9 +30,6 @@
         android:id="@+id/position"
         android:title="Position"/>
     <item
-        android:id="@+id/route"
-        android:title="Route Menu"/>
-    <item
         android:id="@+id/routemenu"
         android:title="Route Mode">
         <menu>
