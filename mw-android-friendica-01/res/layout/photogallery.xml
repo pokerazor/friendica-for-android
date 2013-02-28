@@ -9,7 +9,7 @@
 						<include layout="@layout/header_logo" />
 					  
 						<TextView android:text="@string/mm_myphotoalbums" android:id="@+id/header_text" android:layout_width="wrap_content" android:layout_height="wrap_content"
-			    			  android:textColor="#000" android:layout_toRightOf="@id/header_logo" android:layout_alignBaseline="@id/header_logo"></TextView>
+			    			  android:textColor="#000" android:layout_toRightOf="@id/header" android:layout_alignBaseline="@id/header"></TextView>
 			    	
 						<!-- <ImageButton android:layout_height="wrap_content" android:id="@+id/btn_upload_paste" android:layout_toLeftOf="@+id/btn_upload_sdcard" android:layout_width="wrap_content" android:src="@drawable/clipboard_paste"></ImageButton>
 						<ImageButton android:layout_height="wrap_content" android:id="@+id/btn_upload_sdcard" android:layout_toLeftOf="@+id/btn_upload_photo" android:layout_width="wrap_content" android:src="@drawable/sdcard"></ImageButton>

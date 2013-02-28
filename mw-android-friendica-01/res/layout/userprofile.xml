@@ -17,8 +17,8 @@
             android:id="@+id/header_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/header_logo"
-            android:layout_toRightOf="@+id/header_logo"
+            android:layout_alignBaseline="@+id/text_logoletters"
+            android:layout_toRightOf="@+id/text_logoletters"
             android:text="Loading..."
             android:textColor="#000" >
         </TextView>

@@ -24,7 +24,7 @@ public class GenericContentActivity extends FragmentActivity implements Fragment
 		
 		setContentView(R.layout.genericcontentactivity);
 		
-		TextView header_logo = (TextView) findViewById(R.id.header_logo);
+		TextView header_logo = (TextView) findViewById(R.id.header);
 		header_logo.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

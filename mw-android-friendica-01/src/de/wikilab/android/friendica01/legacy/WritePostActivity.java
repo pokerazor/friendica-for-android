@@ -22,7 +22,7 @@ public class WritePostActivity extends FragmentActivity implements FragmentParen
 		
 		setContentView(R.layout.writepost);
 		
-		TextView header_logo = (TextView) findViewById(R.id.header_logo);
+		TextView header_logo = (TextView) findViewById(R.id.header);
 		header_logo.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

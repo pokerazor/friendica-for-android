@@ -82,8 +82,8 @@
                 android:id="@+id/header_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBaseline="@id/header_logo"
-                android:layout_toRightOf="@id/header_logo"
+                android:layout_alignBaseline="@id/header"
+                android:layout_toRightOf="@id/header"
                 android:text="@string/hello"
                 android:textColor="#000" 
                 android:maxLines="1">
