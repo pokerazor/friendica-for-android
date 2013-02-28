@@ -23,7 +23,7 @@
     <string name="app_title_html">goAdventourUs</string>
     <string name="upload_file">Upload a photo</string>
     <string name="upload_now">Start upload</string>
-    <string name="viewLatLon">Post Current Location</string>
+    <string name="viewLatLon">Location</string>
     <string name="proxy_settings"><u>Proxy / SSL Settings...</u></string>
     <string name="post_status_update">Post Status Update</string>
     <string name="post">Post</string>
