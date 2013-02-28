@@ -26,7 +26,7 @@ import android.widget.TextView;
 
 import com.google.android.gcm.GCMRegistrar;
 
-import de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.RouteAdminFragment;
+import de.wikilab.android.friendica01.legacy.RouteAdminFragment;
 
 public class HomeActivity extends FragmentActivity implements FragmentParentListener, LoginListener {
 	private static final String TAG = "Friendica/HomeActivity";
@@ -246,9 +246,6 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 
 		if (navTarget.equals(getString(R.string.menuitem_map))) {
 			navigateMapActivity();
-		}
-		if (navTarget.equals(getString(R.string.menuitem_routes))) {
-			navigateMainFragment(new RouteAdminFragment(), navTarget);
 		}
 
 		if (navTarget.equals(getString(R.string.mm_friends))) {

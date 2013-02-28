@@ -1,4 +1,4 @@
-package de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon;
+package de.wikilab.android.friendica01.legacy;
 
 import java.util.ArrayList;
 
@@ -17,6 +17,7 @@ import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Frien
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.JsonFinishReaction;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.ResultObject;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.GenericJsonAdapter;
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.RoutesAdapter;
 import de.wikilab.android.friendica01.ContentFragment;
 import de.wikilab.android.friendica01.R;
 
