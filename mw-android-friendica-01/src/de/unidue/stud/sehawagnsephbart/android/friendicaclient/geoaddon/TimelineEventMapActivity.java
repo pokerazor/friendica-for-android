@@ -2,6 +2,7 @@ package de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon;
 
 import java.util.ArrayList;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IGeoPoint;
@@ -12,7 +13,6 @@ import org.osmdroid.bonuspack.routing.MapQuestRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
-import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
@@ -24,7 +24,6 @@ import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 
 import android.app.Activity;
-import android.content.ClipData.Item;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -33,8 +32,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
-import android.view.View;
-import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Toast;
@@ -61,20 +58,42 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 	protected ArrayList<GeoPoint> eventItemLocations = new ArrayList<GeoPoint>();
 	protected ArrayList<TimelineEvent> timelineEvents = new ArrayList<TimelineEvent>();
 	protected ArrayList<TimelineEventItem> timelineEventItems = null;
+	
+	protected ArrayList<JSONObject> myRoutes = null;
+
 
 	protected Integer routingMode = 0;
+
+	private Menu myMenu;
 
 	public ArrayList<GeoPoint> getEventItemLocations() {
 		return eventItemLocations;
 	}
 
+	public void loadList() {
+		friendicaAbstraction.executeAjaxQuery("routes/list", new JsonFinishReaction<ArrayList<JSONObject>>() {
+			@Override
+			public void onFinished(ResultObject<ArrayList<JSONObject>> result) {
+				myRoutes = result.getResult();
+				SubMenu routesmenu = myMenu.addSubMenu(R.string.menuitem_routes);
+				for (JSONObject jsonObject : myRoutes) {
+					try {
+						routesmenu.add(jsonObject.getString("name"));
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+	}
+
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.map_activity_menu, menu);
-		
-		SubMenu routesmenu = menu.addSubMenu(R.string.menuitem_routes);
-		routesmenu.add("Philipp");
-		routesmenu.add("Hanno");
+		myMenu=menu;
+		loadList();
+
 
 		return true;
 	}
@@ -158,7 +177,6 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 				item.setChecked(true);
 				routingMode = 0;
 				renderTimelineEventRoadRoute();
-				System.out.println("CAR");
 			}
 			return true;
 
@@ -169,7 +187,6 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 				item.setChecked(true);
 				routingMode = 1;
 				renderTimelineEventRoadRoute();
-				System.out.println("BIKE");
 			}
 			return true;
 
