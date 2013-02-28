@@ -244,10 +244,6 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 			navigatePostList("mywall");
 		}
 
-		if (navTarget.equals(getString(R.string.mm_updatemystatus))) {
-			navigateStatusUpdate();
-		}
-
 		if (navTarget.equals(getString(R.string.menuitem_map))) {
 			navigateMapActivity();
 		}
@@ -335,10 +331,6 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 
 	private void navigateMessages(String target) {
 		navigateMainFragment(new MessageViewFragment(), target);
-	}
-
-	private void navigateStatusUpdate() {
-		navigateMainFragment(new WritePostFragment(), "statusupdate");
 	}
 
 	private void navigatePreferences() {

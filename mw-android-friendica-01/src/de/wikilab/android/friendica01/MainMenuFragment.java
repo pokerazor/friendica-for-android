@@ -6,10 +6,7 @@ import java.util.ArrayList;
 
 import org.w3c.dom.Document;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -108,7 +105,6 @@ public class MainMenuFragment extends Fragment implements LoginListener {
 		MainList.add(getString(R.string.mm_myphotoalbums));
 		MainList.add(getString(R.string.mm_friends));
 		MainList.add(getString(R.string.mm_directmessages));
-		MainList.add(getString(R.string.mm_updatemystatus));
 		MainList.add(getString(R.string.menuitem_map));
 		MainList.add(getString(R.string.menuitem_routes));
 

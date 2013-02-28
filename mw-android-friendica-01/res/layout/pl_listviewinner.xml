@@ -16,31 +16,31 @@
 			android:layout_weight="1"
 			android:inputType="textCapSentences" />
 
-		<Button
+		<ImageButton
 			android:id="@+id/btn_submit"
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
-<!-- 		android:drawable="@android:drawable/stift1_icon" /> -->	
+			android:layout_height="wrap_content"
+			android:src="@drawable/stift1_icon_klein" />
 
-		<Button
+		<ImageButton
 			android:id="@+id/btn_open_image"
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
-<!--			android:drawable="@android:drawable/bild_icon" />-->
+			android:layout_height="wrap_content"
+			android:src="@drawable/bild_icon_klein" />
 
-		<Button
+		<ImageButton
 			android:id="@+id/btn_take_photo"
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
-<!--			android:drawable="@android:drawable/kamera_icon" />-->
+			android:layout_height="wrap_content"
+			android:src="@drawable/kamera_icon_klein" />
 
 		<ToggleButton
 			android:id="@+id/sendLatLon"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:textOff="Off"
-			android:textOn="On"  />
-<!--			android:drawable="@android:drawable/pin1"/>-->
+			android:drawableLeft="@drawable/pin1_icon_klein"
+			android:textOff=""
+			android:textOn="" />
 
 		<TextView
 			android:id="@+id/viewLatLon"

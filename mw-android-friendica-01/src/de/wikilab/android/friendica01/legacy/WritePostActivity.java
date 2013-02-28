@@ -9,7 +9,6 @@ import android.widget.TextView;
 import de.wikilab.android.friendica01.ContentFragment;
 import de.wikilab.android.friendica01.FragmentParentListener;
 import de.wikilab.android.friendica01.R;
-import de.wikilab.android.friendica01.WritePostFragment;
 
 public class WritePostActivity extends FragmentActivity implements FragmentParentListener {
 	private static final String TAG="Friendica/WritePostActivity";
