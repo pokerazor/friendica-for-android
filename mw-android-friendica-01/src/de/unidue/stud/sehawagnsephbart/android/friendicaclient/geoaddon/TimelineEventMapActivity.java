@@ -42,6 +42,8 @@ import de.wikilab.android.friendica01.R;
 
 public class TimelineEventMapActivity extends Activity implements MapEventsReceiver {
 	protected Friendica friendicaAbstraction = null;
+	
+	protected final static Integer ROUTES_GROUP=42;
 
 	protected MapView mapView = null;
 	protected ResourceProxy mResourceProxy = null;
@@ -58,9 +60,8 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 	protected ArrayList<GeoPoint> eventItemLocations = new ArrayList<GeoPoint>();
 	protected ArrayList<TimelineEvent> timelineEvents = new ArrayList<TimelineEvent>();
 	protected ArrayList<TimelineEventItem> timelineEventItems = null;
-	
-	protected ArrayList<JSONObject> myRoutes = null;
 
+	protected ArrayList<JSONObject> myRoutes = null;
 
 	protected Integer routingMode = 0;
 
@@ -78,7 +79,8 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 				SubMenu routesmenu = myMenu.addSubMenu(R.string.menuitem_routes);
 				for (JSONObject jsonObject : myRoutes) {
 					try {
-						routesmenu.add(jsonObject.getString("name"));
+						routesmenu.add(ROUTES_GROUP,jsonObject.getInt("id"),Menu.NONE,jsonObject.getString("name"));
+
 					} catch (JSONException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -91,10 +93,8 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.map_activity_menu, menu);
-		myMenu=menu;
+		myMenu = menu;
 		loadList();
-
-
 		return true;
 	}
 
@@ -120,6 +120,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 				this.myLocationOverlay.enableFollowLocation();
 				this.myLocationOverlay.enableCompass();
 				mapView.getOverlayManager().add(myLocationOverlay);
+				this.mMapController.setZoom(16);
 
 				toast = Toast.makeText(context, "Show current location", Toast.LENGTH_SHORT);
 				toast.show();
@@ -191,7 +192,19 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 			return true;
 
 		default:
+			if(item.getGroupId()==ROUTES_GROUP){
+				System.out.println("Item ID:" + item.getItemId());
+				Integer routeId = item.getItemId();
+				friendicaAbstraction.executeAjaxQuery("routes/setactive/"+routeId, new JsonFinishReaction<ArrayList<JSONObject>>() {
+					@Override
+					public void onFinished(ResultObject<ArrayList<JSONObject>> result) {
+						renderTimelineEventPositions();
+					}
+				});
+
+			}
 			return super.onOptionsItemSelected(item);
+			
 		}
 	}
 
@@ -230,6 +243,8 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 	}
 
 	public void renderTimelineEventPositions() {
+		timelineEvents.clear();
+		eventItemLocations.clear();
 		friendicaAbstraction.executeAjaxQuery("routes/activeevents", new JsonFinishReaction<ArrayList<JSONObject>>() {
 			@Override
 			public void onFinished(ResultObject<ArrayList<JSONObject>> result) {
@@ -246,6 +261,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 				renderTimelineEventRoadRoute();
 
 				timelineEventItems = generateTimelineEventItems(timelineEvents);
+				mapView.getOverlayManager().remove(timelineEventItemsOverlay);
 				timelineEventItemsOverlay = new ItemizedOverlayWithBubble<TimelineEventItem>(TimelineEventMapActivity.this, timelineEventItems, mapView, new TimelineEventMapPopup(R.layout.map_popup, mapView));
 				mapView.getOverlayManager().add(timelineEventItemsOverlay);
 
