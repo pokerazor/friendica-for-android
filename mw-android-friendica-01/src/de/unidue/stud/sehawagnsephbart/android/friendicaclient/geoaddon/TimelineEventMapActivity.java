@@ -6,6 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.bonuspack.overlays.ExtendedOverlayItem;
 import org.osmdroid.bonuspack.overlays.ItemizedOverlayWithBubble;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
@@ -31,6 +32,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
@@ -110,6 +112,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 				this.myLocationOverlay.disableFollowLocation();
 				this.myLocationOverlay.disableCompass();
 
+
 				mapView.getOverlayManager().remove(myLocationOverlay);
 				mapView.getOverlays().remove(myLocationOverlay);
 
@@ -119,6 +122,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 				this.myLocationOverlay.enableMyLocation();
 				this.myLocationOverlay.enableFollowLocation();
 				this.myLocationOverlay.enableCompass();
+				
 				mapView.getOverlayManager().add(myLocationOverlay);
 				this.mMapController.setZoom(16);
 
@@ -349,6 +353,9 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 
 	@Override
 	public boolean longPressHelper(IGeoPoint eventLocation) {
+		TimelineEventItem item = new TimelineEventItem((GeoPoint) eventLocation, this);
+
+		new TimelineEventMapPopup(R.layout.map_popup, mapView,true).open(item, 0, 0);
 		Toast.makeText(this, "Map long pressed at " + eventLocation.getLatitudeE6() + ", " + eventLocation.getLongitudeE6(), Toast.LENGTH_SHORT).show();
 		return false;
 	}

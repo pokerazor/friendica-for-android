@@ -8,11 +8,7 @@ import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,18 +18,14 @@ import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 import android.widget.WrapperListAdapter;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnLastItemVisibleListener;
@@ -57,38 +49,13 @@ public class PostListFragment extends ContentFragment {
 	ListView list;
 	ListAdapter listAdapter;
 	
-	private boolean locationListenerAttached;
-	private final LocationListener locationListener = new LocationListener() {
-	    public void onLocationChanged(Location location) {
-	        double longitude = location.getLongitude();
-	        double latitude = location.getLatitude();
-	        viewLatLon.setText(getString(R.string.viewLatLon)+"\n"+"Lat="+String.valueOf(latitude)+"  Long="+String.valueOf(longitude));
-	    }
-
-		@Override
-		public void onProviderDisabled(String provider) {
-			viewLatLon.setText(getString(R.string.viewLatLon)+"\nDisabled");
-		}
-
-		@Override
-		public void onProviderEnabled(String provider) {
-			viewLatLon.setText(getString(R.string.viewLatLon)+"\nEnabled");
-		}
-
-		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-			viewLatLon.setText(getString(R.string.viewLatLon)+"\nStatus="+String.valueOf(status));
-		}
-	};
+	private PostBarModule postBar=null;
 
 	String refreshTarget;
 	
-	ImageButton submitBtn;
-	TextView viewLatLon;
-
-	final int ITEMS_PER_PAGE = 20;
-	int curLoadPage = 1;
-	boolean loadFinished = false;
+	final Integer ITEMS_PER_PAGE = 20;
+	Integer curLoadPage = 1;
+	Boolean loadFinished = false;
 
 	HashSet<Long> containedIds = new HashSet<Long>();
 
@@ -119,14 +86,6 @@ public class PostListFragment extends ContentFragment {
 	    super.onCreate(savedInstanceState);
 	    setRetainInstance(true);
 	}*/
-	
-	void detachLocationListener() {
-		if (locationListenerAttached) {
-			LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-			lm.removeUpdates(locationListener);
-			this.locationListenerAttached = false;
-		}
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -137,44 +96,10 @@ public class PostListFragment extends ContentFragment {
 		myView = inflater.inflate(R.layout.pl_listviewinner, container, false);
 		refreshListView = (PullToRefreshListView) myView.findViewById(R.id.listview);
 		list = refreshListView.getRefreshableView();
-		
-        viewLatLon = (TextView) myView.findViewById(R.id.viewLatLon);
+		        
+        postBar=new PostBarModule(this);
+        postBar.initialize(myView);
         
-        submitBtn = (ImageButton) myView.findViewById(R.id.btn_submit);
-        submitBtn.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				sendMessage();
-			}
-		});
-        
-        
-        
-        
-        ToggleButton sendLatLon = (ToggleButton) myView.findViewById(R.id.sendLatLon);
-        sendLatLon.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (isChecked) {
-					if (!locationListenerAttached) {
-						LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-						Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-						
-						lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-						
-						viewLatLon.setText(getString(R.string.viewLatLon)+"\n"+"Loading...");
-						locationListenerAttached = true;
-					}
-				} else {
-					detachLocationListener();
-					
-				}
-			}
-		});
-		
-		
-		
-
 		refreshListView.setOnRefreshListener(new OnRefreshListener() {
 			@Override
 			public void onRefresh() {
@@ -236,7 +161,7 @@ public class PostListFragment extends ContentFragment {
 						((Button) postView.findViewById(R.id.btn_upload)).setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								postComment(((EditText) postView.findViewById(R.id.comment_text)).getText().toString(),Long.valueOf(timelineEvent.getId()), view);
+								friendicaAbstraction.postComment(PostListFragment.this, ((EditText) postView.findViewById(R.id.comment_text)).getText().toString(),Long.valueOf(timelineEvent.getId()), view);
 								Toast.makeText(getActivity(), "postButton clicked", Toast.LENGTH_SHORT).show();
 							}
 						});
@@ -261,60 +186,6 @@ public class PostListFragment extends ContentFragment {
 		return myView;
 	}
 	
-	private void sendMessage() {
-		EditText txt_status = (EditText) myView.findViewById(R.id.text_input);
-		ToggleButton geo_en = (ToggleButton) myView.findViewById(R.id.sendLatLon);
-		
-		final ProgressDialog pd = ProgressDialog.show(getActivity(), "Posting status...", "Please wait", true, false);
-		
-		final TwAjax t = new TwAjax(getActivity(), true, true);
-		t.addPostData("status", txt_status.getText().toString());
-		t.addPostData("source", "<a href='http://andfrnd.wikilab.de'>Friendica for Android</a>");
-		if (geo_en.isChecked()) {
-			LocationManager lm = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE); 
-			Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-			if (location == null) {
-				Toast.makeText(getActivity(), "Unable to get location info - please try again.", Toast.LENGTH_LONG).show();
-				pd.dismiss();
-				return;
-			}
-			double longitude = location.getLongitude();
-			double latitude = location.getLatitude();
-
-			t.addPostData("lat", String.valueOf(latitude));
-			t.addPostData("long", String.valueOf(longitude));
-		}
-		t.postData(Max.getServer(getActivity()) + "/api/statuses/update.json", new Runnable() {
-			@Override
-			public void run() {
-				pd.dismiss();
-				//getActivity().finish();
-				((FragmentParentListener)getActivity()).OnFragmentMessage("Finished", null, null);
-			}
-		});
-	}
-	
-	protected void postComment(String commentText, final Long inReplyTo, final View view) {
-//		Toast.makeText(getActivity(), "postComment "+commentText+" "+inReplyTo, Toast.LENGTH_SHORT).show();
-		
-		SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
-		final TwAjax t = new TwAjax(getActivity(), true, true);
-		t.addPostData("status", commentText);
-		t.addPostData("source", getString(R.string.app_title_html));
-		t.addPostData("in_reply_to_status_id", inReplyTo.toString());
-		((Button) view.findViewById(R.id.btn_upload)).setEnabled(false);
-		t.postData(Max.getServer(getActivity()) + "/api/statuses/update", new Runnable() {
-			@Override
-			public void run() {
-				((EditText) view.findViewById(R.id.comment_text)).setText("");
-				((Button) view.findViewById(R.id.btn_upload)).setEnabled(true);
-				fillCommentList(inReplyTo.toString(),(LinearLayout) view.findViewById(R.id.listview));
-			}
-		});
-		
-	}
-	
-
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putParcelable("listviewState", list.onSaveInstanceState());

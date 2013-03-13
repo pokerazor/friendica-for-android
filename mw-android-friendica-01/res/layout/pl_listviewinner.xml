@@ -1,53 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent" >
 
-	<LinearLayout
+	
+	<include
 		android:id="@+id/post_bar"
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal" >
-
-		<EditText
-			android:id="@+id/text_input"
-			android:layout_width="0dp"
-			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:inputType="textCapSentences" />
-
-		<ImageButton
-			android:id="@+id/btn_submit"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:src="@drawable/stift1_icon_klein" />
-
-		<ImageButton
-			android:id="@+id/btn_open_image"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:src="@drawable/bild_icon_klein" />
-
-		<ImageButton
-			android:id="@+id/btn_take_photo"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:src="@drawable/kamera_icon_klein" />
-
-		<ToggleButton
-			android:id="@+id/sendLatLon"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:drawableLeft="@drawable/pin1_icon_klein"
-			android:textOff=""
-			android:textOn="" />
-
-		<TextView
-			android:id="@+id/viewLatLon"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/viewLatLon" />
-	</LinearLayout>
+		android:layout_height="wrap_content" layout="@layout/postbar" />
 
 	<FrameLayout
 		android:layout_width="match_parent"

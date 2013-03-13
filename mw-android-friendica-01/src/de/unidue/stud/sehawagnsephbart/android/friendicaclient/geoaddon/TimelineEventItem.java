@@ -13,7 +13,7 @@ import android.graphics.drawable.Drawable;
 public class TimelineEventItem extends ExtendedOverlayItem {
 	private ArrayList<TimelineEvent> mTimelineEvents = null;
 
-	private TimelineEventItem(GeoPoint aGeoPoint, Context context) {
+	public TimelineEventItem(GeoPoint aGeoPoint, Context context) {
 		super("", "", aGeoPoint, context);
 	}
 

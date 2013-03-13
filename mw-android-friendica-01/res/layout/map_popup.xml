@@ -1,22 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="wrap_content"
 	android:layout_height="wrap_content"
-	android:background="@drawable/bonuspack_bubble"
-	android:orientation="horizontal" >
+	android:paddingRight="0dp"
+	android:paddingTop="0dp" >
 
-	<ListView
-		android:id="@+id/timelineEventsList"
-		android:layout_width="300dp"
-		android:layout_height="150dp" >
-	</ListView>
-
-	<ImageView
-		android:id="@+id/fullsizeImage"
+	<LinearLayout
+		android:id="@+id/bubbleContent"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:contentDescription="@string/descriptionPlaceholder"
-		android:src="@drawable/default_ptr_drawable"
-		android:visibility="gone" />
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentTop="true"
+		android:background="@drawable/bonuspack_bubble"
+		android:orientation="horizontal" >
 
-</LinearLayout>
+		<include
+			android:id="@+id/post_bar"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			layout="@layout/postbar" />
+
+		<ListView
+			android:id="@+id/timelineEventsList"
+			android:layout_width="300dp"
+			android:layout_height="150dp"
+			android:visibility="gone" />
+
+		<ImageView
+			android:id="@+id/fullsizeImage"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:contentDescription="@string/descriptionPlaceholder"
+			android:src="@drawable/default_ptr_drawable"
+			android:visibility="gone" />
+	</LinearLayout>
+
+	<ImageView
+		android:id="@+id/closeButton"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignRight="@+id/bubbleContent"
+		android:contentDescription="@string/close"
+		android:gravity="right"
+		android:src="@drawable/icon_close" />
+
+</RelativeLayout>

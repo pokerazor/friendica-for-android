@@ -64,5 +64,6 @@
         <string name="titlePlaceholder">Title</string>
         <string name="descriptionPlaceholder">Description</string>
         <string name="addressPlaceholder">Address</string>
+        <string name="close">Close</string>
 
 </resources>
