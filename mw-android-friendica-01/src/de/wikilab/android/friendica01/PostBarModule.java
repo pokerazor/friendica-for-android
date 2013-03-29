@@ -2,11 +2,16 @@ package de.wikilab.android.friendica01;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
+import org.json.JSONObject;
 import org.osmdroid.util.GeoPoint;
 
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Tools;
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.JsonFinishReaction;
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.ResultObject;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.TimelineEventMapActivity;
 import de.wikilab.android.friendica01.R.id;
 import android.app.Activity;
@@ -25,10 +30,12 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -207,11 +214,10 @@ public class PostBarModule {
 
 		final ProgressDialog pd = ProgressDialog.show(parentActivity, "Posting status...", "Please wait", true, false);
 
-		final TwAjax t = new TwAjax(parentActivity, true, true);
-		t.addPostData("title", txtStatusTitle.getText().toString());
-		t.addPostData("status", txtStatusBody.getText().toString());
+		HashMap<String, String> postData = new HashMap<String, String>();
 
-		t.addPostData("source", getString(R.string.app_name));
+		postData.put("title", txtStatusTitle.getText().toString());
+
 		if (geoTgl.isChecked() || location != null) {
 			if (location == null) {
 				Toast.makeText(parentActivity, "Unable to get location info - please try again.", Toast.LENGTH_LONG).show();
@@ -221,16 +227,21 @@ public class PostBarModule {
 			Double longitude = location.getLongitude();
 			Double latitude = location.getLatitude();
 
-			t.addPostData("lat", String.valueOf(latitude));
-			t.addPostData("long", String.valueOf(longitude));
+			postData.put("lat", String.valueOf(latitude));
+			postData.put("long", String.valueOf(longitude));
 		}
-		t.postData(Max.getServer(parentActivity) + "/api/statuses/update.json", new Runnable() {
+
+		getFriendicaAbstraction().postPost(txtStatusBody.getText().toString(), postData, new JsonFinishReaction<ArrayList<JSONObject>>() {
 			@Override
-			public void run() {
+			public void onFinished(ResultObject<ArrayList<JSONObject>> result) {
+				ArrayList<JSONObject> cameBack = result.getResult();
+				System.out.println(cameBack);
+
 				pd.dismiss();
 				if (getActivity() instanceof FragmentParentListener) {
 					((FragmentParentListener) getActivity()).OnFragmentMessage("Finished", null, null);
 				}
+
 			}
 		});
 	}
@@ -238,22 +249,17 @@ public class PostBarModule {
 	public void setImage(Uri fileToUpload) {
 		this.fileToUpload = fileToUpload;
 		String fileSpec = Max.getRealPathFromURI(parentActivity, this.fileToUpload);
-
 		try {
 			ExifInterface exif = new ExifInterface(fileSpec);
-
 			float[] exifLatLon = new float[2];
 			if (exif.getLatLong(exifLatLon)) {
 				GeoPoint exifLocation = new GeoPoint(exifLatLon[0], exifLatLon[1]);
 				setLocation(exifLocation);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		previwImg.setImageBitmap(Tools.loadResizedBitmap(fileSpec, 500, 300, false));
-
 	}
 
 	public static void startImageUpload(Context context, Uri uri) {
