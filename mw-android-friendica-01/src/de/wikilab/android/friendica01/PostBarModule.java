@@ -241,11 +241,12 @@ public class PostBarModule {
 
 		try {
 			ExifInterface exif = new ExifInterface(fileSpec);
-			float[] exifLatLon = new float[2];
-			exif.getLatLong(exifLatLon);
-			GeoPoint exifLocation = new GeoPoint(exifLatLon[0], exifLatLon[1]);
-			setLocation(exifLocation);
 
+			float[] exifLatLon = new float[2];
+			if (exif.getLatLong(exifLatLon)) {
+				GeoPoint exifLocation = new GeoPoint(exifLatLon[0], exifLatLon[1]);
+				setLocation(exifLocation);
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -260,13 +261,13 @@ public class PostBarModule {
 		in.putExtra(Intent.EXTRA_STREAM, uri);
 		context.startActivity(in);
 	}
-	
-	public Friendica getFriendicaAbstraction(){
-		if(parentActivity instanceof TimelineEventMapActivity){
-			return ((TimelineEventMapActivity)parentActivity).getFriendicaAbstraction();
+
+	public Friendica getFriendicaAbstraction() {
+		if (parentActivity instanceof TimelineEventMapActivity) {
+			return ((TimelineEventMapActivity) parentActivity).getFriendicaAbstraction();
 		} else if (parentFragment instanceof PostListFragment) {
 			return ((PostListFragment) parentFragment).getFriendicaAbstraction();
-		}else {
+		} else {
 			return null;
 		}
 	}

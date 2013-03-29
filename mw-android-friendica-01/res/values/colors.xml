@@ -2,4 +2,5 @@
     <resources>
         <color name="inputBackground">#FFFFFF</color>
         <color name="text">#000000</color>
+        <color name="timelineTitle">#00aa22</color>
     </resources>

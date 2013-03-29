@@ -41,7 +41,7 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 
 		int Type, position;
 		ImageView profileImage;
-		TextView userName, htmlContent, dateTime;
+		TextView userName, dateTime, postTitle, htmlContent;
 		ImageView[] picture = new ImageView[3];
 		TextView coordinates;
 	}
@@ -124,7 +124,10 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 			if (H.Type == ViewHolder.POST_TYPE_IMAGE) {
 				convertView = inf.inflate(R.layout.pl_listitem_picture, null);
 				H.userName = (TextView) convertView.findViewById(R.id.userName);
+				H.dateTime = (TextView) convertView.findViewById(R.id.postDate);
+				H.postTitle = (TextView) convertView.findViewById(R.id.postTitle);
 				H.htmlContent = (TextView) convertView.findViewById(R.id.htmlContent);
+
 				H.profileImage = (ImageView) convertView.findViewById(R.id.profileImage);
 
 				H.picture[0] = (ImageView) convertView.findViewById(R.id.picture1);
@@ -147,6 +150,8 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 			} else {
 				convertView = inf.inflate(R.layout.pl_listitem, null);
 				H.userName = (TextView) convertView.findViewById(R.id.userName);
+				H.dateTime = (TextView) convertView.findViewById(R.id.postDate);
+				H.postTitle = (TextView) convertView.findViewById(R.id.postTitle);
 				H.htmlContent = (TextView) convertView.findViewById(R.id.htmlContent);
 				H.profileImage = (ImageView) convertView.findViewById(R.id.profileImage);
 			}
@@ -210,9 +215,16 @@ public class PostListAdapter extends ArrayAdapter<JSONObject> {
 		if (H.dateTime != null) {
 			try {
 				H.dateTime.setText(timelineEvent.getRelativeDate(getContext()));
-//				H.dateTime.setText(DateUtils.getRelativeDateTimeString(parent.getContext(), java.util.Date.parse(post.getString("published")), DateUtils.SECOND_IN_MILLIS, DateUtils.WEEK_IN_MILLIS, DateUtils.FORMAT_24HOUR));
 			} catch (Exception e) {
 				H.dateTime.setText("Invalid Dataset!");
+			}
+		}
+		
+		if (H.postTitle != null) {
+			try {
+				H.postTitle.setText(timelineEvent.getTitle());
+			} catch (Exception e) {
+				H.postTitle.setText("Invalid Dataset!");
 			}
 		}
 

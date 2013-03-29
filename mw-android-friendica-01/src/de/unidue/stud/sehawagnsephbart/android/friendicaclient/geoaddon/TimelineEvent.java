@@ -38,6 +38,7 @@ public class TimelineEvent {
 
 	protected GeoPoint location = null;
 	protected Integer id = -1;
+	protected String title = "";
 	protected String text = "";
 	protected JSONObject jsonPost;
 
@@ -60,6 +61,9 @@ public class TimelineEvent {
 			}
 
 			this.setId(Integer.parseInt(jsonPost.getString("id")));
+
+			this.setTitle(jsonPost.getString("text").split("\\n\\n")[0]);
+			
 			this.setText(jsonPost.getString("text"));
 			this.setDateTime(jsonPost.getString("created_at"));
 			this.setInReplyTo(jsonPost.getLong("in_reply_to_status_id"));
@@ -169,6 +173,14 @@ public class TimelineEvent {
 
 	public void setType(Integer type) {
 		this.type = type;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getText() {

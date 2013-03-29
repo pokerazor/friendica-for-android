@@ -23,6 +23,8 @@ public class TimelineEventAdapter<mPopup> extends ArrayAdapter<TimelineEvent> {
 		protected ImageView bubble_image = null;
 		protected TextView bubble_title = null;
 		protected Button bubble_moreinfo = null;
+		protected TextView bubble_subtitle = null;
+
 		protected TextView bubble_description = null;
 		protected TextView bubble_subdescription = null;
 
@@ -53,6 +55,8 @@ public class TimelineEventAdapter<mPopup> extends ArrayAdapter<TimelineEvent> {
 			timEvViHo = new TimelineEventViewHolder();
 			convertView = inf.inflate(R.layout.map_popup_element, null);
 			timEvViHo.bubble_title = (TextView) convertView.findViewById(R.id.bubble_title);
+			timEvViHo.bubble_subtitle = (TextView) convertView.findViewById(R.id.bubble_subtitle);
+
 			timEvViHo.bubble_description = (TextView) convertView.findViewById(R.id.bubble_description);
 			timEvViHo.bubble_subdescription = (TextView) convertView.findViewById(R.id.bubble_subdescription);
 			timEvViHo.bubble_image = (ImageView) convertView.findViewById(R.id.bubble_image);
@@ -67,8 +71,10 @@ public class TimelineEventAdapter<mPopup> extends ArrayAdapter<TimelineEvent> {
 		TimelineEvent item = getItem(position);
 
 		try {
-			timEvViHo.bubble_description.setText(item.getId() + ": " + item.getText());
-			timEvViHo.bubble_title.setText("Posted:");
+			timEvViHo.bubble_title.setText("Posted ("+item.getId()+"):");
+			timEvViHo.bubble_subtitle.setText(item.getTitle());
+			timEvViHo.bubble_description.setText(item.getCleanedHtml());
+
 			timEvViHo.bubble_subdescription.setText(item.getRelativeDate(getContext()));
 			timEvViHo.bubble_image.setImageDrawable(item.getImage());
 			timEvViHo.bubble_image.setTag(R.id.caption, item.getId());

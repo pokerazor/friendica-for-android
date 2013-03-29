@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.json.JSONObject;
+import org.osmdroid.util.GeoPoint;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -49,11 +50,11 @@ public class PostListFragment extends ContentFragment {
 	PullToRefreshListView refreshListView;
 	ListView list;
 	ListAdapter listAdapter;
-	
-	private PostBarModule postBar=null;
+
+	private PostBarModule postBar = null;
 
 	String refreshTarget;
-	
+
 	final Integer ITEMS_PER_PAGE = 20;
 	Integer curLoadPage = 1;
 	Boolean loadFinished = false;
@@ -72,8 +73,8 @@ public class PostListFragment extends ContentFragment {
 				result.getResult().remove(0);
 
 				for (JSONObject curElement : result.getResult()) {
-					TimelineEvent timelineEvent=new TimelineEvent(curElement);
-					TextView commentTextView=new TextView(getActivity());
+					TimelineEvent timelineEvent = new TimelineEvent(curElement);
+					TextView commentTextView = new TextView(getActivity());
 					commentTextView.setText(timelineEvent.getSpannableHtml());
 					list.addView(commentTextView);
 					list.requestLayout();
@@ -97,10 +98,10 @@ public class PostListFragment extends ContentFragment {
 		myView = inflater.inflate(R.layout.pl_listviewinner, container, false);
 		refreshListView = (PullToRefreshListView) myView.findViewById(R.id.listview);
 		list = refreshListView.getRefreshableView();
-		        
-        postBar=new PostBarModule(this);
-        postBar.initialize(myView);
-        
+
+		postBar = new PostBarModule(this);
+		postBar.initialize(myView);
+
 		refreshListView.setOnRefreshListener(new OnRefreshListener() {
 			@Override
 			public void onRefresh() {
@@ -143,26 +144,28 @@ public class PostListFragment extends ContentFragment {
 					});
 				} else {
 					LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-					if (lastOpenedPost != null) {						
+					if (lastOpenedPost != null) {
 						lastOpenedPost.removeView(lastOpenedPost.findViewById(R.id.timelineItemDetailsBar));
 					}
 
 					final LinearLayout postView = (LinearLayout) parentView.findViewById(R.id.postLinearInner);
 					final TimelineEvent timelineEvent = (TimelineEvent) parentView.getTag(R.id.postLinearRoot);
-					if (postView != null) { //TODO only for comments, not for images yet
+					if (postView != null) { // TODO only for comments, not for images yet
 						lastOpenedPost = (LinearLayout) postView;
-					
+
 						View detailsBar = inflater.inflate(R.layout.post_item_detail, postView);
 
-						TextView coordinates = (TextView) postView.findViewById(R.id.coordinates);
-						coordinates.setText("My coords");
-						
+						GeoPoint location = timelineEvent.getLocation();
+						if (location != null) {
+							TextView coordinates = (TextView) postView.findViewById(R.id.coordinates);
+							coordinates.setText(location.toString());
+						}
 						fillCommentList(id + "", (LinearLayout) detailsBar.findViewById(R.id.listview));
-						
+
 						((Button) postView.findViewById(R.id.btn_upload)).setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								postComment(((EditText) postView.findViewById(R.id.comment_text)).getText().toString(),Long.valueOf(timelineEvent.getId()), parentView);
+								postComment(((EditText) postView.findViewById(R.id.comment_text)).getText().toString(), Long.valueOf(timelineEvent.getId()), parentView);
 								Toast.makeText(getActivity(), "postButton clicked", Toast.LENGTH_SHORT).show();
 							}
 						});
@@ -186,21 +189,21 @@ public class PostListFragment extends ContentFragment {
 
 		return myView;
 	}
-	
+
 	public void postComment(String comment, final Long timelineEventId, final View view) {
 		PostListFragment.this.SendMessage(ContentFragment.FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
-		((Button) view.findViewById(id.btn_upload)).setEnabled(false);		
-		friendicaAbstraction.postComment(comment,timelineEventId,new JsonFinishReaction<ArrayList<JSONObject>>() {
+		((Button) view.findViewById(id.btn_upload)).setEnabled(false);
+		friendicaAbstraction.postComment(comment, timelineEventId, new JsonFinishReaction<ArrayList<JSONObject>>() {
 			@Override
 			public void onFinished(ResultObject<ArrayList<JSONObject>> result) {
-				//ArrayList<JSONObject> cameBack = result.getResult();
+				// ArrayList<JSONObject> cameBack = result.getResult();
 				((EditText) view.findViewById(id.comment_text)).setText("");
 				((Button) view.findViewById(id.btn_upload)).setEnabled(true);
-				fillCommentList(timelineEventId.toString(),(LinearLayout) view.findViewById(id.listview));
+				fillCommentList(timelineEventId.toString(), (LinearLayout) view.findViewById(id.listview));
 			}
 		});
 	}
-	
+
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putParcelable("listviewState", list.onSaveInstanceState());
@@ -338,8 +341,8 @@ public class PostListFragment extends ContentFragment {
 	public PostBarModule getPostBar() {
 		return postBar;
 	}
-	
-	public Friendica getFriendicaAbstraction(){
+
+	public Friendica getFriendicaAbstraction() {
 		return friendicaAbstraction;
 	}
 }
