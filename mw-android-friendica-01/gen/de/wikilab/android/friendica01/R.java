@@ -199,7 +199,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int picture2=0x7f070051;
         public static final int picture3=0x7f070052;
         public static final int pl_fragment=0x7f07004c;
-        public static final int position=0x7f070072;
+        public static final int position=0x7f070075;
         public static final int postDetailListLayout=0x7f07004b;
         public static final int postLinearInner=0x7f07004f;
         public static final int postLinearRoot=0x7f07004e;
@@ -219,7 +219,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int rawjson=0x7f07000f;
         public static final int relativeLayout1=0x7f07002b;
         public static final int right_bar=0x7f070018;
-        public static final int routemenu=0x7f070073;
+        public static final int routemenu=0x7f070072;
         public static final int routesList=0x7f07005f;
         public static final int search_box=0x7f070014;
         public static final int selProtocol=0x7f070023;
@@ -234,8 +234,8 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int submenu3=0x7f07006f;
         public static final int submenu4=0x7f070070;
         public static final int submenu5=0x7f070071;
-        public static final int submenu6=0x7f070074;
-        public static final int submenu7=0x7f070075;
+        public static final int submenu6=0x7f070073;
+        public static final int submenu7=0x7f070074;
         public static final int tableLayout1=0x7f070020;
         public static final int tableRow1=0x7f070021;
         public static final int tableRow2=0x7f070025;

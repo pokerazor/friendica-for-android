@@ -319,4 +319,8 @@ public class PostListFragment extends ContentFragment {
 			}
 		});
 	}
+
+	public PostBarModule getPostBar() {
+		return postBar;
+	}
 }

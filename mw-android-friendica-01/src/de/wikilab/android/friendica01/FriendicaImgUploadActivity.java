@@ -7,8 +7,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -25,8 +23,8 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Tools;
 
 public class FriendicaImgUploadActivity extends Activity implements LoginListener {
 	public final static Integer RQ_SELECT_CLIPBOARD = 1;
@@ -96,7 +94,7 @@ public class FriendicaImgUploadActivity extends Activity implements LoginListene
 
 				ImageView gallerypic = ((ImageView) findViewById(R.id.preview));
 
-				gallerypic.setImageBitmap(loadResizedBitmap(fileSpec, 500, 300, false));
+				gallerypic.setImageBitmap(Tools.loadResizedBitmap(fileSpec, 500, 300, false));
 
 				t.setText("Andfrnd Uploader Beta\n\n[b]URI:[/b] " + fileToUpload.toString() + "\n[b]File name:[/b] " + fileSpec);
 
@@ -215,27 +213,6 @@ public class FriendicaImgUploadActivity extends Activity implements LoginListene
 		default:
 			return super.onOptionsItemSelected(item);
 		}
-	}
-
-	public static Bitmap loadResizedBitmap(String filename, int width, int height, boolean exact) {
-		Bitmap bitmap = null;
-		BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inJustDecodeBounds = true;
-		BitmapFactory.decodeFile(filename, options);
-		if (options.outHeight > 0 && options.outWidth > 0) {
-			options.inJustDecodeBounds = false;
-			options.inSampleSize = 2;
-			while (options.outWidth / options.inSampleSize > width && options.outHeight / options.inSampleSize > height) {
-				options.inSampleSize++;
-			}
-			options.inSampleSize--;
-
-			bitmap = BitmapFactory.decodeFile(filename, options);
-			if (bitmap != null && exact) {
-				bitmap = Bitmap.createScaledBitmap(bitmap, width, height, false);
-			}
-		}
-		return bitmap;
 	}
 
 	void detachLocationListener() {

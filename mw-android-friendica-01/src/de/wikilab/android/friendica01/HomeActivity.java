@@ -1,7 +1,6 @@
 package de.wikilab.android.friendica01;
 
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+/* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import java.io.File;
 
 import android.content.Intent;
@@ -26,8 +25,6 @@ import android.widget.TextView;
 
 import com.google.android.gcm.GCMRegistrar;
 
-import de.wikilab.android.friendica01.legacy.RouteAdminFragment;
-
 public class HomeActivity extends FragmentActivity implements FragmentParentListener, LoginListener {
 	private static final String TAG = "Friendica/HomeActivity";
 
@@ -39,6 +36,8 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 	public File takePhotoTarget;
 
 	boolean isLargeMode = false;
+
+	ContentFragment curFragment = null;
 
 	/*
 	WelcomeFragment frag_welcome = new WelcomeFragment();
@@ -200,6 +199,7 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 		}
 	}
 
+	/*
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
@@ -219,6 +219,35 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 			break;
 		default:
 			super.onActivityResult(requestCode, resultCode, data);
+		}
+	}
+	*/
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (curFragment instanceof PostListFragment) {
+			PostBarModule postBar = ((PostListFragment) curFragment).getPostBar();
+			Uri fileToUpload = null;
+
+			switch (requestCode) {
+			case HomeActivity.RQ_SELECT_PHOTO:
+				if (resultCode == RESULT_OK) {
+					fileToUpload = data.getData();
+				}
+				break;
+			case HomeActivity.RQ_TAKE_PHOTO:
+				if (resultCode == RESULT_OK) {
+					fileToUpload = Uri.fromFile(postBar.takePhotoTarget);
+				}
+				break;
+			default:
+				super.onActivityResult(requestCode, resultCode, data);
+				return;
+			}
+
+			postBar.setImage(fileToUpload);
+
+// PostBarModule.startImageUpload(this, fileToUpload);
 		}
 	}
 
@@ -297,17 +326,18 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 	}
 
 	private void navigateMainFragment(ContentFragment newFragment, String target) {
+		curFragment = newFragment;
 		onNavMainFragment();
 		FragmentTransaction t = getSupportFragmentManager().beginTransaction();
 		Bundle b = new Bundle();
 		b.putString("target", target);
-		newFragment.setArguments(b);
-		t.replace(R.id.view_fragment_container, newFragment);
+		curFragment.setArguments(b);
+		t.replace(R.id.view_fragment_container, curFragment);
 		// t.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		t.setCustomAnimations(R.anim.slide_in_right, android.R.anim.slide_out_right);
 		t.addToBackStack(null);
 		t.commit();
-		newFragment.navigate(target);
+		curFragment.navigate(target);
 	}
 
 	private void navigateFriendList() {

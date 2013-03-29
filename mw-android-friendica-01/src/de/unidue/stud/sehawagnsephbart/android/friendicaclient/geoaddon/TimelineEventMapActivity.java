@@ -6,7 +6,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.bonuspack.overlays.ExtendedOverlayItem;
 import org.osmdroid.bonuspack.overlays.ItemizedOverlayWithBubble;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
@@ -26,13 +25,14 @@ import org.osmdroid.views.overlay.ScaleBarOverlay;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
@@ -40,12 +40,13 @@ import android.widget.Toast;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.JsonFinishReaction;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.ResultObject;
+import de.wikilab.android.friendica01.HomeActivity;
 import de.wikilab.android.friendica01.R;
 
 public class TimelineEventMapActivity extends Activity implements MapEventsReceiver {
 	protected Friendica friendicaAbstraction = null;
-	
-	protected final static Integer ROUTES_GROUP=42;
+
+	protected final static Integer ROUTES_GROUP = 42;
 
 	protected MapView mapView = null;
 	protected ResourceProxy mResourceProxy = null;
@@ -69,11 +70,13 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 
 	private Menu myMenu;
 
+	private TimelineEventMapPopup newPostPopup;
+
 	public ArrayList<GeoPoint> getEventItemLocations() {
 		return eventItemLocations;
 	}
 
-	public void loadList() {
+	public void loadRouteList() {
 		friendicaAbstraction.executeAjaxQuery("routes/list", new JsonFinishReaction<ArrayList<JSONObject>>() {
 			@Override
 			public void onFinished(ResultObject<ArrayList<JSONObject>> result) {
@@ -81,7 +84,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 				SubMenu routesmenu = myMenu.addSubMenu(R.string.menuitem_routes);
 				for (JSONObject jsonObject : myRoutes) {
 					try {
-						routesmenu.add(ROUTES_GROUP,jsonObject.getInt("id"),Menu.NONE,jsonObject.getString("name"));
+						routesmenu.add(ROUTES_GROUP, jsonObject.getInt("id"), Menu.NONE, jsonObject.getString("name"));
 
 					} catch (JSONException e) {
 						// TODO Auto-generated catch block
@@ -96,13 +99,12 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.map_activity_menu, menu);
 		myMenu = menu;
-		loadList();
+		loadRouteList();
 		return true;
 	}
 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Context context = getApplicationContext();
-		Toast toast = null;
 		switch (item.getItemId()) {
 		case R.id.map_mode:
 			return true;
@@ -112,22 +114,19 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 				this.myLocationOverlay.disableFollowLocation();
 				this.myLocationOverlay.disableCompass();
 
-
 				mapView.getOverlayManager().remove(myLocationOverlay);
 				mapView.getOverlays().remove(myLocationOverlay);
 
-				toast = Toast.makeText(context, "Stop showing current location", Toast.LENGTH_SHORT);
-				toast.show();
+				Toast.makeText(context, "Stop showing current location", Toast.LENGTH_SHORT).show();
 			} else {
 				this.myLocationOverlay.enableMyLocation();
 				this.myLocationOverlay.enableFollowLocation();
 				this.myLocationOverlay.enableCompass();
-				
+
 				mapView.getOverlayManager().add(myLocationOverlay);
 				this.mMapController.setZoom(16);
 
-				toast = Toast.makeText(context, "Show current location", Toast.LENGTH_SHORT);
-				toast.show();
+				Toast.makeText(context, "Show current location", Toast.LENGTH_SHORT).show();
 			}
 			return true;
 		case R.id.submenu1:
@@ -196,10 +195,10 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 			return true;
 
 		default:
-			if(item.getGroupId()==ROUTES_GROUP){
+			if (item.getGroupId() == ROUTES_GROUP) {
 				System.out.println("Item ID:" + item.getItemId());
 				Integer routeId = item.getItemId();
-				friendicaAbstraction.executeAjaxQuery("routes/setactive/"+routeId, new JsonFinishReaction<ArrayList<JSONObject>>() {
+				friendicaAbstraction.executeAjaxQuery("routes/setactive/" + routeId, new JsonFinishReaction<ArrayList<JSONObject>>() {
 					@Override
 					public void onFinished(ResultObject<ArrayList<JSONObject>> result) {
 						renderTimelineEventPositions();
@@ -208,7 +207,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 
 			}
 			return super.onOptionsItemSelected(item);
-			
+
 		}
 	}
 
@@ -282,8 +281,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 		for (TimelineEvent timelineEvent : timelineEvents) {
 			ArrayList<TimelineEvent> curTimelineEvents = new ArrayList<TimelineEvent>();
 			curTimelineEvents.add(timelineEvent);
-			curTimelineEvents.add(timelineEvent); // FIXME Duplicate only to
-													// show ListView
+			curTimelineEvents.add(timelineEvent); // FIXME Duplicate only to show ListView
 
 			TimelineEventItem timelineEventItem = new TimelineEventItem(curTimelineEvents, this);
 			timelineEventItem.setMarkerHotspot(OverlayItem.HotspotPlace.CENTER);
@@ -354,8 +352,8 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 	@Override
 	public boolean longPressHelper(IGeoPoint eventLocation) {
 		TimelineEventItem item = new TimelineEventItem((GeoPoint) eventLocation, this);
-
-		new TimelineEventMapPopup(R.layout.map_popup, mapView,true).open(item, 0, 0);
+		newPostPopup = new TimelineEventMapPopup(R.layout.map_popup, mapView, true);
+		newPostPopup.open(item, 0, 0);
 		Toast.makeText(this, "Map long pressed at " + eventLocation.getLatitudeE6() + ", " + eventLocation.getLongitudeE6(), Toast.LENGTH_SHORT).show();
 		return false;
 	}
@@ -396,6 +394,31 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 		System.out.println(boundingBox[0]);
 		System.out.println(boundingBox[1]);
 		return boundingBox;
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Uri fileToUpload = null;
+
+		switch (requestCode) {
+		case HomeActivity.RQ_SELECT_PHOTO:
+			if (resultCode == RESULT_OK) {
+				fileToUpload = data.getData();
+			}
+			break;
+		case HomeActivity.RQ_TAKE_PHOTO:
+			if (resultCode == RESULT_OK) {
+				fileToUpload = Uri.fromFile(newPostPopup.postBar.takePhotoTarget);
+			}
+			break;
+		default:
+			super.onActivityResult(requestCode, resultCode, data);
+			return;
+		}
+
+		newPostPopup.postBar.setImage(fileToUpload);
+
+// PostBarModule.startImageUpload(this, fileToUpload);
 	}
 
 }

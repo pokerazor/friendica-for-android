@@ -1,37 +1,54 @@
 package de.wikilab.android.friendica01;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.osmdroid.util.GeoPoint;
 
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Tools;
 import de.wikilab.android.friendica01.R.id;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
 public class PostBarModule {
-	private Object parent = null;
-	private Activity parentActivity = null;
-	private ContentFragment parentFragment = null;
+	protected Object parent = null;
+	protected Activity parentActivity = null;
+	protected ContentFragment parentFragment = null;
 
-	private ImageButton submitBtn = null;
-	private Boolean locationListenerAttached = false;
-	private TextView viewLatLon = null;
-	private View myView = null;
+	protected ImageButton submitBtn = null;
+	protected ImageButton pickPhotoBtn = null;
+	protected ImageButton takePhotoBtn = null;
+	
+	protected ImageView previwImg = null;
+	
+	protected Boolean locationListenerAttached = false;
+	protected TextView viewLatLon = null;
+	protected View myView = null;
 
-	LocationManager locationManager = null;
-	public Location location = null;
+	protected LocationManager locationManager = null;
+	protected Location location = null;
+
+	public File takePhotoTarget=null;
 
 	private final LocationListener locationListener = new LocationListener() {
 		public void onLocationChanged(Location location) {
@@ -54,6 +71,7 @@ public class PostBarModule {
 			viewLatLon.setText(getString(R.string.viewLatLon) + "\nStatus=" + String.valueOf(status));
 		}
 	};
+	private Uri fileToUpload;
 
 	public PostBarModule(Object parent) {
 		this.parent = parent;
@@ -71,6 +89,12 @@ public class PostBarModule {
 		locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
 		submitBtn = (ImageButton) myView.findViewById(R.id.btn_submit);
+		pickPhotoBtn = (ImageButton) myView.findViewById(R.id.btn_open_image);
+		takePhotoBtn = (ImageButton) myView.findViewById(R.id.btn_take_photo);
+		viewLatLon = (TextView) myView.findViewById(R.id.viewLatLon);
+		
+		previwImg = ((ImageView) myView.findViewById(R.id.image_preview));
+
 		submitBtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -78,7 +102,24 @@ public class PostBarModule {
 			}
 		});
 
-		viewLatLon = (TextView) myView.findViewById(R.id.viewLatLon);
+		pickPhotoBtn.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent in = new Intent(Intent.ACTION_PICK);
+				in.setType("image/*");
+				parentActivity.startActivityForResult(in, HomeActivity.RQ_SELECT_PHOTO);
+			}
+		});
+
+		takePhotoBtn.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent in = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+				takePhotoTarget = Max.getTempFile();
+				in.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(takePhotoTarget));
+				parentActivity.startActivityForResult(in, HomeActivity.RQ_TAKE_PHOTO);
+			}
+		});
 
 		ToggleButton sendLatLon = (ToggleButton) myView.findViewById(R.id.sendLatLon);
 		sendLatLon.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -132,6 +173,19 @@ public class PostBarModule {
 	void sendMessage() {
 		EditText txt_status = (EditText) myView.findViewById(id.text_input);
 		ToggleButton geo_en = (ToggleButton) myView.findViewById(id.sendLatLon);
+		
+		if(this.fileToUpload!=null){ //an image has been attached
+			Intent uploadIntent = new Intent(parentActivity, FileUploadService.class);
+			Bundle b = new Bundle();
+			
+			b.putParcelable(Intent.EXTRA_STREAM, fileToUpload);
+
+			uploadIntent.putExtras(b);
+
+			Log.i("Andfrnd/UploadFile", "before startService");
+			parentActivity.startService(uploadIntent);
+			Log.i("Andfrnd/UploadFile", "after startService");
+		}
 
 		final ProgressDialog pd = ProgressDialog.show(parentActivity, "Posting status...", "Please wait", true, false);
 
@@ -160,5 +214,30 @@ public class PostBarModule {
 			}
 		});
 	}
+	
+	public void setImage(Uri fileToUpload){
+		this.fileToUpload=fileToUpload;
+		String fileSpec = Max.getRealPathFromURI(parentActivity, this.fileToUpload);
+		
+		try {
+			ExifInterface exif=new ExifInterface(fileSpec);
+			float[] exifLatLon=new float[2];
+			exif.getLatLong(exifLatLon);
+            GeoPoint exifLocation=new GeoPoint(exifLatLon[0], exifLatLon[1]);
+            setLocation(exifLocation);
 
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
+		previwImg.setImageBitmap(Tools.loadResizedBitmap(fileSpec, 500, 300, false));
+
+	}
+
+	public static void startImageUpload(Context context, Uri uri) {
+		Intent in = new Intent(context, FriendicaImgUploadActivity.class);
+		in.putExtra(Intent.EXTRA_STREAM, uri);
+		context.startActivity(in);
+	}
 }
