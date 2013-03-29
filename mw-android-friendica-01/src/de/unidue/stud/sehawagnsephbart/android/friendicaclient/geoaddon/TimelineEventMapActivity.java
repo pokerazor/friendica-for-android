@@ -420,5 +420,9 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 
 // PostBarModule.startImageUpload(this, fileToUpload);
 	}
+	
+	public Friendica getFriendicaAbstraction(){
+		return friendicaAbstraction;
+	}
 
 }

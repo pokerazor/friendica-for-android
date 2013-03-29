@@ -285,17 +285,6 @@ public class HomeActivity extends FragmentActivity implements FragmentParentList
 			navigatePhotoGallery("myalbums");
 		}
 
-		if (navTarget.equals(getString(R.string.mm_takephoto))) {
-			Intent in = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-			takePhotoTarget = Max.getTempFile();
-			in.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(takePhotoTarget));
-			startActivityForResult(in, RQ_TAKE_PHOTO);
-		}
-		if (navTarget.equals(getString(R.string.mm_selectphoto))) {
-			Intent in = new Intent(Intent.ACTION_PICK);
-			in.setType("image/*");
-			startActivityForResult(in, RQ_SELECT_PHOTO);
-		}
 		if (navTarget.equals(getString(R.string.mm_directmessages))) {
 			// Intent in = new Intent(HomeActivity.this, MessagesActivity.class);
 			// startActivity(in);

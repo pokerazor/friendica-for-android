@@ -36,6 +36,7 @@ import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Frien
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.JsonFinishReaction;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.ResultObject;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.TimelineEvent;
+import de.wikilab.android.friendica01.R.id;
 
 public class PostListFragment extends ContentFragment {
 	private static final String TAG = "Friendica/PostListFragment";
@@ -125,7 +126,7 @@ public class PostListFragment extends ContentFragment {
 
 		list.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> self, final View view, int position, long id) {
+			public void onItemClick(AdapterView<?> self, final View parentView, int position, long id) {
 				if (refreshTarget.equals("notifications")) {
 					SendMessage(FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
 					final Notification n = ((Notification.NotificationsListAdapter) getListAdapter()).getItem(position - 1);
@@ -146,8 +147,8 @@ public class PostListFragment extends ContentFragment {
 						lastOpenedPost.removeView(lastOpenedPost.findViewById(R.id.timelineItemDetailsBar));
 					}
 
-					final LinearLayout postView = (LinearLayout) view.findViewById(R.id.postLinearInner);
-					final TimelineEvent timelineEvent = (TimelineEvent) view.getTag(R.id.postLinearRoot);
+					final LinearLayout postView = (LinearLayout) parentView.findViewById(R.id.postLinearInner);
+					final TimelineEvent timelineEvent = (TimelineEvent) parentView.getTag(R.id.postLinearRoot);
 					if (postView != null) { //TODO only for comments, not for images yet
 						lastOpenedPost = (LinearLayout) postView;
 					
@@ -161,7 +162,7 @@ public class PostListFragment extends ContentFragment {
 						((Button) postView.findViewById(R.id.btn_upload)).setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								friendicaAbstraction.postComment(PostListFragment.this, ((EditText) postView.findViewById(R.id.comment_text)).getText().toString(),Long.valueOf(timelineEvent.getId()), view);
+								postComment(((EditText) postView.findViewById(R.id.comment_text)).getText().toString(),Long.valueOf(timelineEvent.getId()), parentView);
 								Toast.makeText(getActivity(), "postButton clicked", Toast.LENGTH_SHORT).show();
 							}
 						});
@@ -184,6 +185,20 @@ public class PostListFragment extends ContentFragment {
 		}
 
 		return myView;
+	}
+	
+	public void postComment(String comment, final Long timelineEventId, final View view) {
+		PostListFragment.this.SendMessage(ContentFragment.FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
+		((Button) view.findViewById(id.btn_upload)).setEnabled(false);		
+		friendicaAbstraction.postComment(comment,timelineEventId,new JsonFinishReaction<ArrayList<JSONObject>>() {
+			@Override
+			public void onFinished(ResultObject<ArrayList<JSONObject>> result) {
+				//ArrayList<JSONObject> cameBack = result.getResult();
+				((EditText) view.findViewById(id.comment_text)).setText("");
+				((Button) view.findViewById(id.btn_upload)).setEnabled(true);
+				fillCommentList(timelineEventId.toString(),(LinearLayout) view.findViewById(id.listview));
+			}
+		});
 	}
 	
 	@Override
@@ -322,5 +337,9 @@ public class PostListFragment extends ContentFragment {
 
 	public PostBarModule getPostBar() {
 		return postBar;
+	}
+	
+	public Friendica getFriendicaAbstraction(){
+		return friendicaAbstraction;
 	}
 }

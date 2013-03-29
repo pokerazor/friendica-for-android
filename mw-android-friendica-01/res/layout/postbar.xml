@@ -1,78 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/post_bar"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical" >
 
-
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-		android:id="@+id/post_bar"
+	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:orientation="vertical" >
+		android:orientation="horizontal" >
 
-		<LinearLayout
-			android:layout_width="match_parent"
+		<EditText
+			android:id="@+id/text_status_title"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
-			android:orientation="horizontal" >
+			android:layout_weight="1"
+			android:inputType="textCapSentences"
+			android:textColor="@color/text" />
 
-			<EditText
-				android:id="@+id/text_input"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_weight="1"
-				android:inputType="textCapSentences" />
-
-			<ImageButton
-				android:id="@+id/btn_submit"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:src="@drawable/stift1_icon_klein" />
-
-			<ImageButton
-				android:id="@+id/btn_open_image"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:src="@drawable/bild_icon_klein" />
-
-			<ImageButton
-				android:id="@+id/btn_take_photo"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:src="@drawable/kamera_icon_klein" />
-
-			<ToggleButton
-				android:id="@+id/sendLatLon"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:drawableLeft="@drawable/pin1_icon_klein"
-				android:textOff=""
-				android:textOn="" />
-
-			<TextView
-				android:id="@+id/viewLatLon"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/viewLatLon" />
-		</LinearLayout>
-
-		<LinearLayout
-			android:layout_width="match_parent"
+		<ImageButton
+			android:id="@+id/btn_submit"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:orientation="horizontal" >
+			android:src="@drawable/stift1_icon_klein" />
 
-			<EditText
-				android:id="@+id/description_text"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:layout_weight="1"
-				android:inputType="text" >
-			</EditText>
+		<ImageButton
+			android:id="@+id/btn_open_image"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/bild_icon_klein" />
 
-			<ImageView
-				android:id="@+id/image_preview"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:layout_weight="1"
-				android:background="#000000"
-				android:contentDescription="@string/contentDescriptionUploadImagePreview"
-				android:padding="10dp"
-				android:src="@drawable/ic_menu_archive" />
-		</LinearLayout>
+		<ImageButton
+			android:id="@+id/btn_take_photo"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/kamera_icon_klein" />
+
+		<ToggleButton
+			android:id="@+id/sendLatLon"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:drawableLeft="@drawable/pin1_icon_klein"
+			android:textOff=""
+			android:textOn="" />
+
+		<TextView
+			android:id="@+id/viewLatLon"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/viewLatLon"
+			android:textColor="@color/text" />
 	</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal" >
+
+		<EditText
+			android:id="@+id/text_status_body"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_weight="1"
+			android:inputType="text"
+			android:textColor="@color/text" >
+		</EditText>
+
+		<ImageView
+			android:id="@+id/image_preview"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_weight="1"
+			android:background="#000000"
+			android:contentDescription="@string/contentDescriptionUploadImagePreview"
+			android:padding="10dp"
+			android:src="@drawable/ic_menu_archive" />
+	</LinearLayout>
+
+</LinearLayout>

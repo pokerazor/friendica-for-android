@@ -5,12 +5,16 @@ import java.io.IOException;
 
 import org.osmdroid.util.GeoPoint;
 
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica;
 import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Tools;
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.TimelineEventMapActivity;
 import de.wikilab.android.friendica01.R.id;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -38,9 +42,14 @@ public class PostBarModule {
 	protected ImageButton submitBtn = null;
 	protected ImageButton pickPhotoBtn = null;
 	protected ImageButton takePhotoBtn = null;
-	
+
+	protected EditText txtStatusTitle = null;
+	protected EditText txtStatusBody = null;
+
+	protected ToggleButton geoTgl = null;
+
 	protected ImageView previwImg = null;
-	
+
 	protected Boolean locationListenerAttached = false;
 	protected TextView viewLatLon = null;
 	protected View myView = null;
@@ -48,7 +57,7 @@ public class PostBarModule {
 	protected LocationManager locationManager = null;
 	protected Location location = null;
 
-	public File takePhotoTarget=null;
+	public File takePhotoTarget = null;
 
 	private final LocationListener locationListener = new LocationListener() {
 		public void onLocationChanged(Location location) {
@@ -92,13 +101,19 @@ public class PostBarModule {
 		pickPhotoBtn = (ImageButton) myView.findViewById(R.id.btn_open_image);
 		takePhotoBtn = (ImageButton) myView.findViewById(R.id.btn_take_photo);
 		viewLatLon = (TextView) myView.findViewById(R.id.viewLatLon);
-		
+
 		previwImg = ((ImageView) myView.findViewById(R.id.image_preview));
+
+		txtStatusTitle = (EditText) myView.findViewById(id.text_status_title);
+		txtStatusBody = (EditText) myView.findViewById(id.text_status_body);
+
+		geoTgl = (ToggleButton) myView.findViewById(id.sendLatLon);
 
 		submitBtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				sendMessage();
+				clearFields();
 			}
 		});
 
@@ -141,6 +156,11 @@ public class PostBarModule {
 		});
 	}
 
+	protected void clearFields() {
+		txtStatusTitle.setText("");
+		previwImg.setImageURI(null);
+	}
+
 	public void setLocation(GeoPoint location) {
 		Toast.makeText(parentActivity, "setLocation(GeoPoint location) " + location, Toast.LENGTH_SHORT).show();
 
@@ -171,13 +191,11 @@ public class PostBarModule {
 	}
 
 	void sendMessage() {
-		EditText txt_status = (EditText) myView.findViewById(id.text_input);
-		ToggleButton geo_en = (ToggleButton) myView.findViewById(id.sendLatLon);
-		
-		if(this.fileToUpload!=null){ //an image has been attached
+
+		if (this.fileToUpload != null) { // an image has been attached
 			Intent uploadIntent = new Intent(parentActivity, FileUploadService.class);
 			Bundle b = new Bundle();
-			
+
 			b.putParcelable(Intent.EXTRA_STREAM, fileToUpload);
 
 			uploadIntent.putExtras(b);
@@ -190,9 +208,11 @@ public class PostBarModule {
 		final ProgressDialog pd = ProgressDialog.show(parentActivity, "Posting status...", "Please wait", true, false);
 
 		final TwAjax t = new TwAjax(parentActivity, true, true);
-		t.addPostData("status", txt_status.getText().toString());
-		t.addPostData("source", "<a href='http://andfrnd.wikilab.de'>Friendica for Android</a>");
-		if (geo_en.isChecked() || location != null) {
+		t.addPostData("title", txtStatusTitle.getText().toString());
+		t.addPostData("status", txtStatusBody.getText().toString());
+
+		t.addPostData("source", getString(R.string.app_name));
+		if (geoTgl.isChecked() || location != null) {
 			if (location == null) {
 				Toast.makeText(parentActivity, "Unable to get location info - please try again.", Toast.LENGTH_LONG).show();
 				pd.dismiss();
@@ -214,23 +234,23 @@ public class PostBarModule {
 			}
 		});
 	}
-	
-	public void setImage(Uri fileToUpload){
-		this.fileToUpload=fileToUpload;
+
+	public void setImage(Uri fileToUpload) {
+		this.fileToUpload = fileToUpload;
 		String fileSpec = Max.getRealPathFromURI(parentActivity, this.fileToUpload);
-		
+
 		try {
-			ExifInterface exif=new ExifInterface(fileSpec);
-			float[] exifLatLon=new float[2];
+			ExifInterface exif = new ExifInterface(fileSpec);
+			float[] exifLatLon = new float[2];
 			exif.getLatLong(exifLatLon);
-            GeoPoint exifLocation=new GeoPoint(exifLatLon[0], exifLatLon[1]);
-            setLocation(exifLocation);
+			GeoPoint exifLocation = new GeoPoint(exifLatLon[0], exifLatLon[1]);
+			setLocation(exifLocation);
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
-		
+		}
+
 		previwImg.setImageBitmap(Tools.loadResizedBitmap(fileSpec, 500, 300, false));
 
 	}
@@ -239,5 +259,15 @@ public class PostBarModule {
 		Intent in = new Intent(context, FriendicaImgUploadActivity.class);
 		in.putExtra(Intent.EXTRA_STREAM, uri);
 		context.startActivity(in);
+	}
+	
+	public Friendica getFriendicaAbstraction(){
+		if(parentActivity instanceof TimelineEventMapActivity){
+			return ((TimelineEventMapActivity)parentActivity).getFriendicaAbstraction();
+		} else if (parentFragment instanceof PostListFragment) {
+			return ((PostListFragment) parentFragment).getFriendicaAbstraction();
+		}else {
+			return null;
+		}
 	}
 }

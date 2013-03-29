@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map.Entry;
 
 import org.json.JSONArray;
@@ -21,16 +20,9 @@ import android.text.style.ImageSpan;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import de.wikilab.android.friendica01.ContentFragment;
 import de.wikilab.android.friendica01.Max;
-import de.wikilab.android.friendica01.PostListFragment;
 import de.wikilab.android.friendica01.R;
-import de.wikilab.android.friendica01.R.id;
-import de.wikilab.android.friendica01.R.string;
 import de.wikilab.android.friendica01.TwAjax;
 
 public class Friendica {
@@ -224,43 +216,59 @@ public class Friendica {
 	}
 
 	public JsonProcessor executeAjaxQuery(String command, HashMap<String, String> queryElements, JsonFinishReaction<ArrayList<JSONObject>> finishReaction, Boolean asPostList,ResultObject<ArrayList<JSONObject>> result) {
-		JsonProcessor jsonProcessor = null;
 		lastCommand=command;
 		Uri uri = Uri.parse(Max.getServer(getContext()) + API_PATH + command + API_TYPE_JSON);
 		Builder uriBuilder = uri.buildUpon();
 		for (Entry<String, String> queryElement : queryElements.entrySet()) {
 			uriBuilder.appendQueryParameter(queryElement.getKey(), queryElement.getValue());
 		}
+		
+		return getUrlContent(uriBuilder.build().toString(),queryElements,finishReaction,asPostList,result);
+	}
+	
+	private JsonProcessor getUrlContent(String url, HashMap<String, String> queryElements, JsonFinishReaction<ArrayList<JSONObject>> finishReaction, Boolean asPostList,ResultObject<ArrayList<JSONObject>> result){
+		JsonProcessor jsonProcessor = null;
+
 		final TwAjax t = new TwAjax(getContext(), true, true);
 		if (asPostList) {
 			jsonProcessor = new PostProcessor(t, finishReaction, result, queryElements);
-//			jsonProcessor = new JsonProcessor(t, finishReaction, result);
-
 		} else {
 			jsonProcessor = new JsonProcessor(t, finishReaction, result);
 		}
-		t.getUrlContent(uriBuilder.build().toString(), jsonProcessor);
+		t.getUrlContent(url, jsonProcessor);
+		return jsonProcessor;
+	}
+	
+	private JsonProcessor postData(String url, HashMap<String, String> postData, JsonFinishReaction<ArrayList<JSONObject>> finishReaction, Boolean asPostList,ResultObject<ArrayList<JSONObject>> result){
+		JsonProcessor jsonProcessor = null;
+
+		final TwAjax t = new TwAjax(getContext(), true, true);
+		if (asPostList) {
+			jsonProcessor = new PostProcessor(t, finishReaction, result, postData);
+		} else {
+			jsonProcessor = new JsonProcessor(t, finishReaction, result);
+		}
+		
+		for (Entry<String, String> postDatum : postData.entrySet()) {
+			t.addPostData(postDatum.getKey(),postDatum.getValue());
+		}
+		
+		t.postData(url, jsonProcessor);
 		return jsonProcessor;
 	}
 
-	public void postComment(final PostListFragment postListFragment, String commentText, final Long inReplyTo, final View view) {
+	public void postComment(String commentText, final Long inReplyTo, JsonFinishReaction<ArrayList<JSONObject>> finishReaction) {
 	//		Toast.makeText(getActivity(), "postComment "+commentText+" "+inReplyTo, Toast.LENGTH_SHORT).show();
+		String command="statuses/update";
 		
-		postListFragment.SendMessage(ContentFragment.FRGM_MSG_SHW_LOADING_ANIMATION, Integer.valueOf(View.VISIBLE), null);
-		final TwAjax t = new TwAjax(postListFragment.getActivity(), true, true);
-		t.addPostData("status", commentText);
-		t.addPostData("source", postListFragment.getString(string.app_title_html));
-		t.addPostData("in_reply_to_status_id", inReplyTo.toString());
-		((Button) view.findViewById(id.btn_upload)).setEnabled(false);
-		t.postData(Max.getServer(postListFragment.getActivity()) + "/api/statuses/update", new Runnable() {
-			@Override
-			public void run() {
-				((EditText) view.findViewById(id.comment_text)).setText("");
-				((Button) view.findViewById(id.btn_upload)).setEnabled(true);
-				postListFragment.fillCommentList(inReplyTo.toString(),(LinearLayout) view.findViewById(id.listview));
-			}
-		});
+		HashMap<String, String> postData=new HashMap<String, String>();
+		postData.put("status", commentText);
+		postData.put("source", getContext().getString(R.string.app_name));
+		postData.put("in_reply_to_status_id", inReplyTo.toString());
 		
+		lastCommand=command;
+		
+		postData(Max.getServer(getContext()) + API_PATH + command + API_TYPE_JSON,postData,finishReaction,false, new ResultObject<ArrayList<JSONObject>>());
 	}
 
 	public static void displayProfileImageFromPost(JSONObject post, final ImageView target, Context context) {

@@ -34,7 +34,7 @@
     <string name="mm_friends">Friends</string>
     <string name="mm_directmessages">Messages</string>
     <string name="mm_updatemystatus">Update My Status</string>
-    <string name="menuitem_map">Map</string>
+    <string name="menuitem_map">Routes</string>
     <string name="menuitem_routes">Routes</string>
     <string name="mm_takephoto">Take Photo And Upload</string>
     <string name="mm_selectphoto">Select Photo And Upload</string>
