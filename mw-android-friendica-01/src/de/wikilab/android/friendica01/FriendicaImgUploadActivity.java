@@ -126,12 +126,13 @@ public class FriendicaImgUploadActivity extends Activity implements LoginListene
 
 				b.putString(FileUploadService.EXTRA_DESCTEXT, txtDesc.getText().toString());
 				b.putString(Intent.EXTRA_SUBJECT, txtSubject.getText().toString());
-				
 
+				/*
 				if (location != null) {
 					b.putString(FileUploadService.EXTRA_LOCLAT, String.valueOf(location.getLatitude()));
 					b.putString(FileUploadService.EXTRA_LOCLAN, String.valueOf(location.getLongitude()));
 				}
+				*/
 				b.putParcelable(Intent.EXTRA_STREAM, fileToUpload);
 				System.out.println(b);
 

@@ -5,21 +5,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.util.GeoPoint;
 
-import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica;
-import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Tools;
-import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.JsonFinishReaction;
-import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.ResultObject;
-import de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.TimelineEventMapActivity;
-import de.wikilab.android.friendica01.R.id;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -27,21 +23,29 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica;
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.JsonFinishReaction;
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Friendica.ResultObject;
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction.Tools;
+import de.unidue.stud.sehawagnsephbart.android.friendicaclient.geoaddon.TimelineEventMapActivity;
+import de.wikilab.android.friendica01.R.id;
 
 public class PostBarModule {
+
+	private static final int UPLOAD_SUCCESS_ID = 1;
+	private static final int UPLOAD_FAILED_ID = 2;
+	private static final int UPLOAD_PROGRESS_ID = 3;
+
 	protected Object parent = null;
 	protected Activity parentActivity = null;
 	protected ContentFragment parentFragment = null;
@@ -65,6 +69,8 @@ public class PostBarModule {
 	protected Location location = null;
 
 	public File takePhotoTarget = null;
+
+	private NotificationManager mNotificationManager = null;
 
 	private final LocationListener locationListener = new LocationListener() {
 		public void onLocationChanged(Location location) {
@@ -197,20 +203,24 @@ public class PostBarModule {
 		}
 	}
 
+	private void showStartNotification() {
+		mNotificationManager = (NotificationManager) parentActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		// Instantiate the Notification:
+		CharSequence tickerText = "Uploading...";
+		Notification notification = new Notification(R.drawable.arrow_up, tickerText, System.currentTimeMillis());
+		notification.flags |= Notification.FLAG_ONGOING_EVENT;
+
+		// Define the Notification's expanded message and Intent:
+		Context context = parentActivity;
+		PendingIntent nullIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
+		notification.setLatestEventInfo(context, "Upload in progress...", "You are notified here when it completes", nullIntent);
+
+		// Pass the Notification to the NotificationManager:
+		mNotificationManager.notify(UPLOAD_PROGRESS_ID, notification);
+	}
+
 	void sendMessage() {
-
-		if (this.fileToUpload != null) { // an image has been attached
-			Intent uploadIntent = new Intent(parentActivity, FileUploadService.class);
-			Bundle b = new Bundle();
-
-			b.putParcelable(Intent.EXTRA_STREAM, fileToUpload);
-
-			uploadIntent.putExtras(b);
-
-			Log.i("Andfrnd/UploadFile", "before startService");
-			parentActivity.startService(uploadIntent);
-			Log.i("Andfrnd/UploadFile", "after startService");
-		}
 
 		final ProgressDialog pd = ProgressDialog.show(parentActivity, "Posting status...", "Please wait", true, false);
 
@@ -231,17 +241,54 @@ public class PostBarModule {
 			postData.put("long", String.valueOf(longitude));
 		}
 
-		getFriendicaAbstraction().postPost(txtStatusBody.getText().toString(), postData, new JsonFinishReaction<ArrayList<JSONObject>>() {
+		ArrayList<Uri> files = new ArrayList<Uri>();
+
+		if (this.fileToUpload != null) { // an image has been attached
+			files.add(this.fileToUpload);
+			showStartNotification();
+		}
+
+// getFriendicaAbstraction().postPost(txtStatusBody.getText().toString(), postData, files,null);
+
+		getFriendicaAbstraction().postPost(txtStatusBody.getText().toString(), postData, files, new JsonFinishReaction<ArrayList<JSONObject>>() {
 			@Override
 			public void onFinished(ResultObject<ArrayList<JSONObject>> result) {
 				ArrayList<JSONObject> cameBack = result.getResult();
-				System.out.println(cameBack);
 
 				pd.dismiss();
 				if (getActivity() instanceof FragmentParentListener) {
 					((FragmentParentListener) getActivity()).OnFragmentMessage("Finished", null, null);
 				}
 
+				TwAjax uploader = result.getProcessor();
+				JSONObject jsonResult = null;
+				if (result.getResult().size() > 0) {
+					jsonResult = result.getResult().get(0);
+					mNotificationManager.cancel(UPLOAD_PROGRESS_ID);
+					if (uploader.isSuccess() && uploader.getError() == null) {
+						try {
+							String postedText = jsonResult.getString("text");
+							showSuccessNotification(parentActivity);
+
+						} catch (Exception e) {
+							String errMes = e.getMessage() + " | " + uploader.getResult();
+							if (jsonResult != null)
+								try {
+									errMes = jsonResult.getString("error");
+								} catch (JSONException je) {
+								}
+
+							showFailNotification(parentActivity, errMes);
+
+							e.printStackTrace();
+						}
+					} else if (uploader.getError() != null) {
+						showFailNotification(parentActivity, uploader.getError().toString());
+					} else {
+						showFailNotification(parentActivity, uploader.getResult());
+					}
+
+				}
 			}
 		});
 	}
@@ -276,5 +323,50 @@ public class PostBarModule {
 		} else {
 			return null;
 		}
+	}
+
+	private void showFailNotification(Context ctx, String txt) {
+		// Instantiate the Notification:
+		CharSequence tickerText = "Upload failed, please retry!";
+		Notification notification = new Notification(R.drawable.arrow_up, tickerText, System.currentTimeMillis());
+		notification.flags |= Notification.FLAG_AUTO_CANCEL;
+
+		// Define the Notification's expanded message and Intent:
+		Context context = parentActivity;
+		CharSequence contentTitle = "Upload failed, click to retry!";
+		CharSequence contentText = txt;
+		Intent notificationIntent = new Intent(parentActivity, FriendicaImgUploadActivity.class);
+		Bundle b = new Bundle();
+		b.putParcelable(Intent.EXTRA_STREAM, fileToUpload);
+		/*
+		b.putString(Intent.EXTRA_SUBJECT, subject);
+		b.putString(EXTRA_DESCTEXT, descText);
+		*/
+
+		notificationIntent.putExtras(b);
+		PendingIntent contentIntent = PendingIntent.getActivity(parentActivity, 0, notificationIntent, 0);
+		notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
+
+		// Pass the Notification to the NotificationManager:
+		mNotificationManager.notify(UPLOAD_FAILED_ID, notification);
+	}
+
+	private void showSuccessNotification(Context ctx) {
+		// Instantiate the Notification:
+		Integer icon = R.drawable.arrow_up;
+		CharSequence tickerText = "Upload succeeded!";
+		Long when = System.currentTimeMillis();
+
+		Notification notification = new Notification(icon, tickerText, when);
+		notification.flags |= Notification.FLAG_AUTO_CANCEL;
+
+		// Define the Notification's expanded message and Intent:
+
+		PendingIntent nullIntent = PendingIntent.getActivity(parentActivity, 0, new Intent(), 0);
+		notification.setLatestEventInfo(parentActivity, tickerText, "Click to dismiss", nullIntent);
+
+		// Pass the Notification to the NotificationManager:
+
+		mNotificationManager.notify(UPLOAD_SUCCESS_ID, notification);
 	}
 }

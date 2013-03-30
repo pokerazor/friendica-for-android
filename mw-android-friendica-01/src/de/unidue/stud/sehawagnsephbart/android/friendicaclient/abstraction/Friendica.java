@@ -3,7 +3,9 @@ package de.unidue.stud.sehawagnsephbart.android.friendicaclient.abstraction;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -21,6 +23,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import de.wikilab.android.friendica01.FileUploadService;
 import de.wikilab.android.friendica01.Max;
 import de.wikilab.android.friendica01.R;
 import de.wikilab.android.friendica01.TwAjax;
@@ -39,6 +42,7 @@ public class Friendica {
 
 	public class ResultObject<TargetResultClass extends Object> {
 		private TargetResultClass result = null;
+		private TwAjax processor = null;
 		private Integer originalNumberOfElements = 0;
 
 		public Integer getOriginalNumberOfElements() {
@@ -55,6 +59,14 @@ public class Friendica {
 
 		public void setResult(TargetResultClass result) {
 			this.result = result;
+		}
+
+		public TwAjax getProcessor() {
+			return processor;
+		}
+
+		public void setProcessor(TwAjax processor) {
+			this.processor = processor;
 		}
 	}
 
@@ -113,7 +125,10 @@ public class Friendica {
 			finished = true;
 
 			this.result.setResult(resultArray);
-			jsonFinishReaction.onFinished(this.result);
+			this.result.setProcessor(t);
+			if (jsonFinishReaction != null) {
+				jsonFinishReaction.onFinished(this.result);
+			}
 		}
 	}
 
@@ -239,7 +254,7 @@ public class Friendica {
 		return jsonProcessor;
 	}
 
-	private JsonProcessor postData(String url, HashMap<String, String> postData, JsonFinishReaction<ArrayList<JSONObject>> finishReaction, Boolean asPostList, ResultObject<ArrayList<JSONObject>> result) {
+	private JsonProcessor postData(String url, HashMap<String, String> postData, ArrayList<Uri> files, JsonFinishReaction<ArrayList<JSONObject>> finishReaction, Boolean asPostList, ResultObject<ArrayList<JSONObject>> result) {
 		JsonProcessor jsonProcessor = null;
 
 		final TwAjax t = new TwAjax(getContext(), true, true);
@@ -253,36 +268,54 @@ public class Friendica {
 			t.addPostData(postDatum.getKey(), postDatum.getValue());
 		}
 
+		String tempFile = null;
+
+		if (files != null) {
+			for (Uri curFile : files) {
+				String targetFilename = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date()) + ".txt";
+
+				String fileSpec = Max.getRealPathFromURI(context, curFile);
+
+				tempFile = Max.IMG_CACHE_DIR + "/imgUploadTemp_" + System.currentTimeMillis() + ".jpg";
+				Max.resizeImage(fileSpec, tempFile, 1024, 768);
+
+				t.addPostFile(new TwAjax.PostFile("media", targetFilename, tempFile));
+
+			}
+		}
+		if (finishReaction == null) { // test
+			jsonProcessor = null;
+		}
+
 		t.postData(url, jsonProcessor);
+		/*
+		if (tempFile != null) {
+			new File(tempFile).delete();
+		}
+		*/
 		return jsonProcessor;
 	}
 
-	public JsonProcessor postData(String command, HashMap<String, String> postData, JsonFinishReaction<ArrayList<JSONObject>> finishReaction) {
+	protected JsonProcessor postData(String command, HashMap<String, String> postData, ArrayList<Uri> files, JsonFinishReaction<ArrayList<JSONObject>> finishReaction) {
 		lastCommand = command;
 
-		return postData(Max.getServer(getContext()) + API_PATH + command + API_TYPE_JSON, postData, finishReaction, false, new ResultObject<ArrayList<JSONObject>>());
+		return postData(Max.getServer(getContext()) + API_PATH + command + API_TYPE_JSON, postData, files, finishReaction, false, new ResultObject<ArrayList<JSONObject>>());
 	}
 
-	public void postPost(String postText, HashMap<String, String> postData, JsonFinishReaction<ArrayList<JSONObject>> finishReaction) {
+	public JsonProcessor postPost(String postText, HashMap<String, String> postData, ArrayList<Uri> files, JsonFinishReaction<ArrayList<JSONObject>> finishReaction) {
 		String command = "statuses/update";
 
 		postData.put("source", getContext().getString(R.string.app_name));
 		postData.put("status", postText);
 
-		postData(command, postData, finishReaction);
+		return postData(command, postData, files, finishReaction);
 	}
 
-	public void postComment(String commentText, final Long inReplyTo, JsonFinishReaction<ArrayList<JSONObject>> finishReaction) {
-		String command = "statuses/update";
-
+	public JsonProcessor postComment(String commentText, final Long inReplyTo, JsonFinishReaction<ArrayList<JSONObject>> finishReaction) {
 		HashMap<String, String> postData = new HashMap<String, String>();
-		postData.put("status", commentText);
-		postData.put("source", getContext().getString(R.string.app_name));
 		postData.put("in_reply_to_status_id", inReplyTo.toString());
 
-		lastCommand = command;
-
-		postData(Max.getServer(getContext()) + API_PATH + command + API_TYPE_JSON, postData, finishReaction, false, new ResultObject<ArrayList<JSONObject>>());
+		return postPost(commentText, postData, null, finishReaction);
 	}
 
 	public static void displayProfileImageFromPost(JSONObject post, final ImageView target, Context context) {
