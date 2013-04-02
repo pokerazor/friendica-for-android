@@ -21,7 +21,7 @@ public class WritePostActivity extends FragmentActivity implements FragmentParen
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.writepost);
-		
+		/*
 		TextView header_logo = (TextView) findViewById(R.id.header);
 		header_logo.setOnClickListener(new OnClickListener() {
 			@Override
@@ -29,6 +29,7 @@ public class WritePostActivity extends FragmentActivity implements FragmentParen
 				finish();
 			}
 		});
+		*/
 		
 		header_text = (TextView) findViewById(R.id.header_text);
 		header_text.setText(getString(R.string.mm_updatemystatus));

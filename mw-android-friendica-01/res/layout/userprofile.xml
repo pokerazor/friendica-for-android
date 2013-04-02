@@ -11,7 +11,8 @@
         android:layout_alignParentTop="true"
         android:id="@+id/header" >
 
-        <include layout="@layout/header_logo" />
+        <include layout="@layout/header_logo" 
+        	android:id="@+id/text_logoletters"/>
 
         <TextView
             android:id="@+id/header_text"
