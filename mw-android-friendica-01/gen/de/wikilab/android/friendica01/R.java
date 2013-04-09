@@ -72,6 +72,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int inputBackground=0x7f0a0000;
         public static final int text=0x7f0a0001;
         public static final int timelineTitle=0x7f0a0002;
+        public static final int titlebackgroundcolor=0x7f0a0003;
     }
     public static final class dimen {
         public static final int indicator_corner_radius=0x7f080001;
@@ -144,9 +145,9 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int btn_nav_1=0x7f070068;
         public static final int btn_nav_2=0x7f070069;
         public static final int btn_new=0x7f07003c;
-        public static final int btn_open_image=0x7f070057;
-        public static final int btn_submit=0x7f070056;
-        public static final int btn_take_photo=0x7f070058;
+        public static final int btn_open_image=0x7f07005b;
+        public static final int btn_submit=0x7f07005a;
+        public static final int btn_take_photo=0x7f07005c;
         public static final int btn_toggledislike=0x7f070046;
         public static final int btn_togglelike=0x7f070044;
         public static final int btn_togglestar=0x7f070048;
@@ -182,7 +183,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int header_text=0x7f070010;
         public static final int htmlContent=0x7f070038;
         public static final int image_logoletters=0x7f070015;
-        public static final int image_preview=0x7f07005c;
+        public static final int image_preview=0x7f070059;
         public static final int lblInfo=0x7f07001d;
         public static final int left_bar=0x7f070019;
         public static final int left_bar_header=0x7f07001a;
@@ -225,7 +226,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int search_box=0x7f070014;
         public static final int selProtocol=0x7f070021;
         public static final int selected_clipboard=0x7f07001b;
-        public static final int sendLatLon=0x7f070059;
+        public static final int sendLatLon=0x7f070056;
         public static final int sendLatLonPhoto=0x7f070064;
         public static final int star_count=0x7f070049;
         public static final int subheader=0x7f07003a;
@@ -246,7 +247,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int textView1=0x7f070020;
         public static final int textView2=0x7f070026;
         public static final int text_logoletters=0x7f070066;
-        public static final int text_status_body=0x7f07005b;
+        public static final int text_status_body=0x7f070058;
         public static final int text_status_title=0x7f070055;
         public static final int timelineEventsList=0x7f070031;
         public static final int timelineItemDetailsBar=0x7f070042;
@@ -254,7 +255,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int top_control_bar=0x7f07002e;
         public static final int userName=0x7f070036;
         public static final int userNameRecipient=0x7f07003b;
-        public static final int viewLatLon=0x7f07005a;
+        public static final int viewLatLon=0x7f070057;
         public static final int viewLatLonPhoto=0x7f070065;
         public static final int view_debug=0x7f070078;
         public static final int view_fragment_container=0x7f070018;
@@ -312,8 +313,8 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int writepostinner=0x7f030030;
     }
     public static final class menu {
-        public static final int map_activity_menu=0x7f0c0000;
-        public static final int uploadfile_menu=0x7f0c0001;
+        public static final int map_activity_menu=0x7f0d0000;
+        public static final int uploadfile_menu=0x7f0d0001;
     }
     public static final class raw {
         public static final int doorbell2=0x7f060000;
@@ -369,6 +370,10 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int upload_now=0x7f090014;
         public static final int username=0x7f09000f;
         public static final int viewLatLon=0x7f090015;
+    }
+    public static final class style {
+        public static final int WindowTitleBackground=0x7f0c0000;
+        public static final int customTheme=0x7f0c0001;
     }
     public static final class xml {
         public static final int prefs_main=0x7f050000;

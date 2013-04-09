@@ -117,7 +117,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 				mapView.getOverlayManager().remove(myLocationOverlay);
 				mapView.getOverlays().remove(myLocationOverlay);
 
-				Toast.makeText(context, "Stop showing current location", Toast.LENGTH_SHORT).show();
+//				Toast.makeText(context, "Stop showing current location", Toast.LENGTH_SHORT).show();
 			} else {
 				this.myLocationOverlay.enableMyLocation();
 				this.myLocationOverlay.enableFollowLocation();
@@ -126,7 +126,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 				mapView.getOverlayManager().add(myLocationOverlay);
 				this.mMapController.setZoom(16);
 
-				Toast.makeText(context, "Show current location", Toast.LENGTH_SHORT).show();
+//				Toast.makeText(context, "Show current location", Toast.LENGTH_SHORT).show();
 			}
 			return true;
 		case R.id.submenu1:
@@ -281,7 +281,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 		for (TimelineEvent timelineEvent : timelineEvents) {
 			ArrayList<TimelineEvent> curTimelineEvents = new ArrayList<TimelineEvent>();
 			curTimelineEvents.add(timelineEvent);
-			curTimelineEvents.add(timelineEvent); // FIXME Duplicate only to show ListView
+//			curTimelineEvents.add(timelineEvent); // FIXME Duplicate only to show ListView
 
 			TimelineEventItem timelineEventItem = new TimelineEventItem(curTimelineEvents, this);
 			timelineEventItem.setMarkerHotspot(OverlayItem.HotspotPlace.CENTER);
@@ -306,7 +306,7 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 			return;
 		}
 		if (road.mStatus == Road.STATUS_DEFAULT) {
-			Toast.makeText(this.mapView.getContext(), "Event road route cannot be calculated (water in the way?)", Toast.LENGTH_SHORT).show();
+//			Toast.makeText(this.mapView.getContext(), "Event road route cannot be calculated (water in the way?)", Toast.LENGTH_SHORT).show();
 		}
 		eventRoadRouteOverlay = RoadManager.buildRoadOverlay(road, this);
 
@@ -354,13 +354,13 @@ public class TimelineEventMapActivity extends Activity implements MapEventsRecei
 		TimelineEventItem item = new TimelineEventItem((GeoPoint) eventLocation, this);
 		newPostPopup = new TimelineEventMapPopup(R.layout.map_popup, mapView, true);
 		newPostPopup.open(item, 0, 0);
-		Toast.makeText(this, "Map long pressed at " + eventLocation.getLatitudeE6() + ", " + eventLocation.getLongitudeE6(), Toast.LENGTH_SHORT).show();
+//		Toast.makeText(this, "Map long pressed at " + eventLocation.getLatitudeE6() + ", " + eventLocation.getLongitudeE6(), Toast.LENGTH_SHORT).show();
 		return false;
 	}
 
 	@Override
 	public boolean singleTapUpHelper(IGeoPoint eventLocation) {
-		Toast.makeText(this, "Map single tapped at " + eventLocation.getLatitudeE6() + ", " + eventLocation.getLongitudeE6(), Toast.LENGTH_SHORT).show();
+//		Toast.makeText(this, "Map single tapped at " + eventLocation.getLatitudeE6() + ", " + eventLocation.getLongitudeE6(), Toast.LENGTH_SHORT).show();
 		return false;
 	}
 

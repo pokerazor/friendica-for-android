@@ -12,29 +12,12 @@
 
 		<EditText
 			android:id="@+id/text_status_title"
-			android:layout_width="0dp"
+			android:layout_width="wrap_content"
+			android:minWidth="30dp"
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
 			android:inputType="textCapSentences"
 			android:textColor="@color/text" />
-
-		<ImageButton
-			android:id="@+id/btn_submit"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:src="@drawable/stift1_icon_klein" />
-
-		<ImageButton
-			android:id="@+id/btn_open_image"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:src="@drawable/bild_icon_klein" />
-
-		<ImageButton
-			android:id="@+id/btn_take_photo"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:src="@drawable/kamera_icon_klein" />
 
 		<ToggleButton
 			android:id="@+id/sendLatLon"
@@ -75,6 +58,30 @@
 			android:contentDescription="@string/contentDescriptionUploadImagePreview"
 			android:padding="10dp"
 			android:src="@drawable/ic_menu_archive" />
+
+		<LinearLayout
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:orientation="vertical" >
+
+			<ImageButton
+				android:id="@+id/btn_submit"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/stift1_icon_klein" />
+
+			<ImageButton
+				android:id="@+id/btn_open_image"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/bild_icon_klein" />
+
+			<ImageButton
+				android:id="@+id/btn_take_photo"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/kamera_icon_klein" />
+		</LinearLayout>
 	</LinearLayout>
 
 </LinearLayout>

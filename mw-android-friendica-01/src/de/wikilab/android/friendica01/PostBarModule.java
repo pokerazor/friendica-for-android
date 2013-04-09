@@ -16,6 +16,7 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -172,6 +173,8 @@ public class PostBarModule {
 	protected void clearFields() {
 		txtStatusTitle.setText("");
 		previwImg.setImageURI(null);
+		previwImg.setImageBitmap(null);
+		txtStatusBody.setText("");
 	}
 
 	public void setLocation(GeoPoint location) {
@@ -291,6 +294,16 @@ public class PostBarModule {
 				}
 			}
 		});
+		refreshParent();
+	}
+
+	private void refreshParent() {
+		if(parentActivity instanceof TimelineEventMapActivity){
+			((TimelineEventMapActivity) parentActivity).renderTimelineEventPositions();
+		} else if (parentFragment instanceof PostListFragment) {
+			((PostListFragment) parentFragment).onNavigate(((PostListFragment) parentFragment).refreshTarget);
+		}
+		
 	}
 
 	public void setImage(Uri fileToUpload) {
